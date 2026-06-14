@@ -1,0 +1,10 @@
+{
+  "capability_id": "summarize_doc",
+  "description": "Legge un file di testo indicato dall'utente e ne restituisce il contenuto (max 8000 caratteri) perche' il runtime lo riassuma. Solo lettura.",
+  "input_schema": {"path": "percorso completo del file da leggere"},
+  "risk_class": "read_sensitive",
+  "origin": "builtin",
+  "state": "active",
+  "needs_llm": true,
+  "timeout": 20
+}

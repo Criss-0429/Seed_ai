@@ -1,0 +1,9 @@
+{
+  "capability_id": "daily_digest",
+  "description": "Riepilogo della giornata osservata (categorie d'uso, tempo). I dati arrivano dal runtime, il tool li formatta.",
+  "input_schema": {"usage_json": "JSON con ore per categoria, fornito dal runtime"},
+  "risk_class": "safe",
+  "origin": "builtin",
+  "state": "active",
+  "timeout": 10
+}

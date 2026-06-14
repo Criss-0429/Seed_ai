@@ -1,0 +1,26 @@
+# Core
+requests>=2.31
+psutil>=5.9
+pywebview>=5.0
+
+# Privacy gate locale (OpenAI Privacy Filter)
+# installare dal repo ufficiale:  pip install git+https://github.com/openai/privacy-filter
+# (il checkpoint si scarica al primo avvio in ~/.opf/privacy_filter)
+
+# Media session Windows (facoltativo, fallback euristico se assente)
+winsdk>=1.0; sys_platform == 'win32'
+
+# M3 retrieval vector stream (opt-in via models.embedding_enabled).
+# Assente = retrieval su lexical+graph (degrada con grazia). Il modello
+# multilingue (~1GB) si scarica al primo uso.
+sentence-transformers>=3.0
+
+# S11.2 emotion (SER wav2vec2 via transformers, opt-in via voice.emotion_enabled,
+# solo pannello voce). Assente = voce senza segnale affettivo. Modello (~1GB) al
+# primo uso. emotion2vec/funasr scartato: dep editdistance senza wheel py3.14.
+transformers>=4.40
+soundfile>=0.12
+librosa>=0.10
+
+# Build
+pyinstaller>=6.0

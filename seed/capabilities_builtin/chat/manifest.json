@@ -1,0 +1,9 @@
+{
+  "capability_id": "chat",
+  "description": "Conversazione base. Non e' un tool invocabile: e' il default del runtime.",
+  "input_schema": {},
+  "risk_class": "safe",
+  "origin": "builtin",
+  "state": "active",
+  "no_tool": true
+}

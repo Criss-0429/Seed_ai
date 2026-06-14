@@ -1,0 +1,9 @@
+{
+  "capability_id": "open_app",
+  "description": "Apre un'applicazione sul PC dell'utente (es. 'apri Spotify'). Richiede consenso la prima volta per ogni app, poi viene ricordato.",
+  "input_schema": {"app": "nome dell'applicazione da aprire, es. 'spotify' o 'excel'"},
+  "risk_class": "execute",
+  "origin": "builtin",
+  "state": "active",
+  "timeout": 20
+}

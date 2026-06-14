@@ -1,0 +1,108 @@
+{
+  "user_alias": "utente",
+  "llm": {
+    "base_url": "",
+    "api_key": "",
+    "model_runtime": "",
+    "model_reflection": "",
+    "max_tokens": 2048,
+    "monthly_budget_warn_usd": 10.0,
+    "_note": "base_url esempi: https://openrouter.ai/api/v1 | https://ai-gateway.vercel.sh/v1 | http://localhost:11434/v1"
+  },
+  "models": {
+    "provider": "",
+    "base_url": "",
+    "api_key": "",
+    "roles": {},
+    "policy": {
+      "fail_closed_roles": ["design_reviewer"],
+      "record_model_per_call": true,
+      "allow_automatic_premium_escalation": false
+    },
+    "_note": "S10 ruoli. roles vuoto = eredita da llm (conversation<-model_runtime, tool_builder<-model_reflection). base_url/api_key vuoti = eredita llm. Esempio Ollama Cloud: base_url https://ollama.com/v1, roles {conversation: gemma4:31b, tool_builder: qwen3-coder-next, design_reviewer: gpt-oss:120b, design_reviewer_fallback: nemotron-3-super}. Key SOLO qui."
+  },
+  "provider_hub": {
+    "required": true,
+    "_note": "P0 tester: chat e onboarding personale bloccati finche almeno un provider BYOK non viene validato."
+  },
+  "voice": {
+    "elevenlabs_api_key": "",
+    "enabled": false,
+    "stt_model": "scribe_v1",
+    "tts_model": "eleven_v3",
+    "tts_fallback_model": "eleven_multilingual_v2",
+    "voice_id_female": "21m00Tcm4TlvDq8ikWAM",
+    "voice_id_male": "pNInz6obpgDQGcFmaJgB",
+    "active_voice": "female",
+    "voice_id": "",
+    "persist_audio": false,
+    "persist_transcript": false,
+    "monthly_char_cap": 100000,
+    "emotion_enabled": false,
+    "emotion_model": "superb/wav2vec2-base-superb-er",
+    "_note": "S11. Key SOLO in core_config. tts eleven_v3 = espressivo (audio tag). emotion = SER per-turno SOLO pannello voce, scarica ~1GB al primo uso."
+  },
+  "privacy": {
+    "opf_checkpoint": "",
+    "recall_bias": true,
+    "fail_closed": true
+  },
+  "watcher": {
+    "enabled": true,
+    "poll_seconds": 5,
+    "process_scan_seconds": 60,
+    "excluded_apps": []
+  },
+  "research": {
+    "enabled": true,
+    "provider": "exa",
+    "exa_api_key": "",
+    "tavily_api_key": "",
+    "fallback": true,
+    "max_results": 5,
+    "timeout_s": 20,
+    "daily_call_cap": 40,
+    "_note": "provider: exa | tavily. Key SOLO qui. Pagine analizzate: quick/basic/deep.",
+    "max_results_quick": 3,
+    "max_results_deep": 10
+  },
+  "evolution": {
+    "enabled": true,
+    "max_mutations_per_night": 2,
+    "trait_cooldown_days": 2,
+    "capability_dormant_days": 4,
+    "capability_prune_days": 7,
+    "lifecycle_enabled": true,
+    "tool_builder_enabled": false,
+    "canary_context": "desktop-session"
+  },
+  "daemon": {
+    "enabled": true,
+    "heartbeat_seconds": 60,
+    "cooldown_seconds": 1800,
+    "min_net_value": 0.0,
+    "_note": "D1. Daemon SOLO in-process: parte con SEED, muore alla chiusura. Nessun servizio OS, auto-start o always-on. Heartbeat reviewable + coda proattivita' persistente con cooldown/suppression/silenzio di default. ZERO azioni agentiche di scrittura."
+  },
+  "worker": {
+    "enabled": true,
+    "allowed_actions": ["worker.runtime_status"],
+    "write_safe_enabled": false,
+    "write_safe_actions": [],
+    "_note": "D2 READ-only worker dietro broker+audit (solo allowlist, in D2 worker.runtime_status). D3 trust gate e isolamento reale. D4 WRITE_SAFE: default OFF; write reversibili allowlistate richiedono approval owner + dry-run + rollback + observation, scrittura solo nel workspace. Delega isolata = D5."
+  },
+  "observation": {
+    "enabled": false,
+    "sensitive_excluded": true,
+    "min_salience": 0.5,
+    "poll_seconds": 15,
+    "_note": "D-OBS. Observation lane READ-only: default OFF + consenso per-classe (foreground_app/browser_tab/process) dalla UI. Sensibile escluso. Produce SOLO candidate-ipotesi redatte a bassa confidenza, mai fatti, mai azioni. Revoca = purge derivati."
+  },
+  "skills": {
+    "enabled": false,
+    "allowed_capabilities": [],
+    "delegation_enabled": false,
+    "isolation_available": false,
+    "isolation_backend": "process",
+    "_note": "D5. Skills procedurali (ricette = sequenze di capability allowlistate) + delega a sub-agenti isolati. Default OFF. Install richiede audit + reviewer + owner gate: nessun self-install. Task graph IR validato (no cicli, capability allowlistate). Delega gated, isolamento reale (worktree/container) = futuro."
+  }
+}

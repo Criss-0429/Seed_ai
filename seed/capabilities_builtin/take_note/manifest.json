@@ -1,0 +1,9 @@
+{
+  "capability_id": "take_note",
+  "description": "Salva o rilegge note locali dell'utente. action='save' con text, action='list' per rileggerle.",
+  "input_schema": {"action": "save | list", "text": "testo della nota (per save)"},
+  "risk_class": "safe",
+  "origin": "builtin",
+  "state": "active",
+  "timeout": 10
+}

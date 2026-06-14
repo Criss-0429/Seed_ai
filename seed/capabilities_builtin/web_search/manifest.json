@@ -1,0 +1,13 @@
+{
+  "capability_id": "web_search",
+  "description": "Cerca sul web (DuckDuckGo HTML, nessuna API key). Richiede consenso network.",
+  "input_schema": {
+    "query": "termini di ricerca"
+  },
+  "risk_class": "network",
+  "origin": "builtin",
+  "state": "dormant",
+  "needs_network": true,
+  "timeout": 30,
+  "_note": "Sostituita dalla S9 Online Research Lane (research.py): citazioni, privacy gate, budget. Riattivabile da Cristian."
+}
