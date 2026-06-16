@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SEED — un'intelligenza che cresce con te</title>
+<meta name="description" content="SEED parte da un seme e si plasma su di te: anticipa ciò che ti serve, rimodella interfaccia e dati sul tuo modo di lavorare. Locale su Windows. Scarica l'installer per i tester.">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="assets/seed-mark.svg" type="image/svg+xml">
+<link rel="alternate icon" href="assets/seed.ico">
+<style>
+/* SEED distribution site — design tokens lifted verbatim from
+   SEED_UI/SEED Prototype.dc.html and seed/ui/surface/index.html so the site
+   and the app share one identity. No remote fonts, no CDN, no frameworks.
+   Inlined into index.html so the page is fully self-contained (works on
+   file://, any preview panel, and GitHub Pages). */
+:root {
+  --paper:     oklch(94% 0.004 85);
+  --app:       oklch(97% 0.005 85);
+  --line:      oklch(88% 0.006 85);
+  --line-soft: oklch(93% 0.005 85);
+  --ink:       oklch(23% 0.008 80);
+  --ink-2:     oklch(28% 0.008 80);
+  --mut:       oklch(62% 0.01 85);
+  --mut-2:     oklch(68% 0.01 85);
+  --bubble:    oklch(92.5% 0.006 85);
+  --sd-hue: 45;
+  --sd-chroma: 0.07;
+  --accent: oklch(62% var(--sd-chroma) var(--sd-hue));
+  --accent-soft: oklch(70% 0.06 var(--sd-hue));
+  --ok:    oklch(60% 0.09 145);
+  --warn:  oklch(68% 0.12 75);
+  --danger: oklch(58% 0.16 28);
+  --sans: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "Cascadia Mono", "Segoe UI Mono", "SF Mono", Consolas, monospace;
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px;
+  --s6: 32px; --s7: 48px; --s8: 64px; --s9: 96px;
+  --maxw: 940px;
+  --radius: 14px;
+  --radius-lg: 22px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; }
+}
+body {
+  margin: 0; background: var(--app); color: var(--ink);
+  font-family: var(--sans); font-size: 17px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+::selection { background: oklch(88% 0.02 85); }
+a { color: var(--ink); text-decoration-color: var(--accent-soft); text-underline-offset: 3px; }
+a:hover { text-decoration-color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+h1, h2, h3 { font-weight: 450; line-height: 1.2; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(34px, 5vw, 52px); }
+h2 { font-size: clamp(24px, 3vw, 32px); }
+h3 { font-size: 18px; }
+p { margin: 0; }
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--s5); }
+.kicker { font-family: var(--mono); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--mut); }
+.mono { font-family: var(--mono); }
+.muted { color: var(--mut); }
+header.site {
+  position: sticky; top: 0; z-index: 20;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  background: oklch(97% 0.005 85 / .82); border-bottom: 1px solid var(--line-soft);
+}
+header.site .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+.brandlock { display: flex; align-items: center; gap: var(--s3); }
+.brandlock img { width: 28px; height: 28px; border-radius: 7px; }
+.brandlock .name { font-family: var(--mono); font-size: 13px; letter-spacing: .26em; }
+.navlinks { display: flex; gap: var(--s5); align-items: center; }
+.navlinks a { font-size: 14px; color: var(--mut); text-decoration: none; }
+.navlinks a:hover { color: var(--ink); }
+@media (max-width: 720px) { .navlinks .hide-sm { display: none; } }
+.btn {
+  display: inline-flex; align-items: center; gap: var(--s2);
+  font-family: var(--sans); font-size: 16px; border-radius: 100px;
+  padding: 13px 22px; min-height: 48px; cursor: pointer; text-decoration: none;
+  border: 1px solid var(--line); background: var(--app); color: var(--ink);
+  transition: background .15s ease, border-color .15s ease, transform .05s ease;
+}
+.btn:hover { background: oklch(95% 0.005 85); }
+.btn:active { transform: translateY(1px); }
+.btn.primary { background: var(--ink); color: var(--app); border-color: var(--ink); }
+.btn.primary:hover { background: oklch(32% 0.01 80); }
+.btn[aria-disabled="true"] { opacity: .55; pointer-events: none; }
+.btn .sz { font-family: var(--mono); font-size: 12px; opacity: .7; }
+.orb { position: relative; display: grid; place-items: center; width: var(--orb, 150px); height: var(--orb, 150px); }
+.orb .ring-out { position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--accent); opacity: .5; box-sizing: border-box; }
+.orb .ring-in { position: absolute; inset: calc(var(--orb, 150px) * 0.22); border-radius: 50%; border: 2px solid var(--ink); opacity: .65; box-sizing: border-box; }
+.orb .seed { width: calc(var(--orb, 150px) * 0.085); height: calc(var(--orb, 150px) * 0.085); min-width: 6px; min-height: 6px; background: var(--ink); border-radius: 50%; }
+@keyframes sd-breathe { 0%,100%{ transform: scale(1); } 50%{ transform: scale(1.045); } }
+@media (prefers-reduced-motion: no-preference) { .orb.breathe { animation: sd-breathe 3.6s ease-in-out infinite; } }
+.hero { padding: var(--s9) 0 var(--s8); }
+.hero .wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: var(--s7); align-items: center; }
+@media (max-width: 820px) { .hero .wrap { grid-template-columns: 1fr; gap: var(--s6); text-align: left; } .hero .orbcol { order: -1; justify-self: start; } }
+.hero h1 { margin: var(--s4) 0 var(--s4); }
+.hero .lede { font-size: 19px; color: var(--ink-2); max-width: 46ch; }
+.hero .actions { display: flex; flex-wrap: wrap; gap: var(--s3); margin-top: var(--s6); }
+.hero .underbtn { margin-top: var(--s3); font-size: 13px; color: var(--mut); }
+.orbcol { display: grid; place-items: center; }
+.orbcol .stato { margin-top: var(--s4); font-family: var(--mono); font-size: 10px; letter-spacing: .26em; color: oklch(66% 0.04 var(--sd-hue)); }
+section { padding: var(--s8) 0; border-top: 1px solid var(--line-soft); }
+/* keep section headings clear of the 60px sticky header when jumped to */
+:target, section[id], #top { scroll-margin-top: 76px; }
+section > .wrap > .kicker { display: block; margin-bottom: var(--s3); }
+.section-lead { max-width: 60ch; color: var(--ink-2); margin-top: var(--s4); }
+.grid { display: grid; gap: var(--s4); margin-top: var(--s6); }
+.grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 760px) { .grid.cols-3, .grid.cols-2 { grid-template-columns: 1fr; } }
+.card { border: 1px solid var(--line); border-radius: var(--radius); padding: var(--s5); background: oklch(96% 0.006 85); }
+.card h3 { margin-bottom: var(--s2); }
+.card p { color: var(--mut); font-size: 15px; }
+.card .num { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; color: var(--accent); display: block; margin-bottom: var(--s3); }
+.stance { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s4); margin-top: var(--s6); }
+@media (max-width: 760px) { .stance { grid-template-columns: 1fr; } }
+.stance .col { border: 1px solid var(--line); border-radius: var(--radius); padding: var(--s5); }
+.stance .col.is { background: oklch(96% 0.012 145 / .4); }
+.stance ul { margin: var(--s3) 0 0; padding: 0; list-style: none; display: grid; gap: var(--s3); }
+.stance li { display: flex; gap: var(--s3); font-size: 15px; line-height: 1.45; }
+.stance li::before { font-family: var(--mono); font-size: 13px; flex-shrink: 0; }
+.stance .is li::before { content: "+"; color: var(--ok); }
+.stance .isnot li::before { content: "\2212"; color: var(--mut-2); }
+.stance .grow li::before { content: "\2192"; color: var(--accent); }
+.stance .col h3 .tag { font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--mut-2); display: block; margin-bottom: var(--s2); }
+.download { background: var(--paper); border-top: 1px solid var(--line); }
+.dlcard { border: 1.5px solid var(--line); border-radius: var(--radius-lg); background: var(--app); padding: var(--s6); box-shadow: 0 24px 60px -34px oklch(40% 0.02 85 / .5); margin-top: var(--s6); }
+.dlhead { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--s4); }
+.dlhead .file { display: flex; align-items: center; gap: var(--s4); }
+.dlhead .file .meta .fn { font-family: var(--mono); font-size: 14px; }
+.dlhead .file .meta .sub { font-size: 13px; color: var(--mut); margin-top: 2px; }
+.relstate { display: inline-flex; align-items: center; gap: var(--s2); font-family: var(--mono); font-size: 11px; letter-spacing: .08em; color: var(--mut); }
+.relstate::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--mut-2); }
+.relstate[data-kind="loading"]::before { background: var(--accent); }
+.relstate[data-kind="ready"]::before { background: var(--ok); }
+.relstate[data-kind="fallback"]::before { background: var(--warn); }
+.relstate[data-kind="error"]::before { background: var(--danger); }
+.dlmeta { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s4); margin-top: var(--s5); }
+@media (max-width: 620px) { .dlmeta { grid-template-columns: 1fr; } }
+.dlmeta .field .lbl { font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--mut-2); }
+.dlmeta .field .val { margin-top: var(--s1); font-size: 15px; }
+.hash { margin-top: var(--s5); border: 1px solid var(--line); border-radius: 10px; background: oklch(95.5% 0.005 85); padding: var(--s4); }
+.hash .lbl { font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--mut-2); }
+.hashrow { display: flex; align-items: center; gap: var(--s3); margin-top: var(--s2); }
+.hashval { font-family: var(--mono); font-size: 13px; word-break: break-all; flex: 1; color: var(--ink-2); }
+.copybtn { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; border: 1px solid var(--line); background: var(--app); border-radius: 8px; padding: 6px 11px; cursor: pointer; min-height: 36px; white-space: nowrap; }
+.copybtn:hover { background: oklch(94% 0.005 85); }
+.callout { border: 1px solid var(--line); border-left: 3px solid var(--warn); border-radius: 0 10px 10px 0; background: oklch(96% 0.02 75 / .35); padding: var(--s5); margin-top: var(--s5); }
+.callout h3 { display: flex; align-items: center; gap: var(--s2); }
+.callout ol { margin: var(--s3) 0 0; padding-left: 1.3em; }
+.callout li { margin: var(--s2) 0; font-size: 15px; }
+.callout code, .codeinline { font-family: var(--mono); font-size: 13px; background: oklch(93% 0.006 85); padding: 1px 6px; border-radius: 5px; }
+pre.code { font-family: var(--mono); font-size: 13px; line-height: 1.5; background: oklch(95% 0.005 85); border: 1px solid var(--line); border-radius: 10px; padding: var(--s4); overflow-x: auto; margin: var(--s3) 0 0; }
+.spec { margin-top: var(--s6); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.spec .row { display: grid; grid-template-columns: 220px 1fr; gap: var(--s4); padding: var(--s4) var(--s5); border-bottom: 1px solid var(--line-soft); }
+.spec .row:last-child { border-bottom: none; }
+.spec .row .k { font-family: var(--mono); font-size: 12px; letter-spacing: .06em; color: var(--mut); }
+.spec .row .v { font-size: 15px; }
+@media (max-width: 620px) { .spec .row { grid-template-columns: 1fr; gap: var(--s1); } }
+.pilotbar { display: inline-flex; align-items: center; gap: var(--s3); border: 1px solid var(--line); border-radius: 100px; padding: 8px 16px; font-size: 14px; background: var(--app); }
+.pilotbar .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+footer.site { border-top: 1px solid var(--line); padding: var(--s7) 0 var(--s8); color: var(--mut); }
+footer.site .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s5); }
+footer.site .cols { display: flex; gap: var(--s7); flex-wrap: wrap; }
+footer.site .col h4 { font-family: var(--mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--mut-2); margin: 0 0 var(--s3); }
+footer.site .col a { display: block; font-size: 14px; color: var(--mut); text-decoration: none; margin: var(--s2) 0; }
+footer.site .col a:hover { color: var(--ink); }
+footer.site .fineprint { font-size: 12px; max-width: 38ch; line-height: 1.5; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+</style>
+<meta property="og:title" content="SEED — un'intelligenza che cresce con te">
+<meta property="og:description" content="Compagno locale per Windows. Memoria sul tuo PC, consenso prima di tutto, mutazioni reversibili.">
+<meta property="og:type" content="website">
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <a class="brandlock" href="#top" aria-label="SEED — home">
+      <img src="assets/seed-mark.svg" alt="" width="28" height="28">
+      <span class="name">SEED</span>
+    </a>
+    <nav class="navlinks" aria-label="Principale">
+      <a class="hide-sm" href="#cose">Cos'è</a>
+      <a class="hide-sm" href="#rapporto">Come cresce</a>
+      <a class="hide-sm" href="#come">Come funziona</a>
+      <a href="#scarica">Scarica</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero" aria-labelledby="h1">
+    <div class="wrap">
+      <div class="copycol">
+        <span class="kicker">Pilot tester · Windows · v0.3</span>
+        <h1 id="h1">Parte da un seme.<br>Diventa ciò che ti serve.</h1>
+        <p class="lede">
+          SEED inizia minimale e si plasma sul tuo modo di lavorare — spesso prima
+          che tu sappia di averne bisogno. Interfaccia, dati, ogni superficie:
+          prendono la forma giusta per te.
+        </p>
+        <div class="actions">
+          <a class="btn primary" id="dl-hero" href="#scarica">
+            Scarica per Windows
+            <span class="sz" id="dl-hero-sz"></span>
+          </a>
+          <a class="btn" href="#come">Come funziona</a>
+        </div>
+        <p class="underbtn">Installer non firmato · porti le tue chiavi · nessun account, nessuna mail.</p>
+      </div>
+      <div class="orbcol">
+        <div class="orb breathe" style="--orb:170px" role="img" aria-label="Il seme di SEED: un nucleo circondato da due anelli di crescita">
+          <span class="ring-out"></span>
+          <span class="ring-in"></span>
+          <span class="seed"></span>
+        </div>
+        <span class="stato">PRESENZA</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- COS'È -->
+  <section id="cose" aria-labelledby="cose-h">
+    <div class="wrap">
+      <span class="kicker">Posizione</span>
+      <h2 id="cose-h">Tre cose, senza giri di parole</h2>
+      <p class="section-lead">
+        SEED è un runtime locale per Windows. Un compagno che conversa ed evolve,
+        ma sotto regole esplicite. Nessun cloud per i tuoi dati, nessun cambiamento
+        alle tue spalle.
+      </p>
+      <div class="grid cols-3">
+        <article class="card">
+          <span class="num">01 — Locale</span>
+          <h3>Sta sul tuo PC</h3>
+          <p>Memoria, tracce, lineage e configurazione restano sotto <code class="codeinline">%LOCALAPPDATA%\SEED</code>. Quello che dici non parte da lì.</p>
+        </article>
+        <article class="card">
+          <span class="num">02 — Consensuale</span>
+          <h3>Chiede prima</h3>
+          <p>Watcher, voce, ricerca e permessi nascono spenti. Li accendi tu. Pausa, revoca e rollback sono sempre a un clic.</p>
+        </article>
+        <article class="card">
+          <span class="num">03 — Reversibile</span>
+          <h3>Cambia, ma puoi tornare indietro</h3>
+          <p>Ogni proposta di cambiamento passa per shadow, canary ed evidenza. L'ultima parola è tua. Mai automatica.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- RAPPORTO -->
+  <section id="rapporto" aria-labelledby="rap-h">
+    <div class="wrap">
+      <span class="kicker">Si plasma su di te</span>
+      <h2 id="rap-h">Più lo usi, più diventa tuo</h2>
+      <p class="section-lead">
+        Il seme è uguale per tutti. Quello che cresce, no. SEED legge i tuoi flussi
+        e le tue frizioni e si rimodella addosso a te — spesso prima che tu sappia
+        di averne bisogno. Due istanze partite uguali finiscono per non somigliarsi.
+      </p>
+      <div class="stance">
+        <div class="col grow">
+          <h3><span class="tag">Anticipa</span>Cosa coglie prima di te</h3>
+          <ul>
+            <li>I flussi che ripeti, prima che li chieda tu</li>
+            <li>Le frizioni dove perdi tempo ogni giorno</li>
+            <li>La capability che ti serve davvero, non quella di moda</li>
+            <li>Quando vale la pena parlare — e quando stare zitto</li>
+          </ul>
+        </div>
+        <div class="col grow">
+          <h3><span class="tag">Rimodella</span>Come prende la tua forma</h3>
+          <ul>
+            <li>Interfaccia e superfici sul tuo modo di leggere</li>
+            <li>Le pagine web ripresentate come le vuoi</li>
+            <li>I dati per rilevanza, non a catalogo uguale per tutti</li>
+            <li>Il suo colore, guadagnato turno dopo turno</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COME FUNZIONA -->
+  <section id="come" aria-labelledby="come-h">
+    <div class="wrap">
+      <span class="kicker">Primo avvio</span>
+      <h2 id="come-h">Dal download alla chat, in quattro mosse</h2>
+      <p class="section-lead">
+        Il primo avvio non è una chat vuota e non è un quiz sulla tua personalità.
+        È una presenza che si presenta e ti chiede il permesso di cominciare.
+      </p>
+      <div class="grid cols-2">
+        <article class="card">
+          <span class="num">01</span>
+          <h3>Installa e avvia</h3>
+          <p>L'installer porta tutto: runtime, supervisor e modelli ML (emotion, embedding, privacy filter). Dopo, niente altri download.</p>
+        </article>
+        <article class="card">
+          <span class="num">02</span>
+          <h3>Metti una chiave</h3>
+          <p>La chat parte quando colleghi un provider tuo: Ollama Cloud (consigliato, c'è il piano free), OpenRouter o Vercel AI Gateway. Le chiavi le cifra DPAPI.</p>
+        </article>
+        <article class="card">
+          <span class="num">03</span>
+          <h3>Vi presentate</h3>
+          <p>Prima il consenso, la privacy e il rollback. Poi SEED ti chiede di raccontarti, ti mostra cosa ha capito e ti lascia correggere.</p>
+        </article>
+        <article class="card">
+          <span class="num">04</span>
+          <h3>14 giorni insieme</h3>
+          <p>Pilot con onboarding al giorno 0 e debrief al giorno 15. Pausa, permessi, spiegazioni e rollback restano sempre sotto mano.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD -->
+  <section id="scarica" class="download" aria-labelledby="dl-h">
+    <div class="wrap">
+      <span class="kicker">Download</span>
+      <h2 id="dl-h">Scaricalo, verifica l'hash, aprilo</h2>
+      <p class="section-lead">
+        Distribuito via GitHub Releases. Il pulsante punta sempre all'ultima
+        release e prende solo l'installer bootstrap — niente altro.
+      </p>
+
+      <div class="dlcard">
+        <div class="dlhead">
+          <div class="file">
+            <div class="orb" style="--orb:48px" aria-hidden="true">
+              <span class="ring-out"></span><span class="ring-in"></span><span class="seed"></span>
+            </div>
+            <div class="meta">
+              <div class="fn">SEED-Bootstrap-Setup-Unsigned.exe</div>
+              <div class="sub">Windows 10 / 11 · 64-bit · installer non firmato</div>
+            </div>
+          </div>
+          <span class="relstate" id="relstate" data-kind="loading" role="status" aria-live="polite">controllo ultima release…</span>
+        </div>
+
+        <div class="actions" style="margin-top:var(--s5)">
+          <a class="btn primary" id="dl-main"
+             href="https://github.com/Criss-0429/Seed_ai/releases/latest/download/SEED-Bootstrap-Setup-Unsigned.exe">
+            Scarica installer
+            <span class="sz" id="dl-main-sz"></span>
+          </a>
+          <a class="btn" id="dl-release" href="https://github.com/Criss-0429/Seed_ai/releases/latest">
+            Tutte le release
+          </a>
+        </div>
+
+        <div class="dlmeta">
+          <div class="field"><div class="lbl">Versione</div><div class="val" id="m-version">—</div></div>
+          <div class="field"><div class="lbl">Pubblicata</div><div class="val" id="m-date">—</div></div>
+          <div class="field"><div class="lbl">Dimensione</div><div class="val" id="m-size">—</div></div>
+        </div>
+
+        <div class="hash" id="hashbox" hidden>
+          <div class="lbl">SHA-256 dell'installer</div>
+          <div class="hashrow">
+            <code class="hashval" id="m-sha">—</code>
+            <button class="copybtn" id="copy-sha" type="button">copia</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SMARTSCREEN -->
+      <div class="callout">
+        <h3>SmartScreen apparirà. È normale.</h3>
+        <p class="muted" style="margin-top:var(--s2)">
+          Il pilot gira <strong>senza certificato di firma</strong>. Windows dirà
+          «PC protetto da Windows» perché l'eseguibile è nuovo, non perché sia
+          pericoloso. E <strong>non tocchiamo i tuoi Trusted Root</strong>: nessun
+          certificato installato.
+        </p>
+        <ol>
+          <li>Prima di aprirlo, verifica lo SHA-256 qui sopra (istruzioni sotto).</li>
+          <li>Esegui <span class="codeinline">SEED-Bootstrap-Setup-Unsigned.exe</span>.</li>
+          <li>Se SmartScreen ti ferma: <strong>Maggiori informazioni</strong> → <strong>Esegui comunque</strong>.</li>
+          <li>Se l'hash non torna o la provenienza non ti convince, fermati e scrivi all'owner.</li>
+        </ol>
+      </div>
+
+      <!-- HASH VERIFY -->
+      <div class="callout" style="border-left-color:var(--accent)">
+        <h3>Verifica l'hash SHA-256</h3>
+        <p class="muted" style="margin-top:var(--s2)">
+          PowerShell, con il percorso del file scaricato. Il valore deve combaciare
+          con lo SHA-256 qui sopra (o con quello in
+          <span class="codeinline">SHA256SUMS.txt</span> nella release). Se non combacia, non aprirlo.
+        </p>
+        <pre class="code">Get-FileHash .\SEED-Bootstrap-Setup-Unsigned.exe -Algorithm SHA256</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRIVACY -->
+  <section id="privacy" aria-labelledby="pr-h">
+    <div class="wrap">
+      <span class="kicker">Privacy e dati locali</span>
+      <h2 id="pr-h">I tuoi dati non vanno da nessuna parte</h2>
+      <div class="grid cols-3">
+        <article class="card">
+          <h3>Tutto in locale</h3>
+          <p>Conversazioni, preferenze e lineage sotto <code class="codeinline">%LOCALAPPDATA%\SEED</code>. Quando disinstalli, decidi tu: tieni o cancella.</p>
+        </article>
+        <article class="card">
+          <h3>Le tue chiavi, il tuo conto</h3>
+          <p>Una chiave per utente, cifrata con DPAPI, con tetto di spesa. Il fallback automatico va solo su Ollama Cloud — mai su un provider a consumo.</p>
+        </article>
+        <article class="card">
+          <h3>Zero invii di nascosto</h3>
+          <p>Niente upload automatici di memoria o tracce. La ricerca online è una lane a parte, spenta di default, con query filtrata dal privacy gate.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- REQUISITI -->
+  <section id="requisiti" aria-labelledby="req-h">
+    <div class="wrap">
+      <span class="kicker">Requisiti</span>
+      <h2 id="req-h">Cosa ti serve</h2>
+      <div class="spec">
+        <div class="row"><div class="k">Sistema</div><div class="v">Windows 10 o 11, 64-bit</div></div>
+        <div class="row"><div class="k">Provider</div><div class="v">Una chiave tra Ollama Cloud, OpenRouter o Vercel AI Gateway</div></div>
+        <div class="row"><div class="k">Rete</div><div class="v">Connessione per le chiamate al provider; i tuoi dati restano locali</div></div>
+        <div class="row"><div class="k">Firma</div><div class="v">Installer non firmato — SmartScreen previsto, nessun certificato installato</div></div>
+        <div class="row"><div class="k">Avvio</div><div class="v">Gli shortcut avviano sempre <span class="codeinline">SEEDSupervisor.exe</span>, mai direttamente <span class="codeinline">SEED.exe</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PILOT -->
+  <section id="pilot" aria-labelledby="pl-h">
+    <div class="wrap">
+      <span class="kicker">Stato</span>
+      <h2 id="pl-h">È un pilot, non un lancio</h2>
+      <p class="section-lead">
+        SEED è in pilot privato. Le fondamenta tengono — privacy gate, supervisor,
+        rollback — le capability sono ancora in movimento. Troverai spigoli: è il
+        punto. Quando ne trovi uno, dillo all'owner.
+      </p>
+      <p style="margin-top:var(--s5)">
+        <span class="pilotbar"><span class="dot"></span> Esperimento di 14 giorni · onboarding giorno 0 · debrief giorno 15</span>
+      </p>
+      <p class="section-lead" style="margin-top:var(--s5)">
+        Le note di rilascio complete e gli asset (runtime, modelli, manifest,
+        <span class="codeinline">SHA256SUMS.txt</span>, guida tester) sono nella
+        <a id="notes-link" href="https://github.com/Criss-0429/Seed_ai/releases/latest">pagina dell'ultima release</a>.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div>
+      <a class="brandlock" href="#top" aria-label="SEED" style="margin-bottom:var(--s4)">
+        <img src="assets/seed-mark.svg" alt="" width="28" height="28">
+        <span class="name">SEED</span>
+      </a>
+      <p class="fineprint">Parte da un seme, si plasma su di te. Pilot distribuito via GitHub Releases.</p>
+    </div>
+    <div class="cols">
+      <div class="col">
+        <h4>Prodotto</h4>
+        <a href="#cose">Cos'è</a>
+        <a href="#rapporto">Come cresce</a>
+        <a href="#come">Come funziona</a>
+        <a href="#privacy">Privacy</a>
+      </div>
+      <div class="col">
+        <h4>Download</h4>
+        <a href="#scarica">Installer Windows</a>
+        <a href="https://github.com/Criss-0429/Seed_ai/releases/latest">Ultima release</a>
+        <a href="https://github.com/Criss-0429/Seed_ai/releases">Tutte le release</a>
+      </div>
+      <div class="col">
+        <h4>Verifica</h4>
+        <a href="#scarica">SHA-256</a>
+        <a href="#requisiti">Requisiti</a>
+        <a href="#pilot">Stato pilot</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* SEED distribution site — release lookup (inlined, self-contained).
+   Fetches the latest GitHub Release, points the download button at the
+   bootstrap installer asset, surfaces version/size/date/SHA-256.
+   Fails gracefully: API down/rate-limited -> static latest/download URL. */
+(function () {
+  "use strict";
+  var OWNER = "Criss-0429", REPO = "Seed_ai";
+  var ASSET = "SEED-Bootstrap-Setup-Unsigned.exe", SUMS = "SHA256SUMS.txt";
+  var API = "https://api.github.com/repos/" + OWNER + "/" + REPO + "/releases/latest";
+  var FALLBACK_DL = "https://github.com/" + OWNER + "/" + REPO + "/releases/latest/download/" + ASSET;
+  var RELEASE_PAGE = "https://github.com/" + OWNER + "/" + REPO + "/releases/latest";
+  var RELEASES_INDEX = "https://github.com/" + OWNER + "/" + REPO + "/releases";
+
+  function $(id) { return document.getElementById(id); }
+  function setState(kind, text) { var el = $("relstate"); if (!el) return; el.setAttribute("data-kind", kind); el.textContent = text; }
+  function humanSize(bytes) {
+    if (!bytes && bytes !== 0) return null;
+    var u = ["B","KB","MB","GB"], i = 0, n = bytes;
+    while (n >= 1024 && i < u.length - 1) { n /= 1024; i++; }
+    return (i === 0 ? n : n.toFixed(1)) + " " + u[i];
+  }
+  function humanDate(iso) {
+    if (!iso) return null;
+    try { return new Date(iso).toLocaleDateString("it-IT", { year:"numeric", month:"long", day:"numeric" }); }
+    catch (e) { return iso.slice(0, 10); }
+  }
+  function setText(id, val) { var el = $(id); if (el) el.textContent = val; }
+  function applyDownloadUrl(url) { var m = $("dl-main"); if (m) m.setAttribute("href", url); var h = $("dl-hero"); if (h) h.setAttribute("href", "#scarica"); }
+  function shaFromSums(text) {
+    if (!text) return null;
+    var lines = text.split(/\r?\n/);
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i].trim();
+      if (!line || line.charAt(0) === "#") continue;
+      var m = line.match(/^([A-Fa-f0-9]{64})[\s*]+(.+)$/);
+      if (m && m[2].replace(/^\*/, "").trim().split(/[\\/]/).pop() === ASSET) return m[1].toLowerCase();
+    }
+    return null;
+  }
+  function showSha(hash) { if (!hash) return; var box = $("hashbox"); if (box) box.hidden = false; setText("m-sha", hash); }
+  function fetchSha(sumsUrl) {
+    if (!sumsUrl) return;
+    fetch(sumsUrl, { headers: { "Accept": "text/plain" } })
+      .then(function (r) { return r.ok ? r.text() : null; })
+      .then(function (t) { showSha(shaFromSums(t)); })
+      .catch(function () {});
+  }
+  function fallback(reason) { applyDownloadUrl(FALLBACK_DL); setState("fallback", reason || "uso link diretto all'ultima release"); }
+
+  // No release published yet: don't point the button at a 404 download URL.
+  function noRelease() {
+    var main = $("dl-main");
+    if (main) {
+      main.setAttribute("href", RELEASES_INDEX);
+      main.setAttribute("aria-disabled", "true");
+      var sz = $("dl-main-sz"); if (sz) sz.textContent = "in arrivo";
+    }
+    if ($("dl-hero")) $("dl-hero").setAttribute("href", "#scarica");
+    if ($("dl-release")) $("dl-release").setAttribute("href", RELEASES_INDEX);
+    if ($("notes-link")) $("notes-link").setAttribute("href", RELEASES_INDEX);
+    setText("m-version", "—"); setText("m-date", "—"); setText("m-size", "—");
+    setState("error", "nessuna release pubblicata ancora — build in arrivo");
+  }
+
+  function init() {
+    applyDownloadUrl(FALLBACK_DL);
+    if ($("dl-release")) $("dl-release").setAttribute("href", RELEASE_PAGE);
+    if ($("notes-link")) $("notes-link").setAttribute("href", RELEASE_PAGE);
+    setState("loading", "controllo ultima release…");
+
+    fetch(API, { headers: { "Accept": "application/vnd.github+json" } })
+      .then(function (r) {
+        if (r.status === 404) { noRelease(); return null; }   // repo has zero releases
+        if (!r.ok) throw new Error("HTTP " + r.status);        // rate limit / server error -> network fallback
+        return r.json();
+      })
+      .then(function (rel) {
+        if (!rel) return;   // handled by noRelease()
+        var assets = (rel && rel.assets) || [], installer = null, sums = null;
+        for (var i = 0; i < assets.length; i++) {
+          var a = assets[i];
+          if (a.name === ASSET) installer = a;   // ONLY the bootstrap installer, never source zips
+          if (a.name === SUMS) sums = a;
+        }
+        setText("m-version", (rel && (rel.tag_name || rel.name)) || "—");
+        setText("m-date", humanDate(rel && rel.published_at) || "—");
+        if (rel && rel.html_url) {
+          if ($("dl-release")) $("dl-release").setAttribute("href", rel.html_url);
+          if ($("notes-link")) $("notes-link").setAttribute("href", rel.html_url);
+        }
+        if (installer) {
+          applyDownloadUrl(installer.browser_download_url);
+          var sz = humanSize(installer.size);
+          setText("m-size", sz || "—");
+          if (sz) { setText("dl-main-sz", sz); setText("dl-hero-sz", sz); }
+          setState("ready", "pronto — ultima release verificata");
+        } else {
+          setText("m-size", "—");
+          fallback("installer non ancora pubblicato in questa release");
+        }
+        fetchSha(sums ? sums.browser_download_url : (RELEASE_PAGE + "/download/" + SUMS));
+      })
+      .catch(function () { fallback("API GitHub non raggiungibile — link diretto attivo"); });
+  }
+
+  // In-page navigation: scroll explicitly so it works in any host
+  // (some embedded preview panels swallow default #anchor jumps).
+  document.addEventListener("click", function (e) {
+    var a = e.target && e.target.closest ? e.target.closest('a[href^="#"]') : null;
+    if (a) {
+      var id = a.getAttribute("href").slice(1);
+      if (id) {
+        var t = document.getElementById(id);
+        if (t) {
+          e.preventDefault();
+          t.scrollIntoView({ behavior: "smooth", block: "start" });
+          if (history.replaceState) history.replaceState(null, "", "#" + id);
+          else location.hash = id;
+        }
+      }
+    }
+  });
+
+  document.addEventListener("click", function (e) {
+    if (e.target && e.target.id === "copy-sha") {
+      var v = $("m-sha"), text = v ? v.textContent.trim() : "";
+      if (!text || text === "—") return;
+      var done = function () { var b = e.target, old = b.textContent; b.textContent = "copiato"; setTimeout(function () { b.textContent = old; }, 1400); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, function () {});
+    }
+  });
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+</script>
+</body>
+</html>

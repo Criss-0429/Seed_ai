@@ -150,8 +150,22 @@ venv.bak/
 # Rope project settings
 .ropeproject
 
-# mkdocs documentation
-/site
+# mkdocs documentation (unused). The SEED distribution site lives in /site and
+# IS tracked — it is the GitHub Pages source. Do not re-ignore it.
+# /site
+
+# Release/installer binaries are published as GitHub Release assets, never
+# committed. Safety net in case one lands in the working tree.
+*.exe
+*.zip
+*.7z
+*.msi
+SHA256SUMS.txt
+release-manifest.json
+# but keep tracked source/site assets that legitimately use these extensions
+!site/**/*.svg
+!assets/seed.ico
+!assets/*.svg
 
 # mypy
 .mypy_cache/

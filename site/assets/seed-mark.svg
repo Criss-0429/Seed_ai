@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">SEED</title>
+  <desc id="desc">Un seme centrale circondato da due anelli di crescita.</desc>
+  <rect width="256" height="256" rx="58" fill="#f7f6f3"/>
+  <circle cx="128" cy="128" r="82" fill="none" stroke="#b07952" stroke-width="10"/>
+  <circle cx="128" cy="128" r="43" fill="none" stroke="#332f2b" stroke-width="9"/>
+  <circle cx="128" cy="128" r="13" fill="#332f2b"/>
+</svg>

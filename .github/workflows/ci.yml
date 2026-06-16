@@ -1,0 +1,94 @@
+name: CI
+
+# Lightweight checks for the distribution site and repo hygiene.
+# Does NOT build the SEED release (ML checkpoints are local-only — see release.yml).
+
+on:
+  push:
+    branches: [main, develop, Website]
+  pull_request:
+    branches: [main, develop, Website]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  site:
+    name: Site & hygiene checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate workflow YAML
+        run: |
+          python3 - <<'PY'
+          import glob, sys, yaml
+          bad = False
+          for f in glob.glob(".github/workflows/*.yml"):
+              try:
+                  yaml.safe_load(open(f, encoding="utf-8"))
+                  print("ok:", f)
+              except Exception as e:
+                  bad = True
+                  print("FAIL:", f, e)
+          sys.exit(1 if bad else 0)
+          PY
+
+      - name: HTML well-formedness (site/)
+        run: |
+          python3 - <<'PY'
+          import glob, sys
+          from html.parser import HTMLParser
+          VOID = {"area","base","br","col","embed","hr","img","input",
+                  "link","meta","param","source","track","wbr"}
+          class P(HTMLParser):
+              def __init__(s): super().__init__(); s.stack=[]; s.errs=[]
+              def handle_starttag(s,t,a):
+                  if t not in VOID: s.stack.append((t, s.getpos()[0]))
+              def handle_endtag(s,t):
+                  if t in VOID: return
+                  if not s.stack or s.stack[-1][0]!=t:
+                      s.errs.append(f"line {s.getpos()[0]}: unexpected </{t}>")
+                  else: s.stack.pop()
+          bad=False
+          for f in glob.glob("site/**/*.html", recursive=True):
+              p=P(); p.feed(open(f,encoding="utf-8").read())
+              if p.stack: p.errs.append("unclosed: "+", ".join(t for t,_ in p.stack))
+              if p.errs:
+                  bad=True; print("FAIL", f); [print("  ",e) for e in p.errs]
+              else: print("ok:", f)
+          sys.exit(1 if bad else 0)
+          PY
+
+      - name: Required site files present
+        run: |
+          set -e
+          for f in site/index.html site/.nojekyll; do
+            test -f "$f" && echo "ok: $f" || { echo "MISSING: $f"; exit 1; }
+          done
+
+      - name: No download links point at a branch
+        run: |
+          # The site must link to GitHub Releases, never to branches/raw files.
+          if grep -REn "blob/(main|develop|Website)|raw\.githubusercontent" site/; then
+            echo "ERROR: site links to a branch/raw file — use Releases."; exit 1
+          fi
+          echo "ok: no branch/raw links"
+
+      - name: No heavy artifacts tracked by Git
+        run: |
+          # Installer binaries, ZIPs and release output must never be committed.
+          matches=$(git ls-files | grep -EI '\.(exe|zip|7z|msi)$|^(build|dist|release)/' || true)
+          if [ -n "$matches" ]; then
+            echo "ERROR: tracked release/binary artifacts:"; echo "$matches"; exit 1
+          fi
+          echo "ok: no heavy artifacts tracked"
+
+      - name: git diff --check (whitespace / conflict markers)
+        run: git diff --check HEAD~1 HEAD || git diff --check $(git hash-object -t tree /dev/null) HEAD
