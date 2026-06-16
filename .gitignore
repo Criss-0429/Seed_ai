@@ -186,3 +186,11 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# Compatibility guard: GitHub Desktop was previously pointed at the nested
+# package repository under /seed. Keep its local governance files from making
+# the full project repository dirty, without ignoring package source code.
+/seed/.gitattributes
+/seed/.gitignore
+/seed/.github/
+/seed/docs/release/
