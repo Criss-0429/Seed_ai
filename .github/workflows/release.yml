@@ -1,0 +1,109 @@
+name: Release
+
+# IMPORTANT — read before relying on this workflow.
+#
+# The full SEED release CANNOT be built on GitHub-hosted runners: the installer
+# bundles local-only ML checkpoints (emotion/wav2vec2, embeddings, privacy
+# filter) that are not available in CI and must not be committed to Git.
+#
+# Therefore the actual build + asset upload is a LOCAL / SELF-HOSTED step:
+#
+#   1. On a Windows machine with the checkpoints present, build the release:
+#        python scripts\build_release.py --version X.Y.Z --schema-version 1
+#        & "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe" /DAppVersion=X.Y.Z `
+#            /DReleaseRoot="$PWD\release\X.Y.Z" installer\SEED.iss
+#        python scripts\build_release.py --version X.Y.Z --finalize-installer
+#   2. Upload assets to the tag's GitHub Release (manual, or self-hosted runner):
+#        gh release upload vX.Y.Z `
+#            release\X.Y.Z\SEED-Bootstrap-Setup-Unsigned.exe `
+#            release\X.Y.Z\SEED-runtime-X.Y.Z.zip `
+#            release\X.Y.Z\release-manifest.json `
+#            release\X.Y.Z\SHA256SUMS.txt `
+#            installer\TESTER_GUIDE.md
+#
+# This hosted workflow only PREPARES the release shell (a draft) and validates
+# the tag. It never builds or fabricates installer binaries.
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to prepare a draft release for (e.g. v0.3.0-pilot)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  prepare-draft:
+    name: Prepare draft GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve tag
+        id: tag
+        run: |
+          TAG="${{ github.event.inputs.tag }}"
+          [ -z "$TAG" ] && TAG="${GITHUB_REF_NAME}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Preparing draft release for: $TAG"
+
+      - name: Validate tag exists and points to main history
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin main
+          git fetch origin "refs/tags/$TAG:refs/tags/$TAG"
+          TAG_SHA="$(git rev-list -n 1 "$TAG")"
+          MAIN_SHA="$(git rev-parse origin/main)"
+          echo "tag sha:  $TAG_SHA"
+          echo "main sha: $MAIN_SHA"
+          git merge-base --is-ancestor "$TAG_SHA" origin/main || {
+            echo "ERROR: $TAG does not point to a commit reachable from origin/main."
+            exit 1
+          }
+
+      - name: Create or update DRAFT release (no assets)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          NOTES=$(cat <<EOF
+          SEED $TAG — pilot tester build.
+
+          **Installer non firmato.** Windows SmartScreen può apparire: è previsto.
+          Verifica l'hash con \`Get-FileHash\` prima di eseguire.
+
+          ### Asset attesi (caricati localmente / da runner self-hosted)
+          - SEED-Bootstrap-Setup-Unsigned.exe
+          - SEED-runtime-$TAG.zip
+          - SEED-models-*-$TAG.zip
+          - release-manifest.json
+          - SHA256SUMS.txt
+          - TESTER_GUIDE.md
+
+          > Questa draft è stata creata dalla CI. Gli asset NON vengono costruiti
+          > su runner GitHub: aggiungili dalla macchina di build, poi pubblica.
+          EOF
+          )
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG exists — leaving as-is (assets managed locally)."
+          else
+            gh release create "$TAG" \
+              --draft \
+              --title "SEED $TAG" \
+              --notes "$NOTES"
+            echo "Draft release $TAG created. Upload assets locally, then publish."
+          fi
+
+      - name: Reminder — assets are uploaded out-of-band
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          echo "::notice::Draft prepared. Build on a machine with ML checkpoints,"
+          echo "::notice::then 'gh release upload $TAG ...' and publish the release."

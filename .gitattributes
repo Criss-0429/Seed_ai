@@ -1,2 +1,15 @@
-# Auto detect text files and perform LF normalization
+# Normalize text files across Windows and GitHub runners.
 * text=auto
+
+# Release/build outputs must not be committed, but keep binary detection sane
+# when inspecting local artifacts.
+*.exe binary
+*.dll binary
+*.pyd binary
+*.zip binary
+*.7z binary
+*.ico binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
