@@ -201,6 +201,9 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
+# Local assistant/editor launch state.
+.claude/
+
 # Compatibility guard: GitHub Desktop was previously pointed at the nested
 # package repository under /seed. Keep its local governance files from making
 # the full project repository dirty, without ignoring package source code.

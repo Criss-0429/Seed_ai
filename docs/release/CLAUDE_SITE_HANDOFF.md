@@ -2,7 +2,7 @@
 
 ## Current State
 
-- Repository: `Criss-0429/Seed`
+- Repository: `Criss-0429/Seed_ai`
 - Working branch prepared by Codex: `codex/site-release-handoff`
 - GitHub rulesets have already been configured manually by Cristian.
 - Local ruleset templates are stored in `.github/rulesets/`.
@@ -24,13 +24,13 @@ The site must not link to branches or raw files. It must link to GitHub Releases
 Preferred stable download URL:
 
 ```text
-https://github.com/Criss-0429/Seed/releases/latest/download/SEED-Bootstrap-Setup-Unsigned.exe
+https://github.com/Criss-0429/Seed_ai/releases/latest/download/SEED-Bootstrap-Setup-Unsigned.exe
 ```
 
 Robust API option:
 
 ```text
-https://api.github.com/repos/Criss-0429/Seed/releases/latest
+https://api.github.com/repos/Criss-0429/Seed_ai/releases/latest
 ```
 
 Required release assets for the bootstrap strategy:

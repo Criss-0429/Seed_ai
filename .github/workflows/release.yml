@@ -52,6 +52,22 @@ jobs:
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "Preparing draft release for: $TAG"
 
+      - name: Validate tag exists and points to main history
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin main
+          git fetch origin "refs/tags/$TAG:refs/tags/$TAG"
+          TAG_SHA="$(git rev-list -n 1 "$TAG")"
+          MAIN_SHA="$(git rev-parse origin/main)"
+          echo "tag sha:  $TAG_SHA"
+          echo "main sha: $MAIN_SHA"
+          git merge-base --is-ancestor "$TAG_SHA" origin/main || {
+            echo "ERROR: $TAG does not point to a commit reachable from origin/main."
+            exit 1
+          }
+
       - name: Create or update DRAFT release (no assets)
         env:
           GH_TOKEN: ${{ github.token }}
@@ -86,6 +102,8 @@ jobs:
           fi
 
       - name: Reminder — assets are uploaded out-of-band
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
         run: |
           echo "::notice::Draft prepared. Build on a machine with ML checkpoints,"
           echo "::notice::then 'gh release upload $TAG ...' and publish the release."
