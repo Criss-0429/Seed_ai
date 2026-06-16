@@ -1,0 +1,4 @@
+# Runtime/build dependencies only. No test, lint, docs, or repository-analysis
+# tooling. Windows PyPI torch wheel is CPU-only.
+-r requirements.txt
+git+https://github.com/openai/privacy-filter

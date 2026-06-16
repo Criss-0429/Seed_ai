@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&amp;family=Patrick+Hand&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #f4f1ea; }
+  </style>
+</helmet>
+
+<div style="min-height: 100vh; background: #f4f1ea; padding: 36px 28px 80px; box-sizing: border-box; color: #2b2b2b;">
+  <div style="max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+
+    <!-- Header -->
+    <header style="display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-family: 'Courier New', monospace; font-size: 12px; letter-spacing: 2px; color: #97907f;">SEED · ESPLORAZIONE WIREFRAME · LOW-FI</div>
+      <h1 style="margin: 0; font-family: Caveat, cursive; font-weight: 700; font-size: 44px; line-height: 1;">Quattro modi di stare con una presenza</h1>
+      <p style="margin: 0; max-width: 760px; font-family: Caveat, cursive; font-size: 21px; color: #5a554a; line-height: 1.3;">Solo struttura e flusso, niente estetica finale. La superficie primaria resta conversazionale e minimale; tutto il resto emerge con una scorciatoia e si ritira.</p>
+    </header>
+
+    <!-- Tabs -->
+    <nav style="display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 1.6px solid #2b2b2b; padding-bottom: 10px;">
+      <sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="7">
+        <button onClick="{{ tab.onClick }}" style="background: {{ tab.bg }}; color: {{ tab.color }}; border: 1.5px solid #2b2b2b; border-radius: 200px 14px 180px 12px / 12px 160px 14px 200px; padding: 7px 16px; font-family: Caveat, cursive; font-size: 19px; font-weight: 600; cursor: pointer;">{{ tab.label }}</button>
+      </sc-for>
+    </nav>
+
+    <!-- ============ VARIANTE A — PRESENZA PURA ============ -->
+    <sc-if value="{{ showA }}" hint-placeholder-val="{{ true }}">
+      <section data-screen-label="Variante A — Presenza pura" style="display: flex; flex-direction: column; gap: 20px;">
+        <p style="margin: 0; max-width: 820px; font-family: Caveat, cursive; font-size: 22px; line-height: 1.3; color: #3a372f;"><b>A — Presenza pura.</b> La conversazione è un luogo, non un log. Lo schermo resta quasi vuoto: la presenza al centro, il testo è effimero e svanisce dopo la lettura. Scrivere in qualsiasi momento evoca la barra.</p>
+        <div style="display: flex; gap: 28px; align-items: flex-start; flex-wrap: wrap;">
+          <!-- Frame -->
+          <div style="position: relative; width: 880px; max-width: 100%; background: #fffdf9; border: 1.6px solid #2b2b2b; border-radius: 14px 16px 15px 17px; box-shadow: 4px 5px 0 rgba(43,43,43,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; border-bottom: 1.4px dashed #c9c2b6;">
+              <span style="font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 1.5px; color: #97907f;">SEED</span>
+              <span style="font-family: 'Courier New', monospace; font-size: 12px; color: #97907f; letter-spacing: 4px;">─ □ ✕</span>
+            </div>
+            <div style="position: relative; height: 520px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px;">
+              <div style="font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 3px; color: #97907f;">· ASCOLTO ·</div>
+              <!-- Orb: punto + anelli -->
+              <div style="position: relative; width: 132px; height: 132px; display: grid; place-items: center;">
+                <div style="position: absolute; inset: 0; border: 1.5px solid #2b2b2b; border-radius: 49% 51% 50% 50% / 51% 49% 51% 49%; opacity: 0.35;"></div>
+                <div style="position: absolute; inset: 24px; border: 1.5px solid #2b2b2b; border-radius: 51% 49% 50% 50% / 49% 51% 49% 51%; opacity: 0.65;"></div>
+                <div style="width: 11px; height: 11px; background: #2b2b2b; border-radius: 50%;"></div>
+                <div style="position: absolute; top: -8px; right: -10px; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f; background: #fffdf9;">1</div>
+              </div>
+              <!-- Testo effimero -->
+              <div style="position: relative; display: flex; flex-direction: column; gap: 8px; align-items: center; max-width: 460px;">
+                <div style="font-family: 'Patrick Hand', cursive; font-size: 16px; color: #97907f; align-self: flex-end; font-style: italic;">com'era la mia giornata di ieri?</div>
+                <div style="font-family: 'Patrick Hand', cursive; font-size: 18px; color: #3a372f; text-align: center; line-height: 1.35;">Ieri hai lavorato a lungo sul capitolo 3, fino a tardi. Vuoi che riprenda da dove ti sei fermato?</div>
+                <div style="position: absolute; left: -36px; top: 8px; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f; background: #fffdf9;">2</div>
+              </div>
+              <!-- Barra evocata -->
+              <div style="position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); width: 480px; display: flex; align-items: center; gap: 12px; border: 1.5px dashed #97907f; border-radius: 200px 16px 180px 14px / 14px 180px 16px 200px; padding: 11px 18px;">
+                <span style="flex: 1; font-family: 'Patrick Hand', cursive; font-size: 15px; color: #97907f;">scrivi, o tieni premuto spazio per parlare…</span>
+                <span style="font-family: 'Courier New', monospace; font-size: 13px; color: #97907f; letter-spacing: 2px;">✎ | ◉</span>
+                <div style="position: absolute; top: -11px; right: -11px; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f; background: #fffdf9;">3</div>
+              </div>
+              <!-- Angolo vuoto -->
+              <div style="position: absolute; top: 18px; right: 22px; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f; background: #fffdf9;">4</div>
+            </div>
+          </div>
+          <!-- Note -->
+          <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 16px; padding-top: 8px;">
+            <div style="display: flex; gap: 10px; align-items: flex-start;"><div style="flex-shrink: 0; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f;">1</div><div style="font-family: Caveat, cursive; font-size: 19px; line-height: 1.25; color: #3a372f;">La presenza: punto + anelli. Pulsa quando parla, gli anelli ruotano lenti quando ragiona, respirano in ascolto.</div></div>
+            <div style="display: flex; gap: 10px; align-items: flex-start;"><div style="flex-shrink: 0; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f;">2</div><div style="font-family: Caveat, cursive; font-size: 19px; line-height: 1.25; color: #3a372f;">Testo effimero: le battute restano qualche secondo e svaniscono. Niente cronologia a vista — la chiedi a voce («cosa ci siamo detti ieri?»).</div></div>
+            <div style="display: flex; gap: 10px; align-items: flex-start;"><div style="flex-shrink: 0; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f;">3</div><div style="font-family: Caveat, cursive; font-size: 19px; line-height: 1.25; color: #3a372f;">La barra non esiste finché non scrivi: qualsiasi tasto la evoca, Esc la dissolve. A destra il toggle testo/voce.</div></div>
+            <div style="display: flex; gap: 10px; align-items: flex-start;"><div style="flex-shrink: 0; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f;">4</div><div style="font-family: Caveat, cursive; font-size: 19px; line-height: 1.25; color: #3a372f;">Nessun menu, nessuna icona. Le superfici secondarie emergono con <span style="font-family: 'Courier New', monospace; font-size: 14px;">Ctrl + .</span></div></div>
+            <div style="border-top: 1.4px dashed #c9c2b6; padding-top: 12px; font-family: Caveat, cursive; font-size: 17px; color: #97907f; line-height: 1.3;">Rischio: senza log visibile serve molta fiducia nella memoria. Adatta a chi usa soprattutto la voce.</div>
+          </div>
+        </div>
+        <!-- Strip voce/testo -->
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-end;">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="width: 280px; height: 170px; background: #fffdf9; border: 1.5px solid #2b2b2b; border-radius: 12px 14px 13px 15px; position: relative; display: grid; place-items: center;">
+              <div style="position: relative; width: 84px; height: 84px; display: grid; place-items: center;">
+                <div style="position: absolute; inset: 0; border: 1.4px solid #2b2b2b; border-radius: 50%; opacity: 0.35;"></div>
+                <div style="position: absolute; inset: 15px; border: 1.4px solid #2b2b2b; border-radius: 50%; opacity: 0.65;"></div>
+                <div style="width: 9px; height: 9px; background: #2b2b2b; border-radius: 50%;"></div>
+              </div>
+              <div style="position: absolute; bottom: 12px; left: 0; right: 0; text-align: center; font-family: 'Patrick Hand', cursive; font-size: 13px; color: #97907f;">«certo, te lo segno per domani»</div>
+            </div>
+            <div style="font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 1.5px; color: #97907f;">MODALITÀ VOCE — presenza grande + trascrizione live</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="width: 280px; height: 170px; background: #fffdf9; border: 1.5px solid #2b2b2b; border-radius: 14px 12px 15px 13px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 14px; box-sizing: border-box;">
+              <div style="position: relative; width: 34px; height: 34px; display: grid; place-items: center;">
+                <div style="position: absolute; inset: 0; border: 1.3px solid #2b2b2b; border-radius: 50%; opacity: 0.5;"></div>
+                <div style="width: 6px; height: 6px; background: #2b2b2b; border-radius: 50%;"></div>
+              </div>
+              <div style="font-family: 'Patrick Hand', cursive; font-size: 13px; color: #3a372f; text-align: center;">il testo resta finché scrivi</div>
+              <div style="width: 100%; border: 1.4px solid #2b2b2b; border-radius: 100px; padding: 7px 12px; box-sizing: border-box; font-family: 'Patrick Hand', cursive; font-size: 13px; color: #97907f;">scrivi a SEED…</div>
+            </div>
+            <div style="font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 1.5px; color: #97907f;">MODALITÀ TESTO — orb si ritira, barra stabile</div>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <!-- ============ VARIANTE B — COLONNA ============ -->
+    <sc-if value="{{ showB }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Variante B — Colonna di conversazione" style="display: flex; flex-direction: column; gap: 20px;">
+        <p style="margin: 0; max-width: 820px; font-family: Caveat, cursive; font-size: 22px; line-height: 1.3; color: #3a372f;"><b>B — Colonna di conversazione.</b> La struttura più familiare, ridotta all'osso: una colonna centrale. SEED non ha avatar né bolla — parla «dalla pagina», firmato dal glifo ad anello. Moderno e bilanciato, senza identità imposta.</p>
+        <div style="display: flex; gap: 28px; align-items: flex-start; flex-wrap: wrap;">
+          <div style="position: relative; width: 880px; max-width: 100%; background: #fffdf9; border: 1.6px solid #2b2b2b; border-radius: 16px 14px 17px 15px; box-shadow: 4px 5px 0 rgba(43,43,43,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; border-bottom: 1.4px dashed #c9c2b6;">
+              <span style="font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 1.5px; color: #97907f;">SEED</span>
+              <span style="font-family: 'Courier New', monospace; font-size: 12px; color: #97907f; letter-spacing: 4px;">─ □ ✕</span>
+            </div>
+            <div style="height: 520px; display: flex; flex-direction: column; align-items: center; padding: 18px 0; box-sizing: border-box;">
+              <!-- sigillo -->
+              <div style="position: relative; width: 38px; height: 38px; display: grid; place-items: center; margin-bottom: 14px;">
+                <div style="position: absolute; inset: 0; border: 1.4px solid #2b2b2b; border-radius: 50%; opacity: 0.45;"></div>
+                <div style="width: 7px; height: 7px; background: #2b2b2b; border-radius: 50%;"></div>
+                <div style="position: absolute; top: -10px; right: -12px; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f; background: #fffdf9;">1</div>
+              </div>
+              <!-- colonna messaggi -->
+              <div style="position: relative; width: 540px; flex: 1; display: flex; flex-direction: column; gap: 16px; overflow: hidden;">
+                <div style="align-self: flex-end; max-width: 360px; background: #efeae0; border-radius: 16px 16px 4px 16px; padding: 10px 14px; font-family: 'Patrick Hand', cursive; font-size: 16px; line-height: 1.3; color: #3a372f;">Domani devo presentare la tesi al relatore, sono in ritardo sul capitolo 3.
+                  <div style="position: absolute; right: -30px; margin-top: -34px; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f; background: #fffdf9;">3</div>
+                </div>
+                <div style="position: relative; display: flex; gap: 10px; align-items: flex-start; max-width: 420px;">
+                  <div style="flex-shrink: 0; margin-top: 5px; width: 14px; height: 14px; border: 1.3px solid #2b2b2b; border-radius: 50%; display: grid; place-items: center;"><div style="width: 3px; height: 3px; background: #2b2b2b; border-radius: 50%;"></div></div>
+                  <div style="font-family: 'Patrick Hand', cursive; font-size: 16px; line-height: 1.35; color: #2b2b2b;">In ritardo rispetto al piano che mi avevi raccontato, o rispetto a una scadenza nuova? Se è il piano, ieri eri più avanti di quanto pensi.
+                    <div style="margin-top: 4px; font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 1px; color: #c9c2b6;">14:02 · perché lo dico? →</div>
+                  </div>
+                  <div style="position: absolute; left: -34px; top: 0; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f; background: #fffdf9;">2</div>
+                </div>
+                <div style="align-self: flex-end; max-width: 360px; background: #efeae0; border-radius: 16px 16px 4px 16px; padding: 10px 14px; font-family: 'Patrick Hand', cursive; font-size: 16px; line-height: 1.3; color: #3a372f;">Hai ragione, è l'ansia. Rileggiamo insieme l'indice?</div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                  <div style="flex-shrink: 0; width: 14px; height: 14px; border: 1.3px solid #2b2b2b; border-radius: 50%; display: grid; place-items: center;"><div style="width: 3px; height: 3px; background: #2b2b2b; border-radius: 50%;"></div></div>
+                  <div style="font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 2px; color: #97907f;">STO PENSANDO ···</div>
+                </div>
+              </div>
+              <!-- input -->
+              <div style="position: relative; width: 540px; display: flex; align-items: center; gap: 12px; border: 1.5px solid #2b2b2b; border-radius: 200px 18px 190px 16px / 16px 190px 18px 200px; padding: 11px 18px; box-sizing: border-box; margin-top: 14px;">
+                <span style="flex: 1; font-family: 'Patrick Hand', cursive; font-size: 15px; color: #97907f;">scrivi a SEED…</span>
+                <span style="font-family: 'Courier New', monospace; font-size: 14px; color: #2b2b2b; letter-spacing: 3px;">◉ ↑</span>
+                <div style="position: absolute; top: -11px; right: -11px; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f; background: #fffdf9;">4</div>
+              </div>
+            </div>
+          </div>
+          <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 16px; padding-top: 8px;">
+            <div style="display: flex; gap: 10px; align-items: flex-start;"><div style="flex-shrink: 0; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f;">1</div><div style="font-family: Caveat, cursive; font-size: 19px; line-height: 1.25; color: #3a372f;">La presenza ridotta a sigillo. Toccandola (o col toggle) si espande a tutto schermo per la modalità voce.</div></div>
+            <div style="display: flex; gap: 10px; align-items: flex-start;"><div style="flex-shrink: 0; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f;">2</div><div style="font-family: Caveat, cursive; font-size: 19px; line-height: 1.25; color: #3a372f;">SEED senza bolla: testo libero firmato dal glifo. Nota il dissenso calibrato («eri più avanti di quanto pensi») e il link «perché lo dico?» — trasparenza interrogabile.</div></div>
+            <div style="display: flex; gap: 10px; align-items: flex-start;"><div style="flex-shrink: 0; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f;">3</div><div style="font-family: Caveat, cursive; font-size: 19px; line-height: 1.25; color: #3a372f;">Le tue battute in bolla leggera a destra. Niente avatar, niente nomi.</div></div>
+            <div style="display: flex; gap: 10px; align-items: flex-start;"><div style="flex-shrink: 0; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f;">4</div><div style="font-family: Caveat, cursive; font-size: 19px; line-height: 1.25; color: #3a372f;">Il microfono nella barra commuta l'intera superficie in voce: la colonna sfuma, l'orb cresce al centro.</div></div>
+            <div style="border-top: 1.4px dashed #c9c2b6; padding-top: 12px; font-family: Caveat, cursive; font-size: 17px; color: #97907f; line-height: 1.3;">La più sicura: pattern noto, cronologia leggibile. È la base che «matura» meglio con piccole mutazioni di layout.</div>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <!-- ============ VARIANTE C — SCENA DIVISA ============ -->
+    <sc-if value="{{ showC }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Variante C — Scena divisa" style="display: flex; flex-direction: column; gap: 20px;">
+        <p style="margin: 0; max-width: 820px; font-family: Caveat, cursive; font-size: 22px; line-height: 1.3; color: #3a372f;"><b>C — Scena divisa.</b> Presenza e dialogo convivono: a sinistra lo stato vivo di SEED (risveglio → ascolto → pensiero → azione → ritorno), a destra la conversazione. Per chi vuole vedere il sistema mentre lavora.</p>
+        <div style="display: flex; gap: 28px; align-items: flex-start; flex-wrap: wrap;">
+          <div style="position: relative; width: 880px; max-width: 100%; background: #fffdf9; border: 1.6px solid #2b2b2b; border-radius: 15px 17px 14px 16px; box-shadow: 4px 5px 0 rgba(43,43,43,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; border-bottom: 1.4px dashed #c9c2b6;">
+              <span style="font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 1.5px; color: #97907f;">SEED</span>
+              <span style="font-family: 'Courier New', monospace; font-size: 12px; color: #97907f; letter-spacing: 4px;">─ □ ✕</span>
+            </div>
+            <div style="height: 520px; display: grid; grid-template-columns: 290px 1fr;">
+              <!-- pannello presenza -->
+              <div style="position: relative; background: #f1ede4; border-right: 1.4px dashed #c9c2b6; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;">
+                <div style="position: relative; width: 110px; height: 110px; display: grid; place-items: center;">
+                  <div style="position: absolute; inset: 0; border: 1.5px solid #2b2b2b; border-radius: 50% 50% 49% 51% / 51% 49% 50% 50%; opacity: 0.35;"></div>
+                  <div style="position: absolute; inset: 20px; border: 1.5px solid #2b2b2b; border-radius: 49% 51% 50% 50% / 50% 50% 51% 49%; opacity: 0.65;"></div>
+                  <div style="width: 10px; height: 10px; background: #2b2b2b; border-radius: 50%;"></div>
+                </div>
+                <div style="position: relative; display: flex; flex-direction: column; gap: 7px; font-family: 'Courier New', monospace; font-size: 12px; letter-spacing: 2px;">
+                  <div style="color: #c9c2b6;">RISVEGLIO</div>
+                  <div style="color: #c9c2b6;">ASCOLTO</div>
+                  <div style="color: #c4683f;">▸ PENSIERO</div>
+                  <div style="color: #c9c2b6;">AZIONE</div>
+                  <div style="color: #c9c2b6;">RITORNO</div>
+                  <div style="position: absolute; left: -36px; top: 50px; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f; background: #f1ede4;">1</div>
+                </div>
+                <div style="position: relative; font-family: 'Patrick Hand', cursive; font-size: 14px; color: #97907f; border-bottom: 1.3px dashed #97907f; padding-bottom: 1px;">perché? →
+                  <div style="position: absolute; right: -32px; top: -4px; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f; background: #f1ede4;">2</div>
+                </div>
+              </div>
+              <!-- conversazione -->
+              <div style="position: relative; display: flex; flex-direction: column; padding: 20px 26px; box-sizing: border-box;">
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 14px; overflow: hidden;">
+                  <div style="align-self: flex-end; max-width: 330px; background: #efeae0; border-radius: 16px 16px 4px 16px; padding: 9px 13px; font-family: 'Patrick Hand', cursive; font-size: 15px; line-height: 1.3; color: #3a372f;">Riordina le note della riunione di stamattina in un riassunto.</div>
+                  <div style="display: flex; gap: 9px; align-items: flex-start; max-width: 400px;">
+                    <div style="flex-shrink: 0; margin-top: 4px; width: 13px; height: 13px; border: 1.3px solid #2b2b2b; border-radius: 50%; display: grid; place-items: center;"><div style="width: 3px; height: 3px; background: #2b2b2b; border-radius: 50%;"></div></div>
+                    <div style="font-family: 'Patrick Hand', cursive; font-size: 15px; line-height: 1.35; color: #2b2b2b;">Ricevuto. Sto leggendo le note — sono 3 file. Ti aggiorno qui mentre lavoro.</div>
+                  </div>
+                  <div style="margin-left: 22px; border: 1.4px dashed #c9c2b6; border-radius: 10px 12px 11px 13px; padding: 10px 14px; max-width: 360px; font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 1px; color: #97907f; line-height: 1.6;">⟳ lettura note_0611.md ✓<br>⟳ estrazione decisioni… in corso<br>⟳ bozza riassunto… in attesa
+                    <div style="position: absolute; right: 120px; margin-top: -50px; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f; background: #fffdf9;">3</div>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; border: 1.5px solid #2b2b2b; border-radius: 200px 18px 190px 16px / 16px 190px 18px 200px; padding: 10px 16px;">
+                  <span style="flex: 1; font-family: 'Patrick Hand', cursive; font-size: 15px; color: #97907f;">scrivi a SEED…</span>
+                  <span style="font-family: 'Courier New', monospace; font-size: 14px; color: #2b2b2b; letter-spacing: 3px;">◉ ↑</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 16px; padding-top: 8px;">
+            <div style="display: flex; gap: 10px; align-items: flex-start;"><div style="flex-shrink: 0; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f;">1</div><div style="font-family: Caveat, cursive; font-size: 19px; line-height: 1.25; color: #3a372f;">Lo stato è sempre dichiarato: sai in quale fase è SEED, come da doc (risveglio, ascolto, pensiero, azione, ritorno).</div></div>
+            <div style="display: flex; gap: 10px; align-items: flex-start;"><div style="flex-shrink: 0; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f;">2</div><div style="font-family: Caveat, cursive; font-size: 19px; line-height: 1.25; color: #3a372f;">«perché?» apre la motivazione dell'azione corrente — la trasparenza interrogabile è a un tocco, sempre.</div></div>
+            <div style="display: flex; gap: 10px; align-items: flex-start;"><div style="flex-shrink: 0; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f;">3</div><div style="font-family: Caveat, cursive; font-size: 19px; line-height: 1.25; color: #3a372f;">Ack immediato + aggiornamenti durante il lavoro + risultato finale, dentro il filo della conversazione.</div></div>
+            <div style="border-top: 1.4px dashed #c9c2b6; padding-top: 12px; font-family: Caveat, cursive; font-size: 17px; color: #97907f; line-height: 1.3;">In voce, la colonna destra si svuota e mostra solo la trascrizione corrente. Rischio: il pannello fisso «affolla» la relazione — contro lo spirito minimale.</div>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <!-- ============ VARIANTE D — OVERLAY-FIRST ============ -->
+    <sc-if value="{{ showD }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Variante D — Overlay-first" style="display: flex; flex-direction: column; gap: 20px;">
+        <p style="margin: 0; max-width: 820px; font-family: Caveat, cursive; font-size: 22px; line-height: 1.3; color: #3a372f;"><b>D — Overlay-first.</b> Nessuna finestra da aprire: SEED vive sopra Windows. Una scorciatoia evoca una barra leggera che cresce quanto serve la conversazione, poi si ritira. Come Spotlight / Dynamic Island, ma con una presenza.</p>
+        <div style="display: flex; gap: 28px; align-items: flex-start; flex-wrap: wrap;">
+          <div style="position: relative; width: 880px; max-width: 100%; height: 540px; border: 1.6px solid #2b2b2b; border-radius: 14px 16px 15px 17px; box-shadow: 4px 5px 0 rgba(43,43,43,0.1); background: repeating-linear-gradient(45deg, #f3f0e9, #f3f0e9 10px, #edeae2 10px, #edeae2 20px); overflow: hidden;">
+            <div style="position: absolute; top: 14px; left: 18px; font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 2px; color: #b3ac9d;">DESKTOP DELL'UTENTE</div>
+            <!-- overlay -->
+            <div style="position: absolute; top: 90px; left: 50%; transform: translateX(-50%); width: 520px; display: flex; flex-direction: column; gap: 10px;">
+              <div style="position: relative; display: flex; align-items: center; gap: 14px; background: #fffdf9; border: 1.6px solid #2b2b2b; border-radius: 200px 20px 190px 18px / 18px 190px 20px 200px; padding: 12px 20px; box-shadow: 3px 4px 0 rgba(43,43,43,0.12);">
+                <div style="position: relative; flex-shrink: 0; width: 26px; height: 26px; display: grid; place-items: center;">
+                  <div style="position: absolute; inset: 0; border: 1.4px solid #2b2b2b; border-radius: 50%; opacity: 0.5;"></div>
+                  <div style="width: 6px; height: 6px; background: #2b2b2b; border-radius: 50%;"></div>
+                </div>
+                <span style="flex: 1; font-family: 'Patrick Hand', cursive; font-size: 16px; color: #97907f;">chiedi, o parla…</span>
+                <span style="font-family: 'Courier New', monospace; font-size: 11px; color: #c9c2b6; letter-spacing: 1px;">Ctrl+Spazio</span>
+                <div style="position: absolute; top: -12px; left: -12px; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f; background: #fffdf9;">1</div>
+                <div style="position: absolute; top: -12px; left: 34px; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f; background: #fffdf9;">2</div>
+              </div>
+              <div style="position: relative; background: #fffdf9; border: 1.5px dashed #97907f; border-radius: 14px 16px 15px 17px; padding: 16px 20px; display: flex; flex-direction: column; gap: 10px;">
+                <div style="font-family: 'Patrick Hand', cursive; font-size: 15px; line-height: 1.35; color: #2b2b2b;">Il PDF che stai guardando cita lo studio di cui parlavamo lunedì. Vuoi i tre punti in comune?</div>
+                <div style="display: flex; gap: 14px; font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 1px; color: #97907f;">
+                  <span style="border-bottom: 1.2px dashed #97907f;">continua nella finestra ⤢</span>
+                  <span style="border-bottom: 1.2px dashed #97907f;">chiudi · Esc</span>
+                </div>
+                <div style="position: absolute; top: -12px; right: -12px; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f; background: #fffdf9;">3</div>
+              </div>
+              <div style="font-family: Caveat, cursive; font-size: 16px; color: #97907f; text-align: center;">↑ cresce fino a ~40% dello schermo, poi scrolla dentro la card</div>
+            </div>
+            <!-- taskbar -->
+            <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 34px; background: #e8e4da; border-top: 1.4px solid #c9c2b6; display: flex; align-items: center; justify-content: center; gap: 18px;">
+              <div style="width: 16px; height: 16px; border: 1.3px solid #b3ac9d; border-radius: 4px;"></div>
+              <div style="width: 16px; height: 16px; border: 1.3px solid #b3ac9d; border-radius: 4px;"></div>
+              <div style="width: 16px; height: 16px; border: 1.3px solid #b3ac9d; border-radius: 50%;"></div>
+              <div style="width: 16px; height: 16px; border: 1.3px solid #b3ac9d; border-radius: 4px;"></div>
+            </div>
+          </div>
+          <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 16px; padding-top: 8px;">
+            <div style="display: flex; gap: 10px; align-items: flex-start;"><div style="flex-shrink: 0; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f;">1</div><div style="font-family: Caveat, cursive; font-size: 19px; line-height: 1.25; color: #3a372f;">Ctrl+Spazio da qualsiasi punto di Windows. Esc la ritira. La finestra completa esiste, ma è opzionale.</div></div>
+            <div style="display: flex; gap: 10px; align-items: flex-start;"><div style="flex-shrink: 0; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f;">2</div><div style="font-family: Caveat, cursive; font-size: 19px; line-height: 1.25; color: #3a372f;">La presenza in miniatura: stessi stati dell'orb grande (respira, ruota, pulsa).</div></div>
+            <div style="display: flex; gap: 10px; align-items: flex-start;"><div style="flex-shrink: 0; width: 22px; height: 22px; border: 1.5px solid #c4683f; border-radius: 50%; display: grid; place-items: center; font-family: Caveat, cursive; font-size: 15px; color: #c4683f;">3</div><div style="font-family: Caveat, cursive; font-size: 19px; line-height: 1.25; color: #3a372f;">Consapevole del contesto (come Siri AI sullo schermo): può riferirsi a ciò che stai guardando — solo se il permesso di osservazione è attivo.</div></div>
+            <div style="border-top: 1.4px dashed #c9c2b6; padding-top: 12px; font-family: Caveat, cursive; font-size: 17px; color: #97907f; line-height: 1.3;">La più «assistente di sistema», la meno «relazione». Forte come complemento di A o B, debole da sola per l'onboarding e i momenti personali.</div>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <!-- ============ OVERLAY MINI ============ -->
+    <sc-if value="{{ showOverlay }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Overlay mini — stati" style="display: flex; flex-direction: column; gap: 20px;">
+        <p style="margin: 0; max-width: 820px; font-family: Caveat, cursive; font-size: 22px; line-height: 1.3; color: #3a372f;"><b>Overlay mini.</b> Il compagno costante per tutte le varianti: una pillola minima al bordo superiore dello schermo. Non interrompe mai; un suggerimento spontaneo appare solo se l'hai permesso.</p>
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+          <!-- stato 1 -->
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="width: 280px; height: 150px; border: 1.5px solid #2b2b2b; border-radius: 12px 14px 13px 15px; background: repeating-linear-gradient(45deg, #f3f0e9, #f3f0e9 10px, #edeae2 10px, #edeae2 20px); position: relative;">
+              <div style="position: absolute; top: 12px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; background: #fffdf9; border: 1.4px solid #2b2b2b; border-radius: 100px; padding: 5px 14px;">
+                <div style="width: 6px; height: 6px; background: #2b2b2b; border-radius: 50%; opacity: 0.5;"></div>
+              </div>
+            </div>
+            <div style="font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 1.5px; color: #97907f;">1 · DORMIENTE — solo il punto, quasi invisibile</div>
+          </div>
+          <!-- stato 2 -->
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="width: 280px; height: 150px; border: 1.5px solid #2b2b2b; border-radius: 14px 12px 15px 13px; background: repeating-linear-gradient(45deg, #f3f0e9, #f3f0e9 10px, #edeae2 10px, #edeae2 20px); position: relative;">
+              <div style="position: absolute; top: 12px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; background: #fffdf9; border: 1.4px solid #2b2b2b; border-radius: 100px; padding: 6px 16px;">
+                <div style="position: relative; width: 18px; height: 18px; display: grid; place-items: center;">
+                  <div style="position: absolute; inset: 0; border: 1.3px solid #2b2b2b; border-radius: 50%; opacity: 0.5;"></div>
+                  <div style="width: 5px; height: 5px; background: #2b2b2b; border-radius: 50%;"></div>
+                </div>
+                <span style="font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 2px; color: #97907f;">ASCOLTO</span>
+              </div>
+            </div>
+            <div style="font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 1.5px; color: #97907f;">2 · ASCOLTO — l'anello respira</div>
+          </div>
+          <!-- stato 3 -->
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="width: 280px; height: 150px; border: 1.5px solid #2b2b2b; border-radius: 13px 15px 12px 14px; background: repeating-linear-gradient(45deg, #f3f0e9, #f3f0e9 10px, #edeae2 10px, #edeae2 20px); position: relative;">
+              <div style="position: absolute; top: 12px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; background: #fffdf9; border: 1.4px solid #2b2b2b; border-radius: 100px; padding: 6px 16px; white-space: nowrap;">
+                <div style="position: relative; width: 18px; height: 18px; display: grid; place-items: center;">
+                  <div style="position: absolute; inset: 0; border: 1.3px solid #2b2b2b; border-top-color: transparent; border-radius: 50%; opacity: 0.7; transform: rotate(40deg);"></div>
+                  <div style="width: 5px; height: 5px; background: #2b2b2b; border-radius: 50%;"></div>
+                </div>
+                <span style="font-family: 'Patrick Hand', cursive; font-size: 13px; color: #3a372f;">sto ragionando…</span>
+              </div>
+            </div>
+            <div style="font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 1.5px; color: #97907f;">3 · PENSIERO — anelli in rotazione lenta</div>
+          </div>
+          <!-- stato 4 -->
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="width: 280px; height: 150px; border: 1.5px solid #2b2b2b; border-radius: 15px 13px 14px 12px; background: repeating-linear-gradient(45deg, #f3f0e9, #f3f0e9 10px, #edeae2 10px, #edeae2 20px); position: relative;">
+              <div style="position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 240px; display: flex; flex-direction: column; gap: 6px; background: #fffdf9; border: 1.4px solid #2b2b2b; border-radius: 16px; padding: 10px 14px; box-sizing: border-box;">
+                <div style="font-family: 'Patrick Hand', cursive; font-size: 13px; line-height: 1.3; color: #2b2b2b;">Fatto: il riassunto è nelle tue note.</div>
+                <div style="display: flex; gap: 12px; font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 1px; color: #97907f;">
+                  <span style="border-bottom: 1.1px dashed #97907f;">apri ⤢</span>
+                  <span style="border-bottom: 1.1px dashed #97907f;">ok</span>
+                </div>
+              </div>
+            </div>
+            <div style="font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 1.5px; color: #97907f;">4 · RISPOSTA — una riga, poi si ritira</div>
+          </div>
+        </div>
+        <div style="max-width: 720px; font-family: Caveat, cursive; font-size: 18px; color: #97907f; line-height: 1.3;">La pillola è la stessa in tutte le varianti A–D: chi sceglie la finestra la usa quando l'app è chiusa; nella variante D è l'intero prodotto. Click sulla pillola = apre la barra; trascinala per spostarla.</div>
+      </section>
+    </sc-if>
+
+    <!-- ============ SUPERFICI NASCOSTE ============ -->
+    <sc-if value="{{ showHidden }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Superfici nascoste" style="display: flex; flex-direction: column; gap: 20px;">
+        <p style="margin: 0; max-width: 820px; font-family: Caveat, cursive; font-size: 22px; line-height: 1.3; color: #3a372f;"><b>Superfici nascoste.</b> Le informazioni operative non affollano la relazione: la conversazione recede sul fondo e il pannello scivola sopra. Nessuna icona li annuncia.</p>
+        <div style="display: flex; gap: 16px; align-items: center; font-family: 'Courier New', monospace; font-size: 12px; letter-spacing: 1.5px; color: #5a554a; flex-wrap: wrap;">
+          <span style="border: 1.4px solid #2b2b2b; border-radius: 6px; padding: 4px 10px; background: #fffdf9;">Ctrl + .</span><span>apre il selettore</span>
+          <span style="color: #c9c2b6;">/</span>
+          <span style="border: 1.4px solid #2b2b2b; border-radius: 6px; padding: 4px 10px; background: #fffdf9;">Esc</span><span>torna alla conversazione</span>
+          <span style="color: #c9c2b6;">/</span>
+          <span>oppure chiedi a SEED: «mostrami cosa sai di me»</span>
+        </div>
+        <div style="display: flex; gap: 22px; flex-wrap: wrap; align-items: flex-start;">
+          <!-- Pannello modello utente -->
+          <div style="width: 380px; background: #fffdf9; border: 1.6px solid #2b2b2b; border-radius: 15px 17px 14px 16px; box-shadow: 4px 5px 0 rgba(43,43,43,0.1); display: flex; flex-direction: column;">
+            <div style="padding: 14px 18px 10px; border-bottom: 1.4px dashed #c9c2b6; display: flex; flex-direction: column; gap: 2px;">
+              <div style="font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 2px; color: #97907f;">SUPERFICIE NASCOSTA · 1</div>
+              <div style="font-family: Caveat, cursive; font-size: 24px; font-weight: 600;">Cosa penso di sapere di te</div>
+            </div>
+            <div style="display: flex; flex-direction: column;">
+              <div style="padding: 12px 18px; border-bottom: 1.2px dashed #e4ded2; display: flex; flex-direction: column; gap: 5px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-family: 'Patrick Hand', cursive; font-size: 15px; color: #2b2b2b; flex: 1;">Ti chiami Cristian</span>
+                  <span style="font-family: 'Courier New', monospace; font-size: 9px; letter-spacing: 1px; border: 1.2px solid #2b2b2b; border-radius: 100px; padding: 2px 8px;">FATTO</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; font-family: 'Courier New', monospace; font-size: 10px; color: #97907f;">
+                  <span style="letter-spacing: 2px; color: #2b2b2b;">●●●●●</span><span>me l'hai detto · onboarding</span>
+                </div>
+              </div>
+              <div style="padding: 12px 18px; border-bottom: 1.2px dashed #e4ded2; display: flex; flex-direction: column; gap: 5px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-family: 'Patrick Hand', cursive; font-size: 15px; color: #2b2b2b; flex: 1;">Preferisci risposte dirette</span>
+                  <span style="font-family: 'Courier New', monospace; font-size: 9px; letter-spacing: 1px; border: 1.2px solid #2b2b2b; border-radius: 100px; padding: 2px 8px;">PREFERENZA</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; font-family: 'Courier New', monospace; font-size: 10px; color: #97907f;">
+                  <span style="letter-spacing: 2px; color: #2b2b2b;">●●●●○</span><span>esplicita · 12 mag</span>
+                </div>
+              </div>
+              <div style="padding: 12px 18px; border-bottom: 1.2px dashed #e4ded2; display: flex; flex-direction: column; gap: 5px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-family: 'Patrick Hand', cursive; font-size: 15px; color: #2b2b2b; flex: 1;">Lavori meglio la mattina</span>
+                  <span style="font-family: 'Courier New', monospace; font-size: 9px; letter-spacing: 1px; border: 1.2px dashed #c4683f; color: #c4683f; border-radius: 100px; padding: 2px 8px;">IPOTESI</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; font-family: 'Courier New', monospace; font-size: 10px; color: #97907f;">
+                  <span style="letter-spacing: 2px; color: #2b2b2b;">●●○○○</span><span>6 sessioni osservate · scade se smentita</span>
+                </div>
+                <div style="display: flex; gap: 12px; font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 1px; color: #5a554a;">
+                  <span style="border-bottom: 1.1px dashed #5a554a;">è vero</span>
+                  <span style="border-bottom: 1.1px dashed #5a554a;">correggi</span>
+                  <span style="border-bottom: 1.1px dashed #5a554a;">elimina</span>
+                </div>
+              </div>
+              <div style="padding: 12px 18px; display: flex; flex-direction: column; gap: 5px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-family: 'Patrick Hand', cursive; font-size: 15px; color: #2b2b2b; flex: 1;">Non vuoi consigli non richiesti sul lavoro</span>
+                  <span style="font-family: 'Courier New', monospace; font-size: 9px; letter-spacing: 1px; border: 1.2px solid #2b2b2b; border-radius: 100px; padding: 2px 8px;">CONFINE</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; font-family: 'Courier New', monospace; font-size: 10px; color: #97907f;">
+                  <span style="letter-spacing: 2px; color: #2b2b2b;">●●●●●</span><span>dichiarato · 2 giu</span>
+                </div>
+              </div>
+            </div>
+            <div style="padding: 12px 18px; border-top: 1.4px dashed #c9c2b6; font-family: Caveat, cursive; font-size: 16px; color: #97907f;">tutto è correggibile · le ipotesi non diventano fatti da sole</div>
+          </div>
+          <!-- Pannello permessi -->
+          <div style="width: 380px; background: #fffdf9; border: 1.6px solid #2b2b2b; border-radius: 16px 14px 17px 15px; box-shadow: 4px 5px 0 rgba(43,43,43,0.1); display: flex; flex-direction: column;">
+            <div style="padding: 14px 18px 10px; border-bottom: 1.4px dashed #c9c2b6; display: flex; flex-direction: column; gap: 2px;">
+              <div style="font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 2px; color: #97907f;">SUPERFICIE NASCOSTA · 2</div>
+              <div style="font-family: Caveat, cursive; font-size: 24px; font-weight: 600;">Permessi e privacy</div>
+            </div>
+            <div style="display: flex; flex-direction: column;">
+              <div style="padding: 12px 18px; border-bottom: 1.2px dashed #e4ded2; display: flex; align-items: center; gap: 12px;">
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                  <span style="font-family: 'Patrick Hand', cursive; font-size: 15px;">Osservare quali app uso</span>
+                  <span style="font-family: 'Courier New', monospace; font-size: 10px; color: #97907f;">solo titoli finestra · mai contenuti</span>
+                </div>
+                <div style="width: 40px; height: 20px; border: 1.4px solid #2b2b2b; border-radius: 100px; position: relative;"><div style="position: absolute; right: 2px; top: 2px; width: 14px; height: 14px; background: #2b2b2b; border-radius: 50%;"></div></div>
+              </div>
+              <div style="padding: 12px 18px; border-bottom: 1.2px dashed #e4ded2; display: flex; align-items: center; gap: 12px;">
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                  <span style="font-family: 'Patrick Hand', cursive; font-size: 15px;">Leggere i file di lavoro</span>
+                  <span style="font-family: 'Courier New', monospace; font-size: 10px; color: #97907f;">chiede ogni volta · cartella per cartella</span>
+                </div>
+                <span style="font-family: 'Courier New', monospace; font-size: 9px; letter-spacing: 1px; border: 1.2px solid #2b2b2b; border-radius: 100px; padding: 3px 8px;">SU RICHIESTA</span>
+              </div>
+              <div style="padding: 12px 18px; border-bottom: 1.2px dashed #e4ded2; display: flex; align-items: center; gap: 12px;">
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                  <span style="font-family: 'Patrick Hand', cursive; font-size: 15px;">Inviare contenuto al modello remoto</span>
+                  <span style="font-family: 'Courier New', monospace; font-size: 10px; color: #c4683f; border-bottom: 1.1px dashed #c4683f; align-self: flex-start;">passa dal privacy gate · vedi cosa esce →</span>
+                </div>
+                <div style="width: 40px; height: 20px; border: 1.4px solid #2b2b2b; border-radius: 100px; position: relative;"><div style="position: absolute; right: 2px; top: 2px; width: 14px; height: 14px; background: #2b2b2b; border-radius: 50%;"></div></div>
+              </div>
+              <div style="padding: 12px 18px; display: flex; align-items: center; gap: 12px;">
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                  <span style="font-family: 'Patrick Hand', cursive; font-size: 15px;">Microfono</span>
+                  <span style="font-family: 'Courier New', monospace; font-size: 10px; color: #97907f;">attivo solo col push-to-talk</span>
+                </div>
+                <div style="width: 40px; height: 20px; border: 1.4px solid #2b2b2b; border-radius: 100px; position: relative;"><div style="position: absolute; left: 2px; top: 2px; width: 14px; height: 14px; border: 1.4px solid #2b2b2b; box-sizing: border-box; border-radius: 50%;"></div></div>
+              </div>
+            </div>
+            <div style="padding: 12px 18px; border-top: 1.4px dashed #c9c2b6; display: flex; gap: 12px;">
+              <span style="font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 1px; border: 1.3px solid #2b2b2b; border-radius: 100px; padding: 5px 12px;">esporta tutto</span>
+              <span style="font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 1px; border: 1.3px dashed #c4683f; color: #c4683f; border-radius: 100px; padding: 5px 12px;">cancella tutto</span>
+            </div>
+          </div>
+          <!-- Come emergono -->
+          <div style="width: 300px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="height: 190px; background: #fffdf9; border: 1.5px solid #2b2b2b; border-radius: 13px 15px 12px 14px; position: relative; overflow: hidden; display: grid; place-items: center;">
+              <div style="position: absolute; inset: 0; display: grid; place-items: center; opacity: 0.25; filter: blur(1px);">
+                <div style="position: relative; width: 64px; height: 64px; display: grid; place-items: center;">
+                  <div style="position: absolute; inset: 0; border: 1.4px solid #2b2b2b; border-radius: 50%;"></div>
+                  <div style="width: 7px; height: 7px; background: #2b2b2b; border-radius: 50%;"></div>
+                </div>
+              </div>
+              <div style="position: relative; width: 200px; background: #fffdf9; border: 1.5px solid #2b2b2b; border-radius: 12px; padding: 12px 14px; box-shadow: 3px 4px 0 rgba(43,43,43,0.12); display: flex; flex-direction: column; gap: 8px;">
+                <div style="font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 2px; color: #97907f;">CTRL + . </div>
+                <div style="font-family: 'Patrick Hand', cursive; font-size: 14px; line-height: 1.6; color: #2b2b2b;">→ cosa sai di me<br>→ permessi e privacy<br>→ evoluzione <span style="color: #c9c2b6;">(più avanti)</span></div>
+              </div>
+            </div>
+            <div style="font-family: Caveat, cursive; font-size: 18px; line-height: 1.3; color: #3a372f;">La conversazione non scompare: arretra, sfocata, dietro il pannello. Chiudendo, sei esattamente dov'eri.</div>
+            <div style="font-family: Caveat, cursive; font-size: 17px; line-height: 1.3; color: #97907f;">Stessi pannelli raggiungibili chiedendolo in chat — SEED li apre lui.</div>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <!-- ============ ONBOARDING ============ -->
+    <sc-if value="{{ showOnboarding }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Onboarding primo avvio" style="display: flex; flex-direction: column; gap: 20px;">
+        <p style="margin: 0; max-width: 820px; font-family: Caveat, cursive; font-size: 22px; line-height: 1.3; color: #3a372f;"><b>Onboarding.</b> Il primo avvio è una conversazione, non un test di personalità. Quattro momenti, nessun form, nessuna diagnosi: solo ipotesi a bassa confidenza che l'uso reale potrà correggere.</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 22px; max-width: 1100px;">
+          <!-- 1 risveglio -->
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="height: 280px; background: #fffdf9; border: 1.6px solid #2b2b2b; border-radius: 14px 16px 15px 17px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;">
+              <div style="position: relative; width: 110px; height: 110px; display: grid; place-items: center;">
+                <div style="position: absolute; inset: 38px; border: 1.5px solid #2b2b2b; border-radius: 50%; opacity: 0.3;"></div>
+                <div style="width: 10px; height: 10px; background: #2b2b2b; border-radius: 50%;"></div>
+              </div>
+              <div style="font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 3px; color: #97907f;">· · ·</div>
+            </div>
+            <div style="font-family: Caveat, cursive; font-size: 18px; line-height: 1.25; color: #3a372f;"><b>1 · Risveglio.</b> Solo il punto e un anello appena visibile: la presenza prende forma in silenzio. Niente testo finché non è pronta a parlare.</div>
+          </div>
+          <!-- 2 patto -->
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="height: 280px; background: #fffdf9; border: 1.6px solid #2b2b2b; border-radius: 16px 14px 17px 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 18px; box-sizing: border-box;">
+              <div style="font-family: 'Patrick Hand', cursive; font-size: 16px; color: #2b2b2b; text-align: center;">Prima di iniziare, il patto.</div>
+              <div style="display: flex; gap: 10px; width: 100%;">
+                <div style="flex: 1; border: 1.4px solid #2b2b2b; border-radius: 10px 12px 11px 13px; padding: 10px; display: flex; flex-direction: column; gap: 4px;">
+                  <div style="font-family: 'Courier New', monospace; font-size: 9px; letter-spacing: 1.5px; color: #97907f;">COSA OSSERVERÒ</div>
+                  <div style="font-family: 'Patrick Hand', cursive; font-size: 12px; line-height: 1.3; color: #3a372f;">solo ciò che autorizzi, e te lo mostro</div>
+                </div>
+                <div style="flex: 1; border: 1.4px solid #2b2b2b; border-radius: 12px 10px 13px 11px; padding: 10px; display: flex; flex-direction: column; gap: 4px;">
+                  <div style="font-family: 'Courier New', monospace; font-size: 9px; letter-spacing: 1.5px; color: #97907f;">COSA POSSO CAMBIARE</div>
+                  <div style="font-family: 'Patrick Hand', cursive; font-size: 12px; line-height: 1.3; color: #3a372f;">me stesso — ma mai senza prove e mai senza ritorno</div>
+                </div>
+                <div style="flex: 1; border: 1.4px solid #2b2b2b; border-radius: 11px 13px 10px 12px; padding: 10px; display: flex; flex-direction: column; gap: 4px;">
+                  <div style="font-family: 'Courier New', monospace; font-size: 9px; letter-spacing: 1.5px; color: #97907f;">COME MI FERMI</div>
+                  <div style="font-family: 'Patrick Hand', cursive; font-size: 12px; line-height: 1.3; color: #3a372f;">una parola, una scorciatoia, un rollback</div>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 16px;">
+                <span style="font-family: 'Patrick Hand', cursive; font-size: 14px; border: 1.5px solid #2b2b2b; border-radius: 100px; padding: 7px 18px;">va bene, iniziamo</span>
+                <span style="font-family: 'Courier New', monospace; font-size: 10px; color: #97907f; border-bottom: 1.1px dashed #97907f;">leggo i dettagli prima</span>
+              </div>
+            </div>
+            <div style="font-family: Caveat, cursive; font-size: 18px; line-height: 1.25; color: #3a372f;"><b>2 · Il patto.</b> In linguaggio semplice: cosa osserverà, cosa può modificare, come interromperlo. Il consenso prima di tutto.</div>
+          </div>
+          <!-- 3 conoscersi -->
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="height: 280px; background: #fffdf9; border: 1.6px solid #2b2b2b; border-radius: 15px 17px 14px 16px; display: flex; flex-direction: column; justify-content: center; gap: 14px; padding: 22px 26px; box-sizing: border-box;">
+              <div style="display: flex; gap: 9px; align-items: flex-start;">
+                <div style="flex-shrink: 0; margin-top: 4px; width: 13px; height: 13px; border: 1.3px solid #2b2b2b; border-radius: 50%; display: grid; place-items: center;"><div style="width: 3px; height: 3px; background: #2b2b2b; border-radius: 50%;"></div></div>
+                <div style="font-family: 'Patrick Hand', cursive; font-size: 15px; line-height: 1.35; color: #2b2b2b;">Raccontami una giornata tipica. Non per schedarti — per capire dove posso essere utile.</div>
+              </div>
+              <div style="font-family: 'Patrick Hand', cursive; font-size: 14px; color: #97907f; text-align: center;">— più avanti nella conversazione —</div>
+              <div style="display: flex; gap: 9px; align-items: flex-start;">
+                <div style="flex-shrink: 0; margin-top: 4px; width: 13px; height: 13px; border: 1.3px solid #2b2b2b; border-radius: 50%; display: grid; place-items: center;"><div style="width: 3px; height: 3px; background: #2b2b2b; border-radius: 50%;"></div></div>
+                <div style="font-family: 'Patrick Hand', cursive; font-size: 15px; line-height: 1.35; color: #2b2b2b;">Se sbagli una scadenza, preferiresti che io…</div>
+              </div>
+              <div style="display: flex; gap: 10px; margin-left: 22px;">
+                <div style="flex: 1; border: 1.4px solid #2b2b2b; border-radius: 12px; padding: 9px 12px; font-family: 'Patrick Hand', cursive; font-size: 13px; line-height: 1.3; color: #3a372f;">A — te lo dica subito, diretto</div>
+                <div style="flex: 1; border: 1.4px dashed #97907f; border-radius: 12px; padding: 9px 12px; font-family: 'Patrick Hand', cursive; font-size: 13px; line-height: 1.3; color: #97907f;">B — aspetti il momento giusto</div>
+              </div>
+            </div>
+            <div style="font-family: Caveat, cursive; font-size: 18px; line-height: 1.25; color: #3a372f;"><b>3 · Conoscersi.</b> Racconto libero + confronti a coppie su comportamenti concreti (diretta/ragionata, spontaneo/su richiesta). Mai domande da questionario.</div>
+          </div>
+          <!-- 4 restituzione -->
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="height: 280px; background: #fffdf9; border: 1.6px solid #2b2b2b; border-radius: 17px 15px 16px 14px; display: flex; flex-direction: column; justify-content: center; gap: 10px; padding: 22px 26px; box-sizing: border-box;">
+              <div style="font-family: 'Patrick Hand', cursive; font-size: 16px; color: #2b2b2b;">Ecco cosa penso di aver capito — correggimi:</div>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="flex: 1; font-family: 'Patrick Hand', cursive; font-size: 14px; color: #3a372f;">vuoi risposte brevi, dettagli solo se chiesti</span>
+                  <span style="font-family: 'Courier New', monospace; font-size: 9px; letter-spacing: 1px; border: 1.2px dashed #c4683f; color: #c4683f; border-radius: 100px; padding: 2px 7px;">IPOTESI</span>
+                  <span style="font-family: 'Courier New', monospace; font-size: 10px; color: #5a554a; border-bottom: 1.1px dashed #5a554a;">giusto</span>
+                  <span style="font-family: 'Courier New', monospace; font-size: 10px; color: #5a554a; border-bottom: 1.1px dashed #5a554a;">correggi</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="flex: 1; font-family: 'Patrick Hand', cursive; font-size: 14px; color: #3a372f;">la scrittura della tesi è la priorità di giugno</span>
+                  <span style="font-family: 'Courier New', monospace; font-size: 9px; letter-spacing: 1px; border: 1.2px dashed #c4683f; color: #c4683f; border-radius: 100px; padding: 2px 7px;">IPOTESI</span>
+                  <span style="font-family: 'Courier New', monospace; font-size: 10px; color: #5a554a; border-bottom: 1.1px dashed #5a554a;">giusto</span>
+                  <span style="font-family: 'Courier New', monospace; font-size: 10px; color: #5a554a; border-bottom: 1.1px dashed #5a554a;">correggi</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="flex: 1; font-family: 'Patrick Hand', cursive; font-size: 14px; color: #3a372f;">niente suggerimenti spontanei, per ora</span>
+                  <span style="font-family: 'Courier New', monospace; font-size: 9px; letter-spacing: 1px; border: 1.2px solid #2b2b2b; border-radius: 100px; padding: 2px 7px;">DETTO DA TE</span>
+                  <span style="font-family: 'Courier New', monospace; font-size: 10px; color: #5a554a; border-bottom: 1.1px dashed #5a554a;">giusto</span>
+                </div>
+              </div>
+              <div style="font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 1px; color: #97907f; margin-top: 4px;">tutto a bassa confidenza · l'uso reale conferma o smentisce</div>
+            </div>
+            <div style="font-family: Caveat, cursive; font-size: 18px; line-height: 1.25; color: #3a372f;"><b>4 · Restituzione.</b> SEED dichiara le sue inferenze, marcate come correggibili. Poi la superficie diventa quella normale (variante scelta).</div>
+          </div>
+        </div>
+        <div style="font-family: 'Courier New', monospace; font-size: 12px; letter-spacing: 2px; color: #97907f; border-top: 1.4px dashed #c9c2b6; padding-top: 14px;">IPOTESI ≠ FATTI · NESSUNA DIAGNOSI · NESSUN ARCHETIPO · TUTTO CORREGGIBILE</div>
+      </section>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { tab: 0 };
+
+  renderVals() {
+    const labels = [
+      "A · Presenza pura",
+      "B · Colonna",
+      "C · Scena divisa",
+      "D · Overlay-first",
+      "Overlay mini",
+      "Superfici nascoste",
+      "Onboarding",
+    ];
+    const tabs = labels.map((label, i) => ({
+      label,
+      onClick: () => this.setState({ tab: i }),
+      bg: this.state.tab === i ? "#2b2b2b" : "transparent",
+      color: this.state.tab === i ? "#f7f5f1" : "#2b2b2b",
+    }));
+    return {
+      tabs,
+      showA: this.state.tab === 0,
+      showB: this.state.tab === 1,
+      showC: this.state.tab === 2,
+      showD: this.state.tab === 3,
+      showOverlay: this.state.tab === 4,
+      showHidden: this.state.tab === 5,
+      showOnboarding: this.state.tab === 6,
+    };
+  }
+}
+</script>
+</body>
+</html>

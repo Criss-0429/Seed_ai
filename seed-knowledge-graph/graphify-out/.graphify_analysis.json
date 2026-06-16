@@ -1,0 +1,514 @@
+{
+  "communities": {
+    "0": [
+      "core_runtime_bench_build_runtime_benchmark",
+      "core_runtime_bench_rationale_138",
+      "core_runtime_bench_rationale_183",
+      "core_runtime_bench_write_runtime_benchmark",
+      "path",
+      "tests_test_runtime_bench",
+      "tests_test_runtime_bench_rationale_1",
+      "tests_test_runtime_bench_test_benchmark_is_deterministic_and_hash_is_stable",
+      "tests_test_runtime_bench_test_broad_runtime_authority_is_blocked",
+      "tests_test_runtime_bench_test_each_option_is_evaluated_against_every_fixture",
+      "tests_test_runtime_bench_test_fixtures_are_synthetic_and_privacy_safe",
+      "tests_test_runtime_bench_test_recommendation_keeps_seed_core_and_requires_owner_gate",
+      "tests_test_runtime_bench_test_runtimebench_command_is_local_and_returns_recommendation",
+      "tests_test_runtime_bench_test_write_report_is_auditable_and_reproducible"
+    ],
+    "1": [
+      "concept_mutation_contract",
+      "implementation_plan_k2_living_profile",
+      "implementation_plan_k3_salience",
+      "implementation_plan_m1_m4_memory",
+      "seed_app",
+      "seed_knowledge",
+      "seed_memory",
+      "seed_model_roles",
+      "seed_promotion",
+      "seed_recall",
+      "seed_router",
+      "seed_salience",
+      "seed_supervisor"
+    ],
+    "2": [
+      "docs_activitywatcher",
+      "docs_agentic_daemon",
+      "docs_cognitive_user_knowledge",
+      "docs_implementationplan",
+      "docs_memory_consolidation",
+      "docs_personalita_compatibile",
+      "seed_core_knowledge",
+      "seed_user_knowledge",
+      "wiki_agentmemory",
+      "wiki_cognitive_harness",
+      "wiki_memory_arch",
+      "wiki_openharness",
+      "wiki_runtime_options"
+    ],
+    "3": [
+      "core_runtime_bench",
+      "core_runtime_bench_blockers",
+      "core_runtime_bench_canonical_hash",
+      "core_runtime_bench_criterion",
+      "core_runtime_bench_fixture_results",
+      "core_runtime_bench_optionresult",
+      "core_runtime_bench_rationale_1",
+      "core_runtime_bench_runtimeoption",
+      "core_runtime_bench_syntheticfixture",
+      "core_runtime_bench_weighted_score",
+      "implementation_plan_d0_runtime_benchmark"
+    ],
+    "4": [
+      "impl_app",
+      "impl_knowledge_store",
+      "impl_recall",
+      "impl_router",
+      "impl_salience",
+      "impl_scheduler"
+    ],
+    "5": [
+      "impl_hermes",
+      "impl_openclaw",
+      "impl_openharness",
+      "impl_runtime_bench",
+      "impl_seed_core"
+    ],
+    "6": [
+      "jarvis_agent_ecosystem",
+      "jarvis_m3_memory",
+      "jarvis_workflow",
+      "seed_architettura_evolutiva",
+      "seed_stable_boot_supervisor"
+    ],
+    "7": [
+      "concept_hermes",
+      "concept_openclaw",
+      "concept_openharness",
+      "seed_impl_plan"
+    ],
+    "8": [
+      "jarvis_design_principles",
+      "seed_contratto_mutazione",
+      "seed_evolution_engine",
+      "seed_sandbox_sicurezza"
+    ],
+    "9": [
+      "jarvis_user_knowledge_ontology",
+      "seed_activity_watcher",
+      "seed_personalita_compatibile",
+      "seed_privacy_gate"
+    ],
+    "10": [
+      "core_app_rationale_392",
+      "core_app_seedapp_voice_ready",
+      "core_app_seedapp_voice_reply_audio"
+    ],
+    "11": [
+      "corpus_bridges",
+      "docs_modelroles_voice",
+      "jarvis_mission"
+    ],
+    "12": [
+      "core_app_rationale_398",
+      "core_app_seedapp_run_shadow_review"
+    ],
+    "13": [
+      "core_app_rationale_403",
+      "core_app_seedapp_run_runtime_benchmark"
+    ],
+    "14": [
+      "core_app_rationale_285"
+    ],
+    "15": [
+      "core_app_rationale_323"
+    ],
+    "16": [
+      "core_app_rationale_447"
+    ],
+    "17": [
+      "core_app_rationale_453"
+    ],
+    "18": [
+      "core_app_seedapp_grant_voice_consent"
+    ],
+    "19": [
+      "core_app_seedapp_voice_message"
+    ],
+    "20": [
+      "docs_fontiresicerche"
+    ],
+    "21": [
+      "impl_user_knowledge"
+    ],
+    "22": [
+      "jarvis_implementation"
+    ],
+    "23": [
+      "jarvis_overview"
+    ],
+    "24": [
+      "jarvis_stack"
+    ],
+    "25": [
+      "jarvis_vision"
+    ],
+    "26": [
+      "runtimeerror"
+    ],
+    "27": [
+      "seed_core_acceptance_py_any"
+    ],
+    "28": [
+      "seed_core_acceptance_py_descendantbuilder"
+    ],
+    "29": [
+      "seed_core_acceptance_py_evaluatorharness"
+    ],
+    "30": [
+      "seed_core_acceptance_py_lineagestore"
+    ],
+    "31": [
+      "seed_core_acceptance_py_memory"
+    ],
+    "32": [
+      "seed_core_acceptance_py_mutationcandidate"
+    ],
+    "33": [
+      "seed_core_acceptance_py_path"
+    ],
+    "34": [
+      "seed_core_acceptance_py_promotionauthority"
+    ],
+    "35": [
+      "seed_core_capabilities_py_path"
+    ],
+    "36": [
+      "seed_core_config_py_path"
+    ],
+    "37": [
+      "seed_core_descendant_py_any"
+    ],
+    "38": [
+      "seed_core_descendant_py_mutationcandidate"
+    ],
+    "39": [
+      "seed_core_descendant_py_path"
+    ],
+    "40": [
+      "seed_core_evaluator_py_any"
+    ],
+    "41": [
+      "seed_core_evaluator_py_descendantbuilder"
+    ],
+    "42": [
+      "seed_core_evaluator_py_lineagestore"
+    ],
+    "43": [
+      "seed_core_evaluator_py_mutationcandidate"
+    ],
+    "44": [
+      "seed_core_evaluator_py_path"
+    ],
+    "45": [
+      "seed_core_evolution_py_mutationcandidate"
+    ],
+    "46": [
+      "seed_core_evolution_py_path"
+    ],
+    "47": [
+      "seed_core_forbidden_py_path"
+    ],
+    "48": [
+      "seed_core_lineage_py_any"
+    ],
+    "49": [
+      "seed_core_lineage_py_path"
+    ],
+    "50": [
+      "seed_core_llm_py_any"
+    ],
+    "51": [
+      "seed_core_memory_py_path"
+    ],
+    "52": [
+      "seed_core_onboarding_py_any"
+    ],
+    "53": [
+      "seed_core_promotion_py_any"
+    ],
+    "54": [
+      "seed_core_promotion_py_descendantbuilder"
+    ],
+    "55": [
+      "seed_core_promotion_py_evaluatorharness"
+    ],
+    "56": [
+      "seed_core_promotion_py_lineagestore"
+    ],
+    "57": [
+      "seed_core_promotion_py_mutationcandidate"
+    ],
+    "58": [
+      "seed_core_promotion_py_path"
+    ],
+    "59": [
+      "seed_core_sandbox_py_path"
+    ],
+    "60": [
+      "seed_core_telemetry_py_path"
+    ],
+    "61": [
+      "seed_esperimento"
+    ],
+    "62": [
+      "seed_repo_structure"
+    ],
+    "63": [
+      "seed_research_sources"
+    ],
+    "64": [
+      "seed_tests_test_evaluator_py_descendantbuilder"
+    ],
+    "65": [
+      "seed_tests_test_evaluator_py_evaluatorharness"
+    ],
+    "66": [
+      "seed_tests_test_evaluator_py_lineagestore"
+    ],
+    "67": [
+      "seed_tests_test_evaluator_py_mutationcandidate"
+    ],
+    "68": [
+      "seed_tests_test_evaluator_py_path"
+    ],
+    "69": [
+      "seed_tests_test_onboarding_py_memory"
+    ],
+    "70": [
+      "seed_tests_test_personality_py_memory"
+    ],
+    "71": [
+      "seed_tests_test_promotion_py_descendantbuilder"
+    ],
+    "72": [
+      "seed_tests_test_promotion_py_evaluatorharness"
+    ],
+    "73": [
+      "seed_tests_test_promotion_py_lineagestore"
+    ],
+    "74": [
+      "seed_tests_test_promotion_py_mutationcandidate"
+    ],
+    "75": [
+      "seed_tests_test_promotion_py_path"
+    ],
+    "76": [
+      "seed_tests_test_promotion_py_promotionauthority"
+    ],
+    "77": [
+      "seed_visione_prodotto"
+    ],
+    "78": [
+      "valueerror"
+    ],
+    "79": [
+      "wiki_personal_os"
+    ]
+  },
+  "cohesion": {
+    "0": 0.23076923076923078,
+    "1": 0.1794871794871795,
+    "2": 0.16666666666666666,
+    "3": 0.23636363636363636,
+    "4": 0.4,
+    "5": 0.4,
+    "6": 0.4,
+    "7": 0.5,
+    "8": 0.5,
+    "9": 0.5,
+    "10": 0.6666666666666666,
+    "11": 0.6666666666666666,
+    "12": 1.0,
+    "13": 1.0,
+    "14": 1.0,
+    "15": 1.0,
+    "16": 1.0,
+    "17": 1.0,
+    "18": 1.0,
+    "19": 1.0,
+    "20": 1.0,
+    "21": 1.0,
+    "22": 1.0,
+    "23": 1.0,
+    "24": 1.0,
+    "25": 1.0,
+    "26": 1.0,
+    "27": 1.0,
+    "28": 1.0,
+    "29": 1.0,
+    "30": 1.0,
+    "31": 1.0,
+    "32": 1.0,
+    "33": 1.0,
+    "34": 1.0,
+    "35": 1.0,
+    "36": 1.0,
+    "37": 1.0,
+    "38": 1.0,
+    "39": 1.0,
+    "40": 1.0,
+    "41": 1.0,
+    "42": 1.0,
+    "43": 1.0,
+    "44": 1.0,
+    "45": 1.0,
+    "46": 1.0,
+    "47": 1.0,
+    "48": 1.0,
+    "49": 1.0,
+    "50": 1.0,
+    "51": 1.0,
+    "52": 1.0,
+    "53": 1.0,
+    "54": 1.0,
+    "55": 1.0,
+    "56": 1.0,
+    "57": 1.0,
+    "58": 1.0,
+    "59": 1.0,
+    "60": 1.0,
+    "61": 1.0,
+    "62": 1.0,
+    "63": 1.0,
+    "64": 1.0,
+    "65": 1.0,
+    "66": 1.0,
+    "67": 1.0,
+    "68": 1.0,
+    "69": 1.0,
+    "70": 1.0,
+    "71": 1.0,
+    "72": 1.0,
+    "73": 1.0,
+    "74": 1.0,
+    "75": 1.0,
+    "76": 1.0,
+    "77": 1.0,
+    "78": 1.0,
+    "79": 1.0
+  },
+  "gods": [
+    {
+      "id": "core_runtime_bench_build_runtime_benchmark",
+      "label": "build_runtime_benchmark()",
+      "degree": 15
+    },
+    {
+      "id": "core_runtime_bench_write_runtime_benchmark",
+      "label": "write_runtime_benchmark()",
+      "degree": 6
+    },
+    {
+      "id": "seed_memory",
+      "label": "SEED Memory",
+      "degree": 5
+    },
+    {
+      "id": "core_runtime_bench_runtimeoption",
+      "label": "RuntimeOption",
+      "degree": 4
+    },
+    {
+      "id": "docs_implementationplan",
+      "label": "Implementation Plan SEED",
+      "degree": 4
+    },
+    {
+      "id": "docs_memory_consolidation",
+      "label": "Memory Consolidation Plan",
+      "degree": 4
+    },
+    {
+      "id": "seed_salience",
+      "label": "SEED Salience Gate",
+      "degree": 4
+    },
+    {
+      "id": "impl_runtime_bench",
+      "label": "D0 Runtime Option Benchmark",
+      "degree": 4
+    },
+    {
+      "id": "seed_architettura_evolutiva",
+      "label": "SEED Evolutionary Architecture",
+      "degree": 3
+    },
+    {
+      "id": "seed_contratto_mutazione",
+      "label": "SEED Mutation Contract",
+      "degree": 3
+    }
+  ],
+  "surprises": [
+    {
+      "source": "SEED Memory",
+      "target": "Memory Consolidation (M1-M4)",
+      "source_files": [
+        "seed/core/memory.py",
+        "docs/12_ImplementationPlan.md"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "implements",
+      "why": "crosses file types (code \u2194 doc); connects across different repos/directories; peripheral node `Memory Consolidation (M1-M4)` unexpectedly reaches hub `SEED Memory`"
+    },
+    {
+      "source": "SEED Knowledge Store",
+      "target": "K2 - Living Profile + Counterpoint",
+      "source_files": [
+        "seed/core/knowledge.py",
+        "docs/12_ImplementationPlan.md"
+      ],
+      "confidence": "INFERRED",
+      "relation": "implements",
+      "why": "inferred connection - not explicitly stated in source; crosses file types (code \u2194 doc); connects across different repos/directories"
+    },
+    {
+      "source": "SEED Salience Gate",
+      "target": "K3 - Salience / Awareness",
+      "source_files": [
+        "seed/core/salience.py",
+        "docs/12_ImplementationPlan.md"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "implements",
+      "why": "crosses file types (code \u2194 doc); connects across different repos/directories"
+    },
+    {
+      "source": "D0 Runtime Option Benchmark",
+      "target": "SEED Core",
+      "source_files": [
+        "seed/core/runtime_bench.py",
+        "docs/12_ImplementationPlan.md"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "conceptually_related_to",
+      "why": "crosses file types (doc \u2194 code); connects across different repos/directories"
+    },
+    {
+      "source": "D0 Runtime Option Benchmark",
+      "target": "Hermes",
+      "source_files": [
+        "seed/core/runtime_bench.py",
+        "docs/12_ImplementationPlan.md"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "crosses file types (code \u2194 doc); connects across different repos/directories"
+    }
+  ],
+  "tokens": {
+    "input": 11994,
+    "output": 2161
+  }
+}

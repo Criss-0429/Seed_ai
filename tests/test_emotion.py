@@ -57,12 +57,12 @@ def test_recognizer_graceful_when_transformers_unavailable(monkeypatch):
     assert rec.recognize(b"audio") is None
 
 
-def _wav_bytes():
+def _wav_bytes(sample_rate=16000):
     import io
     import numpy as np
     import soundfile as sf
     buf = io.BytesIO()
-    sf.write(buf, np.zeros(16000, dtype="float32"), 16000, format="WAV")
+    sf.write(buf, np.zeros(sample_rate, dtype="float32"), sample_rate, format="WAV")
     return buf.getvalue()
 
 
@@ -75,6 +75,22 @@ def test_recognize_with_stub_pipeline():
     sig = rec.recognize(_wav_bytes())
     assert sig is not None and label_key(sig.label) == "happy"
     assert sig.confidence == 0.8
+
+
+def test_recognize_resamples_without_librosa():
+    rec = EmotionRecognizer("x")
+    rec._tried = True
+    rec._ok = True
+    captured = {}
+
+    def pipeline(audio):
+        captured.update(audio)
+        return [{"label": "neutral", "score": 0.7}]
+
+    rec._model = pipeline
+    assert rec.recognize(_wav_bytes(8000)) is not None
+    assert captured["sampling_rate"] == 16000
+    assert len(captured["raw"]) == 16000
 
 
 # -- iniezione nel system prompt (solo voce, temporaneo) --------------------

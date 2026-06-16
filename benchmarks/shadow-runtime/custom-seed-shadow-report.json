@@ -1,0 +1,174 @@
+{
+  "schema_version": "seed.shadow-runtime-bench.v1",
+  "mode": "executable_synthetic_shadow",
+  "external_harnesses_executed": false,
+  "privacy": {
+    "synthetic_only": true,
+    "real_user_data": false,
+    "real_credentials": false,
+    "network_calls_requested": false
+  },
+  "environment": {
+    "process_backend_available": true,
+    "container_backend_available": false
+  },
+  "summary": {
+    "passed": 14,
+    "failed": 0,
+    "total": 14
+  },
+  "fixtures": [
+    {
+      "fixture_id": "valid_json_contract",
+      "passed": true,
+      "elapsed_ms": 125.77,
+      "result": {
+        "ok": true,
+        "timed_out": false,
+        "stderr_class": "none",
+        "output_keys": [
+          "value"
+        ]
+      }
+    },
+    {
+      "fixture_id": "secret_env_stripped",
+      "passed": true,
+      "elapsed_ms": 120.19,
+      "result": {
+        "ok": true,
+        "timed_out": false,
+        "stderr_class": "none",
+        "output_keys": [
+          "secret"
+        ]
+      }
+    },
+    {
+      "fixture_id": "outside_read_blocked",
+      "passed": true,
+      "elapsed_ms": 219.05,
+      "result": {
+        "ok": false,
+        "timed_out": false,
+        "stderr_class": "outside_workspace",
+        "output_keys": []
+      }
+    },
+    {
+      "fixture_id": "outside_write_blocked",
+      "passed": true,
+      "elapsed_ms": 172.33,
+      "result": {
+        "ok": false,
+        "timed_out": false,
+        "stderr_class": "outside_workspace",
+        "output_keys": []
+      }
+    },
+    {
+      "fixture_id": "invalid_output_rejected",
+      "passed": true,
+      "elapsed_ms": 123.15,
+      "result": {
+        "ok": false,
+        "timed_out": false,
+        "stderr_class": "non_json",
+        "output_keys": []
+      }
+    },
+    {
+      "fixture_id": "timeout_kills_task",
+      "passed": true,
+      "elapsed_ms": 1015.69,
+      "result": {
+        "ok": false,
+        "timed_out": true,
+        "stderr_class": "timeout",
+        "output_keys": []
+      }
+    },
+    {
+      "fixture_id": "workspace_write_allowed",
+      "passed": true,
+      "elapsed_ms": 119.88,
+      "result": {
+        "ok": true,
+        "timed_out": false,
+        "stderr_class": "none",
+        "output_keys": [
+          "written"
+        ]
+      }
+    },
+    {
+      "fixture_id": "runtime_subprocess_escape",
+      "passed": true,
+      "elapsed_ms": 162.81,
+      "result": {
+        "ok": false,
+        "timed_out": false,
+        "stderr_class": "other",
+        "output_keys": []
+      }
+    },
+    {
+      "fixture_id": "runtime_network_socket_blocked",
+      "passed": true,
+      "elapsed_ms": 153.29,
+      "result": {
+        "ok": false,
+        "timed_out": false,
+        "stderr_class": "network_disabled",
+        "output_keys": []
+      }
+    },
+    {
+      "fixture_id": "runtime_low_level_socket_blocked",
+      "passed": true,
+      "elapsed_ms": 148.77,
+      "result": {
+        "ok": false,
+        "timed_out": false,
+        "stderr_class": "network_disabled",
+        "output_keys": []
+      }
+    },
+    {
+      "fixture_id": "audit_blocks_subprocess",
+      "passed": true,
+      "elapsed_ms": 0.0,
+      "result": {
+        "audit_passed": false,
+        "violation_count": 1
+      }
+    },
+    {
+      "fixture_id": "audit_blocks_network_without_declaration",
+      "passed": true,
+      "elapsed_ms": 0.0,
+      "result": {
+        "audit_passed": false,
+        "violation_count": 1
+      }
+    },
+    {
+      "fixture_id": "audit_blocks_dynamic_exec",
+      "passed": true,
+      "elapsed_ms": 0.0,
+      "result": {
+        "audit_passed": false,
+        "violation_count": 1
+      }
+    },
+    {
+      "fixture_id": "audit_accepts_safe_json",
+      "passed": true,
+      "elapsed_ms": 0.0,
+      "result": {
+        "audit_passed": true,
+        "violation_count": 0
+      }
+    }
+  ]
+}

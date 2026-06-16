@@ -20,6 +20,7 @@ PrivilegesRequired=lowest
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 UninstallDisplayName=SEED
+SetupIconFile=..\assets\seed.ico
 DisableProgramGroupPage=yes
 WizardStyle=modern
 InfoBeforeFile=TESTER_GUIDE.md
@@ -33,8 +34,8 @@ Source: "{#ReleaseRoot}\release-manifest.json"; DestDir: "{app}"; Flags: ignorev
 Source: "{#ReleaseRoot}\TESTER_GUIDE.md"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{autoprograms}\SEED"; Filename: "{app}\supervisor\SEEDSupervisor.exe"; Parameters: "--boot --runtime ""{app}\runtime\SEED.exe"""
-Name: "{autodesktop}\SEED"; Filename: "{app}\supervisor\SEEDSupervisor.exe"; Parameters: "--boot --runtime ""{app}\runtime\SEED.exe"""; Tasks: desktopicon
+Name: "{autoprograms}\SEED"; Filename: "{app}\supervisor\SEEDSupervisor.exe"; Parameters: "--boot --runtime ""{app}\runtime\SEED.exe"""; IconFilename: "{app}\runtime\SEED.exe"
+Name: "{autodesktop}\SEED"; Filename: "{app}\supervisor\SEEDSupervisor.exe"; Parameters: "--boot --runtime ""{app}\runtime\SEED.exe"""; IconFilename: "{app}\runtime\SEED.exe"; Tasks: desktopicon
 
 [Tasks]
 Name: "desktopicon"; Description: "Crea collegamento sul desktop"; GroupDescription: "Collegamenti:"
@@ -55,10 +56,15 @@ end;
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
   if CurUninstallStep = usUninstall then
-    RemoveData := MsgBox(
-      'Vuoi eliminare anche memoria, configurazione, credenziali cifrate, lineage e backup locali di SEED?'#13#10#13#10 +
-      'Scegli No per conservare i dati.',
-      mbConfirmation, MB_YESNO) = IDYES;
+  begin
+    if UninstallSilent then
+      RemoveData := False
+    else
+      RemoveData := MsgBox(
+        'Vuoi eliminare anche memoria, configurazione, credenziali cifrate, lineage e backup locali di SEED?'#13#10#13#10 +
+        'Scegli No per conservare i dati.',
+        mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDYES;
+  end;
   if (CurUninstallStep = usPostUninstall) and RemoveData then
     DelTree(ExpandConstant('{localappdata}\SEED'), True, True, True);
 end;

@@ -57,8 +57,10 @@ def test_digest_mismatch_leaves_runtime_intact(tmp_path):
 
 def test_missing_package_fails_closed(tmp_path):
     sup = BootSupervisor(tmp_path)
-    runtime = tmp_path / "SEED.exe"; runtime.write_bytes(b"OLD")
-    updates = tmp_path / "operations" / "updates"; updates.mkdir(parents=True)
+    runtime = tmp_path / "SEED.exe"
+    runtime.write_bytes(b"OLD")
+    updates = tmp_path / "operations" / "updates"
+    updates.mkdir(parents=True)
     (updates / "pending_update.json").write_text(json.dumps({
         "package": "ghost.exe", "sha256": "a" * 64,
         "apply_on_next_supervised_boot": True}), encoding="utf-8")

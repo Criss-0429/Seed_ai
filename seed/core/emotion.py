@@ -19,21 +19,21 @@ funziona comunque (senza segnale affettivo).
 
 from __future__ import annotations
 
+import io
 import logging
-import tempfile
+import math
 import time
 from dataclasses import dataclass
-from pathlib import Path
 
 log = logging.getLogger("seed.emotion")
 
-DEFAULT_MODEL = "superb/wav2vec2-base-superb-er"   # carica pulito con pipeline standard
-_TTL_S = 90.0           # il segnale scade: e' temporaneo, non memoria
+DEFAULT_MODEL = "superb/wav2vec2-base-superb-er"  # carica pulito con pipeline standard
+_TTL_S = 90.0  # il segnale scade: e' temporaneo, non memoria
 
 
 @dataclass(frozen=True)
 class AffectSignal:
-    label: str                 # es. neutral | happy | sad | angry | fearful ...
+    label: str  # es. neutral | happy | sad | angry | fearful ...
     confidence: float
     model: str
     captured_at: float
@@ -57,14 +57,28 @@ def label_key(label: str) -> str:
     """Normalizza i label emotion2vec (possono essere in cinese/inglese)."""
     low = (label or "").strip().lower()
     table = {
-        "生气": "angry", "angry": "angry", "ang": "angry",
-        "开心": "happy", "高兴": "happy", "happy": "happy", "hap": "happy",
-        "伤心": "sad", "难过": "sad", "sad": "sad",
-        "害怕": "fearful", "恐惧": "fearful", "fearful": "fearful",
+        "生气": "angry",
+        "angry": "angry",
+        "ang": "angry",
+        "开心": "happy",
+        "高兴": "happy",
+        "happy": "happy",
+        "hap": "happy",
+        "伤心": "sad",
+        "难过": "sad",
+        "sad": "sad",
+        "害怕": "fearful",
+        "恐惧": "fearful",
+        "fearful": "fearful",
         "neu": "neutral",
-        "惊讶": "surprised", "surprised": "surprised",
-        "厌恶": "disgusted", "disgust": "disgusted", "disgusted": "disgusted",
-        "中立": "neutral", "neutral": "neutral", "calm": "neutral",
+        "惊讶": "surprised",
+        "surprised": "surprised",
+        "厌恶": "disgusted",
+        "disgust": "disgusted",
+        "disgusted": "disgusted",
+        "中立": "neutral",
+        "neutral": "neutral",
+        "calm": "neutral",
     }
     for key, norm in table.items():
         if key in low:
@@ -75,6 +89,7 @@ def label_key(label: str) -> str:
 class EmotionRecognizer:
     def __init__(self, model_name: str = DEFAULT_MODEL):
         from .model_bundle import resolve
+
         self.model_name = resolve(model_name)
         self._model = None
         self._tried = False
@@ -86,8 +101,8 @@ class EmotionRecognizer:
         self._tried = True
         try:
             from transformers import pipeline
-            self._model = pipeline("audio-classification", model=self.model_name,
-                                   top_k=1)
+
+            self._model = pipeline("audio-classification", model=self.model_name, top_k=1)
             self._ok = True
             log.info("emotion recognizer caricato: %s", self.model_name)
         except Exception as exc:
@@ -99,32 +114,31 @@ class EmotionRecognizer:
     def available(self) -> bool:
         return self._ensure()
 
-    def recognize(self, audio_bytes: bytes, *, suffix: str = ".wav"
-                  ) -> AffectSignal | None:
+    def recognize(self, audio_bytes: bytes, *, suffix: str = ".wav") -> AffectSignal | None:
         """Ritorna il segnale affettivo del turno, o None se non disponibile.
         L'audio (atteso wav 16k mono, ma resamplato) non viene persistito."""
         if not audio_bytes or not self._ensure():
             return None
-        tmp = None
         try:
-            import librosa
-            with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as f:
-                f.write(audio_bytes)
-                tmp = f.name
-            wave, _ = librosa.load(tmp, sr=16000, mono=True)
+            import numpy as np
+            import soundfile as sf
+            from scipy.signal import resample_poly
+
+            wave, sample_rate = sf.read(io.BytesIO(audio_bytes), dtype="float32", always_2d=True)
+            wave = np.mean(wave, axis=1)
+            if sample_rate != 16000:
+                divisor = math.gcd(sample_rate, 16000)
+                wave = resample_poly(wave, 16000 // divisor, sample_rate // divisor)
             out = self._model({"raw": wave, "sampling_rate": 16000})
             if not out:
                 return None
-            best = out[0]                  # top_k=1, ordinato per score desc
-            return AffectSignal(label=str(best["label"]),
-                                confidence=float(best["score"]),
-                                model=self.model_name, captured_at=time.time())
+            best = out[0]  # top_k=1, ordinato per score desc
+            return AffectSignal(
+                label=str(best["label"]),
+                confidence=float(best["score"]),
+                model=self.model_name,
+                captured_at=time.time(),
+            )
         except Exception as exc:
             log.warning("riconoscimento emozione fallito: %s", exc)
             return None
-        finally:
-            if tmp:
-                try:
-                    Path(tmp).unlink(missing_ok=True)
-                except OSError:
-                    pass

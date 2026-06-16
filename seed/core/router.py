@@ -19,7 +19,6 @@ from __future__ import annotations
 
 import difflib
 import hashlib
-import json
 import logging
 import re
 import unicodedata

@@ -1,0 +1,76 @@
+{
+  "schema_version": "seed.shadow-runtime-bench.v1",
+  "harness": {
+    "name": "Hermes Agent",
+    "repository": "NousResearch/hermes-agent",
+    "version": "0.16.0",
+    "commit": "4e6d05c6a51e4461af0d0d51e79e3c6afe3f7b9a"
+  },
+  "mode": "isolated_offline_security_and_pattern_test_suites",
+  "privacy": {
+    "synthetic_only": true,
+    "real_user_data": false,
+    "real_credentials": false,
+    "model_calls_executed": false,
+    "live_tools_executed": false
+  },
+  "installation": {
+    "temporary_path": "C:\\tmp\\seed-hermes-bench",
+    "peak_mb_including_download_cache": 529.61,
+    "measured_mb_after_cache_cleanup": 328.81,
+    "limit_mb": 500
+  },
+  "results": [
+    {
+      "suite": "broad_security_selection",
+      "passed": 643,
+      "failed": 53,
+      "skipped": 2,
+      "note": "Includes environment-dependent Tirith, POSIX-assumption, encoding and symlink failures."
+    },
+    {
+      "suite": "approval_and_core_guards_without_optional_tirith",
+      "passed": 455,
+      "failed": 9,
+      "skipped": 0,
+      "note": "All nine failures reproduce Windows absolute-path approval bypasses."
+    },
+    {
+      "suite": "skill_guard_and_ast_audit",
+      "passed": 87,
+      "failed": 2,
+      "skipped": 2,
+      "note": "Two failures require UTF-8 default encoding and Windows symlink privilege."
+    },
+    {
+      "suite": "registry_skill_dispatch_and_delegation",
+      "passed": 306,
+      "failed": 5,
+      "skipped": 2,
+      "note": "Four Windows skill-command regressions and one delegated heartbeat timing failure."
+    }
+  ],
+  "findings": [
+    {
+      "severity": "high",
+      "title": "Windows absolute paths bypass sensitive-write approval detection",
+      "detail": "The approval normalizer rewrites resolved home paths only when they begin with '/'. Native Windows paths such as C:\\Users\\... are not folded to ~/ and redirect, tee, sed, perl and ruby writes toward shell startup files, SSH authorized_keys and Hermes config are not classified dangerous."
+    },
+    {
+      "severity": "high",
+      "title": "Hermes is not a suitable SEED safety boundary",
+      "detail": "Hermes exposes broad shell, autonomous memory, skill mutation, cron and gateway capabilities. Its policy and approval layer cannot substitute for OS-level isolation, especially with the confirmed Windows path bypass."
+    },
+    {
+      "severity": "medium",
+      "title": "Delegated heartbeat test is timing-fragile",
+      "detail": "The long-running-tool heartbeat fixture produced six touches where more than six were required, indicating a boundary timing regression or Windows scheduler sensitivity."
+    },
+    {
+      "severity": "medium",
+      "title": "Hermes skill architecture remains useful as a reference",
+      "detail": "Registry, tool search, scoped delegation, skill AST audit and most approval tests passed. These patterns may be reimplemented behind SEED governance without importing Hermes runtime."
+    }
+  ],
+  "verdict": "Reject as runtime or security boundary on Windows; retain only as a design reference for registry, skills and scoped delegation."
+}

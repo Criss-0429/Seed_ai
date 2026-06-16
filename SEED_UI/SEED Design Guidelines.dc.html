@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; background: #f6f4f0; }
+  </style>
+</helmet>
+
+<div style="min-height: 100vh; background: #f6f4f0; color: #1f1d1a; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 64px 40px 120px; box-sizing: border-box;">
+  <div style="max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 72px;">
+
+    <!-- ============ HEADER ============ -->
+    <header data-screen-label="Intro guidelines" style="display: flex; flex-direction: column; gap: 28px; border-bottom: 1px solid #1f1d1a; padding-bottom: 44px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">
+        <span>SEED · DESIGN GUIDELINES · KNOWLEDGE BASE PER L'EVOLUTION ENGINE</span>
+        <span>v0.1 · GIUGNO 2026</span>
+      </div>
+      <div style="display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap;">
+        <div style="flex: 1.4; min-width: 380px; display: flex; flex-direction: column; gap: 16px;">
+          <h1 style="margin: 0; font-size: 38px; font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; text-wrap: pretty;">Pattern verificati, prima dell'invenzione</h1>
+          <p style="margin: 0; font-size: 17px; line-height: 1.55; color: #57534b; text-wrap: pretty;">Questa pagina ha due lettori: l'utente e SEED stesso. Quando il motore evolutivo genera una mutazione che tocca interfaccia o esperienza, la proposta deve consultare queste regole, citare quelle pertinenti e dichiarare esplicitamente ogni deroga. Non sono leggi ferree: sono conoscenza consolidata — il punto di partenza che l'evidenza personale di ogni utente può raffinare, mai ignorare in silenzio.</p>
+        </div>
+        <!-- Gerarchia di precedenza -->
+        <div style="flex: 1; min-width: 340px; background: #fdfcfa; border: 1px solid #dedacf; padding: 24px 28px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">GERARCHIA DI PRECEDENZA — IN CASO DI CONFLITTO</div>
+          <div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px; line-height: 1.45; color: #1f1d1a;">
+            <div style="display: flex; gap: 12px;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; color: oklch(60% 0.12 45); flex-shrink: 0; width: 22px;">P0</span><span><b>Controllo e sicurezza dell'utente</b> — mai derogabile</span></div>
+            <div style="display: flex; gap: 12px;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; color: oklch(60% 0.12 45); flex-shrink: 0; width: 22px;">P1</span><span><b>Accessibilità</b> — mai derogabile</span></div>
+            <div style="display: flex; gap: 12px;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; color: #97928a; flex-shrink: 0; width: 22px;">P2</span><span>Correzione o preferenza esplicita recente dell'utente</span></div>
+            <div style="display: flex; gap: 12px;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; color: #97928a; flex-shrink: 0; width: 22px;">P3</span><span>Esito comportamentale ripetuto, osservato in contesti comparabili</span></div>
+            <div style="display: flex; gap: 12px;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; color: #97928a; flex-shrink: 0; width: 22px;">P4</span><span>Queste best practice</span></div>
+            <div style="display: flex; gap: 12px;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; color: #97928a; flex-shrink: 0; width: 22px;">P5</span><span>Preferenza estetica / stilistica</span></div>
+          </div>
+          <div style="font-size: 13px; line-height: 1.5; color: #97928a; border-top: 1px solid #efece4; padding-top: 10px;">Una mutazione che viola P0–P1 non è candidabile. Una che contraddice P4 deve dichiarare quale evidenza P2–P3 la giustifica.</div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 24px; flex-wrap: wrap; font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.1em; color: #57534b;">
+        <span style="display: inline-flex; align-items: center; gap: 8px;"><span style="width: 9px; height: 9px; border: 1.3px solid oklch(60% 0.12 45); border-radius: 50%; background: oklch(60% 0.12 45);"></span>VINCOLO — non derogabile</span>
+        <span style="display: inline-flex; align-items: center; gap: 8px;"><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span>BEST PRACTICE — derogabile con evidenza dichiarata</span>
+      </div>
+    </header>
+
+    <!-- ============ A · PERCEZIONE ============ -->
+    <section data-screen-label="A Percezione e comportamento" style="display: flex; flex-direction: column; gap: 28px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #1f1d1a; padding-bottom: 10px;">
+        <h2 style="margin: 0; font-size: 22px; font-weight: 600;">A · Percezione e comportamento</h2>
+        <span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">LAWS OF UX</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px;">
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">A-01 · LEGGE DI FITTS</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Il tempo per raggiungere un bersaglio cresce con la distanza e cala con la dimensione: le azioni frequenti vanno rese grandi e vicine.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> mai hit target sotto 24px (44px se touch); le azioni ricorrenti dell'utente migrano verso il punto d'attenzione (orb, barra).</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">FITTS 1954 · LAWSOFUX.COM</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">A-02 · LEGGE DI HICK</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Il tempo di decisione cresce con il numero e la complessità delle scelte visibili.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> poche azioni visibili per volta; ciò che è raro resta dietro la scorciatoia. Una mutazione che aggiunge opzioni a vista deve toglierne altrove.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">HICK-HYMAN 1952 · LAWSOFUX.COM</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">A-03 · LEGGE DI JAKOB</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Gli utenti passano la maggior parte del tempo in altri software: si aspettano i pattern che già conoscono.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> non reinventare le convenzioni (input in basso, Esc chiude, invio invia) senza un'evidenza personale forte e dichiarata.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">NIELSEN 2000 · LAWSOFUX.COM</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">A-04 · CARICO DI MEMORIA</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">La memoria di lavoro tiene pochi elementi: l'informazione va raggruppata in blocchi brevi e significativi.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> nelle superfici secondarie, mai più di ~5 elementi senza raggruppamento; le risposte lunghe arrivano a blocchi, non a muro.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">MILLER 1956 · LAWSOFUX.COM</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">A-05 · SOGLIA DI DOHERTY</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Sotto i 400ms di risposta, l'interazione resta un flusso; sopra, l'attenzione si spezza.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> ack entro 400ms, sempre — anche se il lavoro continua: l'orb cambia stato e dice «ricevuto». Mai silenzio durante il pensiero.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">DOHERTY 1982 · LAWSOFUX.COM</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">A-06 · REGOLA PEAK-END</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Di un'esperienza si ricordano il momento più intenso e la fine, non la media.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> cura la chiusura dei task (risultato + ritorno) e la riparazione degli errori: sono i momenti che costruiscono o rompono la relazione.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">KAHNEMAN · LAWSOFUX.COM</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">A-07 · ESTETICA-USABILITÀ</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Ciò che appare curato viene percepito come più usabile — anche quando non lo è.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> la pulizia visiva genera fiducia, ma è anche un bias: nelle valutazioni di mutazione, separa il giudizio estetico dall'utilità misurata.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">KUROSU &amp; KASHIMURA 1995 · LAWSOFUX.COM</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">A-08 · EFFETTO VON RESTORFF</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Tra elementi simili, si nota e si ricorda quello che differisce.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> una sola enfasi per superficie (regola dell'accento del brand): se tutto è evidenziato, niente lo è.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">VON RESTORFF 1933 · LAWSOFUX.COM</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">A-09 · LEGGE DI TESLER</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">La complessità di un compito non si elimina: si può solo decidere chi la porta.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> assorbi tu la complessità (orchestrazione, parametri, dettagli); semplificare la UI scaricando lavoro sull'utente non è una semplificazione.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">TESLER ~1985 · LAWSOFUX.COM</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">A-10 · LEGGE DI POSTEL</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Liberale in ciò che accetti, conservativo in ciò che produci.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> accetta input imprecisi, dialetto, frasi a metà; rispondi in forma prevedibile e coerente. L'elasticità sta in ingresso, mai in uscita.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">POSTEL 1980 · LAWSOFUX.COM</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ B · USABILITÀ ============ -->
+    <section data-screen-label="B Euristiche di usabilita" style="display: flex; flex-direction: column; gap: 28px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #1f1d1a; padding-bottom: 10px;">
+        <h2 style="margin: 0; font-size: 22px; font-weight: 600;">B · Usabilità</h2>
+        <span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">10 EURISTICHE · NIELSEN NORMAN GROUP</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px;">
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">B-01 · STATO VISIBILE</span><span style="width: 9px; height: 9px; border: 1.3px solid oklch(60% 0.12 45); border-radius: 50%; background: oklch(60% 0.12 45);"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Il sistema dichiara sempre cosa sta facendo, con feedback tempestivo.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> gli stati risveglio / ascolto / pensiero / azione / ritorno sono sempre percepibili nell'orb, in ogni variante e dimensione. Vincolo: è il patto di trasparenza.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">NN/G #1 · NIELSEN 1994</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">B-02 · LINGUAGGIO DELL'UTENTE</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Parole, concetti e ordine che appartengono al mondo dell'utente, non al sistema.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> usa il lessico costruito nella relazione (storia della relazione, doc 09); mai gergo tecnico non condiviso. «Snapshot» per te, «punto di ripristino» per chi non lo conosce.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">NN/G #2 · NIELSEN 1994</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">B-03 · CONTROLLO E LIBERTÀ</span><span style="width: 9px; height: 9px; border: 1.3px solid oklch(60% 0.12 45); border-radius: 50%; background: oklch(60% 0.12 45);"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Uscite d'emergenza chiare: annulla, ripeti, esci — senza percorsi obbligati.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> Esc funziona ovunque; ogni azione di SEED è annullabile; il rollback è sempre raggiungibile. Nessuna mutazione può rimuovere un'uscita.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">NN/G #3 · NIELSEN 1994</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">B-04 · COERENZA</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Stessa cosa, stessa forma, stesso posto: l'utente non deve chiedersi se due elementi simili significano cose diverse.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> dopo una mutazione, tutto ciò che non è mutato resta identico — è la continuità percepibile del principio 5.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">NN/G #4 · NIELSEN 1994</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">B-05 · PREVENZIONE ERRORI</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Meglio impedire l'errore che segnalarlo bene: conferme solo dove il rischio le giustifica.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> la conferma è proporzionata all'effetto (permessi per effetti): niente conferme per leggere, conferma esplicita per inviare, eliminare, mutare.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">NN/G #5 · NIELSEN 1994</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">B-06 · RICONOSCERE, NON RICORDARE</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Le opzioni si mostrano nel contesto: la memoria di lavoro dell'utente non è un magazzino.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> le scorciatoie si suggeriscono nel momento d'uso, mai in un manuale; le convenzioni condivise le ricordi tu, non l'utente.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">NN/G #6 · NIELSEN 1994</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">B-07 · FLESSIBILITÀ ED EFFICIENZA</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Acceleratori invisibili al principiante, preziosi per l'esperto.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> è il terreno naturale dell'evoluzione: quando un percorso si ripete, proponi (non imporre) una scorciatoia su misura.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">NN/G #7 · NIELSEN 1994</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">B-08 · MINIMALISMO</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Ogni informazione in più compete con quelle rilevanti e le diluisce.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> ogni elemento che una mutazione aggiunge deve giustificare la propria presenza nella proposta; il default è non aggiungere.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">NN/G #8 · NIELSEN 1994</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">B-09 · RECUPERO DAGLI ERRORI</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Errori espressi in linguaggio umano: cosa è successo, perché, come si rimedia.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> quando sbagli, ammettilo per primo, spiega in una riga e offri la correzione a un tocco. La riparazione è un momento peak-end (A-06).</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">NN/G #9 · NIELSEN 1994</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">B-10 · AIUTO NEL CONTESTO</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Idealmente non serve documentazione; quando serve, è breve, concreta e vicina al compito.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> l'aiuto è conversazionale: si chiede, non si cerca. Nessuna superficie di SEED ha bisogno di un tutorial per essere usata la prima volta.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">NN/G #10 · NIELSEN 1994</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ C · PIATTAFORMA ============ -->
+    <section data-screen-label="C Piattaforma e chiarezza" style="display: flex; flex-direction: column; gap: 28px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #1f1d1a; padding-bottom: 10px;">
+        <h2 style="margin: 0; font-size: 22px; font-weight: 600;">C · Piattaforma e chiarezza</h2>
+        <span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">APPLE HIG · DESIGN PER DESKTOP</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px;">
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">C-01 · GERARCHIA, NON DECORAZIONE</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">L'ordine visivo nasce da tipografia, spazio e allineamento — non da ornamenti.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> 1–2 famiglie tipografiche, scala fissa, il vuoto come struttura. Una mutazione non introduce nuovi font o effetti decorativi.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">APPLE HIG · FOUNDATIONS</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">C-02 · DEFERENZA</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">L'interfaccia serve il contenuto e non compete mai con esso per l'attenzione.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> la cromia resta neutra (carta/inchiostro); il colore appare solo dove significa: stato, ipotesi, correggibilità.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">APPLE HIG · FOUNDATIONS</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">C-03 · CONVENZIONI DESKTOP</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Su desktop la tastiera è un cittadino di prima classe: scorciatoie, focus, menu contestuali, finestre prevedibili.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> tutto è raggiungibile da tastiera; le shortcut sono dichiarate, stabili e coerenti con Windows (Ctrl, non Cmd).</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">APPLE HIG · DESIGNING FOR MACOS (ADATTATO)</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">C-04 · IMPOSTAZIONI DI SISTEMA</span><span style="width: 9px; height: 9px; border: 1.3px solid oklch(60% 0.12 45); border-radius: 50%; background: oklch(60% 0.12 45);"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Tema, riduzione del movimento, scala del testo: le preferenze OS dell'utente valgono più di qualsiasi scelta estetica.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> «riduci movimento» spegne i loop dell'orb (gli stati restano distinguibili per opacità); la scala testo OS si rispetta sempre.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">APPLE HIG · ACCESSIBILITY</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">C-05 · TESTO LEGGIBILE</span><span style="width: 9px; height: 9px; border: 1.3px solid oklch(60% 0.12 45); border-radius: 50%; background: oklch(60% 0.12 45);"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Dimensioni minime e contrasto pieno per il testo funzionale; la gerarchia si fa con peso e colore, non rimpicciolendo.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> mai sotto 13px su desktop; i metadati arretrano col colore (traccia), non con la dimensione.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">APPLE HIG · TYPOGRAPHY</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">C-06 · OGNI INPUT HA RISPOSTA</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Hover, focus, pressione: ogni elemento interattivo dichiara di esserlo e conferma di aver ricevuto.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> stati visibili su tutto ciò che si tocca; il focus da tastiera non è mai invisibile (vedi anche E-02).</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">APPLE HIG · FEEDBACK</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ D · HUMAN-AI ============ -->
+    <section data-screen-label="D Interazione uomo-AI" style="display: flex; flex-direction: column; gap: 28px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #1f1d1a; padding-bottom: 10px;">
+        <h2 style="margin: 0; font-size: 22px; font-weight: 600;">D · Interazione uomo-AI</h2>
+        <span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">MICROSOFT HAX (CHI 2019) · GOOGLE PAIR · OPENAI APPS SDK</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px;">
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">D-01 · CAPACITÀ E LIMITI CHIARI</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">L'utente deve capire cosa il sistema sa fare e quanto bene lo fa — prima di fidarsi.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> mai promettere oltre le capability attive; quando una cosa non ti riesce bene, dillo prima di provarci.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">HAX G1–G2 · PAIR «MENTAL MODELS»</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">D-02 · TEMPISMO CONTESTUALE</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Agire o interrompere in base a cosa l'utente sta facendo ora, non a quando il sistema è pronto.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> mai interrompere il focus; i suggerimenti spontanei (se permessi) aspettano una pausa naturale e si presentano nella pillola, non sopra il lavoro.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">HAX G3 · CHI 2019</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">D-03 · CONTESTO DICHIARATO</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Mostrare informazione rilevante per il compito corrente — e rendere visibile che la si sta usando.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> quando usi il contesto (schermo, file, storia), dichiaralo nella risposta: «vedo che stai guardando…». Mai contesto usato di nascosto.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">HAX G4 · SIRI AI (PATTERN DI MERCATO)</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">D-04 · NORME SOCIALI, NIENTE STEREOTIPI</span><span style="width: 9px; height: 9px; border: 1.3px solid oklch(60% 0.12 45); border-radius: 50%; background: oklch(60% 0.12 45);"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Registro adeguato al contesto sociale; linguaggio e comportamenti che non rinforzano bias e stereotipi.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> le inferenze sull'utente non diventano etichette (ipotesi ≠ diagnosi, doc 09); il tono si adatta al contesto, l'identità no.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">HAX G5–G6 · CHI 2019</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">D-05 · CORREZIONE E CONGEDO FACILI</span><span style="width: 9px; height: 9px; border: 1.3px solid oklch(60% 0.12 45); border-radius: 50%; background: oklch(60% 0.12 45);"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Invocare, correggere e liquidare il sistema deve costare pochissimo.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> correggere un'inferenza costa un tocco; «non ora» è sempre rispettato, senza penalità e senza riproporre subito.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">HAX G7–G9 · CHI 2019</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">D-06 · NEL DUBBIO, RIDUCI LA PORTATA</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Con bassa confidenza: disambiguare, offrire opzioni o degradare con grazia — non agire come se si fosse certi.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> sotto soglia di confidenza chiedi o proponi alternative; non simulare sicurezza per sembrare fluido.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">HAX G10 · PAIR «ERRORS + GRACEFUL FAILURE»</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">D-07 · SPIEGA PERCHÉ</span><span style="width: 9px; height: 9px; border: 1.3px solid oklch(60% 0.12 45); border-radius: 50%; background: oklch(60% 0.12 45);"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Ogni comportamento del sistema deve poter essere spiegato in termini comprensibili, su richiesta.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> «perché?» è disponibile su ogni risposta, suggerimento e mutazione — con l'evidenza usata. È la trasparenza interrogabile del principio 9.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">HAX G11 · PAIR «EXPLAINABILITY + TRUST»</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">D-08 · APPRENDIMENTO DICHIARATO</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Ricordare le interazioni recenti e imparare dal comportamento — con consenso e in modo ispezionabile.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> l'apprendimento implicito produce ipotesi con provenance e confidenza, mai fatti; tutto visibile in «cosa penso di sapere di te».</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">HAX G12–G13 · CHI 2019</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">D-09 · CAMBIA CON CAUTELA, AVVISA</span><span style="width: 9px; height: 9px; border: 1.3px solid oklch(60% 0.12 45); border-radius: 50%; background: oklch(60% 0.12 45);"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">La personalizzazione non deve rendere il sistema imprevedibile; i cambiamenti vanno comunicati.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> una mutazione promossa si annuncia e si spiega; mai cambiare in silenzio ciò che l'utente sa già usare. È il cuore del contratto di mutazione.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">HAX G14, G18 · CHI 2019</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">D-10 · FEEDBACK E CONSEGUENZE</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Incoraggiare correzioni puntuali e mostrare subito come l'azione dell'utente cambierà il comportamento futuro.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> dopo ogni correzione, una riga: «d'ora in poi…». L'effetto è immediato e verificabile nel modello utente.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">HAX G15–G16 · CHI 2019</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">D-11 · CONTROLLI GLOBALI</span><span style="width: 9px; height: 9px; border: 1.3px solid oklch(60% 0.12 45); border-radius: 50%; background: oklch(60% 0.12 45);"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">L'utente governa globalmente cosa il sistema osserva e come si comporta.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> il pannello permessi domina qualunque inferenza o mutazione; una revoca ha effetto immediato e retroattivo sull'osservazione.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">HAX G17 · CHI 2019</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">D-12 · FIDUCIA CALIBRATA</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Né overtrust né sfiducia: l'incertezza si mostra, in modo naturale, dentro l'interfaccia.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> la confidenza è visibile dove conta (●●○○○ nel modello utente, esitazione dichiarata in chat); la fluidità non vale una certezza finta.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">PAIR «CALIBRATED TRUST» · OPENAI APPS SDK UX</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ E · ACCESSIBILITÀ ============ -->
+    <section data-screen-label="E Accessibilita" style="display: flex; flex-direction: column; gap: 28px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #1f1d1a; padding-bottom: 10px;">
+        <h2 style="margin: 0; font-size: 22px; font-weight: 600;">E · Accessibilità</h2>
+        <span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">WCAG 2.2 — TUTTI VINCOLI, MAI DEROGABILI</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px;">
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">E-01 · CONTRASTO</span><span style="width: 9px; height: 9px; border: 1.3px solid oklch(60% 0.12 45); border-radius: 50%; background: oklch(60% 0.12 45);"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Testo ≥ 4.5:1 (3:1 per testo grande e componenti UI) rispetto allo sfondo.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> vale anche per l'accento maturo: ogni hue utente va verificata su carta prima dell'attivazione. Se non passa, si corregge la lightness, non la regola.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">WCAG 2.2 · 1.4.3 / 1.4.11</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">E-02 · TASTIERA COMPLETA</span><span style="width: 9px; height: 9px; border: 1.3px solid oklch(60% 0.12 45); border-radius: 50%; background: oklch(60% 0.12 45);"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Tutto operabile senza mouse, con focus sempre visibile e mai intrappolato.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> anche le superfici nascoste e l'overlay: ogni percorso ha un equivalente da tastiera documentato.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">WCAG 2.2 · 2.1.1 / 2.4.7</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">E-03 · DIMENSIONE DEI TARGET</span><span style="width: 9px; height: 9px; border: 1.3px solid oklch(60% 0.12 45); border-radius: 50%; background: oklch(60% 0.12 45);"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Target interattivi ≥ 24×24px CSS (44px per il touch), o spaziatura equivalente.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> nessuna mutazione di densità può scendere sotto queste soglie, qualunque preferenza l'utente esprima.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">WCAG 2.2 · 2.5.8</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">E-04 · MOVIMENTO RIDUCIBILE</span><span style="width: 9px; height: 9px; border: 1.3px solid oklch(60% 0.12 45); border-radius: 50%; background: oklch(60% 0.12 45);"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Rispettare prefers-reduced-motion; niente lampeggi oltre 3 al secondo; le animazioni non sono mai l'unico segnale.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> con riduzione attiva, gli stati dell'orb si distinguono per opacità degli anelli (come da sheet motion del brand).</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">WCAG 2.2 · 2.3.1 / 2.3.3</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">E-05 · NON SOLO COLORE</span><span style="width: 9px; height: 9px; border: 1.3px solid oklch(60% 0.12 45); border-radius: 50%; background: oklch(60% 0.12 45);"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Nessuna informazione affidata al solo colore: serve sempre forma, testo o posizione.</div>
+          <div style="font-size: 14px; line-height: 1.5;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10.5px; color: oklch(60% 0.12 45);">per SEED →</span> i badge (FATTO / IPOTESI / CONFINE) usano testo + bordo, mai solo tinta; gli stati dell'orb hanno anche l'etichetta testuale.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">WCAG 2.2 · 1.4.1</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ F · MUTAZIONE UI ============ -->
+    <section data-screen-label="F Regole di mutazione" style="display: flex; flex-direction: column; gap: 28px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #1f1d1a; padding-bottom: 10px;">
+        <h2 style="margin: 0; font-size: 22px; font-weight: 600;">F · Come SEED applica tutto questo quando muta</h2>
+        <span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">SINTESI SEED · CONTRATTO DI MUTAZIONE</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px;">
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">F-01 · UNA VARIABILE PER VOLTA</span><span style="width: 9px; height: 9px; border: 1.3px solid oklch(60% 0.12 45); border-radius: 50%; background: oklch(60% 0.12 45);"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Ogni mutazione UI cambia una cosa misurabile. Cambiarne tre insieme rende la valutazione cieca: non si sa a cosa attribuire l'esito.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">DOC 02 · EVOLUTION ENGINE</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">F-02 · CONTINUITÀ RICONOSCIBILE</span><span style="width: 9px; height: 9px; border: 1.3px solid oklch(60% 0.12 45); border-radius: 50%; background: oklch(60% 0.12 45);"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Dopo la mutazione, l'utente si riorienta in pochi secondi. Gli invarianti — orb, input, shortcut globali — non cambiano insieme ad altro.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">DOC 00 · PRINCIPIO 5 + HAX G14</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">F-03 · PREVISIONE OSSERVABILE</span><span style="width: 9px; height: 9px; border: 1.3px solid oklch(60% 0.12 45); border-radius: 50%; background: oklch(60% 0.12 45);"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Prima di attivare, la proposta dichiara il segnale atteso («meno correzioni di tono», «meno tempo per il task X») e lo confronta a fine finestra di prova.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">DOC 11 · CONTRATTO DI MUTAZIONE</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">F-04 · PATTERN PRIMA, INVENZIONE POI</span><span style="width: 9px; height: 9px; border: 1.3px dashed #97928a; border-radius: 50%;"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Prima si adatta un pattern verificato (sezioni A–E); inventare ex novo è ammesso, ma richiede evidenza più forte e va confrontato con almeno una variante convenzionale.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">A-03 JAKOB + DOC 09 · CONFRONTI A COPPIE</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">F-05 · REVERSIBILITÀ VISIBILE</span><span style="width: 9px; height: 9px; border: 1.3px solid oklch(60% 0.12 45); border-radius: 50%; background: oklch(60% 0.12 45);"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Ogni cambiamento attivato si annuncia con un «torna com'era» a un tocco, disponibile per tutta la finestra di prova. Il rollback non è una funzione nascosta: è parte dell'annuncio.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">DOC 00 · PRINCIPIO 10 + HAX G18</div>
+        </div>
+
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 20px 22px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.15em; color: #97928a;">F-06 · MAI OTTIMIZZARE L'ENGAGEMENT</span><span style="width: 9px; height: 9px; border: 1.3px solid oklch(60% 0.12 45); border-radius: 50%; background: oklch(60% 0.12 45);"></span></div>
+          <div style="font-size: 14px; line-height: 1.5; color: #57534b;">Una mutazione UI non è migliore perché trattiene di più o piace di più sul momento: la fitness resta multi-obiettivo — utilità, fiducia, continuità, costo, privacy, sicurezza.</div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9.5px; letter-spacing: 0.1em; color: #b3ada0;">DOC 00 · PRINCIPIO 8</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ FONTI ============ -->
+    <footer style="border-top: 1px solid #dedacf; padding-top: 24px; display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">FONTI</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 8px 28px; font-size: 13px; line-height: 1.6; color: #57534b;">
+        <span>Laws of UX — J. Yablonski · lawsofux.com</span>
+        <span>10 Usability Heuristics — Nielsen Norman Group, 1994</span>
+        <span>Human Interface Guidelines — Apple · developer.apple.com/design</span>
+        <span>Guidelines for Human-AI Interaction — Microsoft, CHI 2019 (HAX Toolkit)</span>
+        <span>People + AI Guidebook — Google PAIR · pair.withgoogle.com</span>
+        <span>Apps SDK UX Principles — OpenAI · developers.openai.com</span>
+        <span>WCAG 2.2 — W3C Web Accessibility Initiative</span>
+        <span>UX Design Principles 2026 — UX Design Institute</span>
+      </div>
+      <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.18em; color: #b3ada0;">SEED · DESIGN GUIDELINES · LE REGOLE SI EVOLVONO COME TUTTO IL RESTO: CON EVIDENZA, MAI IN SILENZIO</div>
+    </footer>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

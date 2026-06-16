@@ -85,7 +85,7 @@ class TestPrivacy:
 
     def test_rehydrate_roundtrip(self, gate):
         g, _ = gate
-        red = g.redact("contatta mario.rossi@example.com")
+        g.redact("contatta mario.rossi@example.com")
         out = g.rehydrate(f"Ok, scrivo a {'[EMAIL_1]'}")
         assert "mario.rossi@example.com" in out
 

@@ -11,6 +11,7 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+release/
 downloads/
 eggs/
 .eggs/
@@ -31,6 +32,11 @@ MANIFEST
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
+
+# PyInstaller specs below are source configuration required to rebuild SEED.
+!packaging/
+!packaging/pyinstaller/
+!packaging/pyinstaller/*.spec
 
 # Installer logs
 pip-log.txt
@@ -130,6 +136,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
+.release-venv/
 env/
 venv/
 ENV/

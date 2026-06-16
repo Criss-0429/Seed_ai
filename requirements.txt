@@ -7,8 +7,8 @@ pywebview>=5.0
 # installare dal repo ufficiale:  pip install git+https://github.com/openai/privacy-filter
 # (il checkpoint si scarica al primo avvio in ~/.opf/privacy_filter)
 
-# Media session Windows (facoltativo, fallback euristico se assente)
-winsdk>=1.0; sys_platform == 'win32'
+# Media session Windows uses the existing heuristic fallback. `winsdk` has no
+# Python 3.14 wheel and is intentionally excluded from the tester release.
 
 # M3 retrieval vector stream (opt-in via models.embedding_enabled).
 # Assente = retrieval su lexical+graph (degrada con grazia). Il modello
@@ -20,7 +20,6 @@ sentence-transformers>=3.0
 # primo uso. emotion2vec/funasr scartato: dep editdistance senza wheel py3.14.
 transformers>=4.40
 soundfile>=0.12
-librosa>=0.10
 
 # Build
 pyinstaller>=6.0

@@ -20,12 +20,14 @@ class MutationLifecycle:
         self.proposals_root.mkdir(parents=True, exist_ok=True)
 
     def advance(self, *, owner_approved_canary: bool = False,
-                canary_probe=None) -> list[dict]:
+                canary_probe=None, mutation_id: str | None = None) -> list[dict]:
         """Advance safely using real recorded evidence; never calls promote()."""
         if not self.enabled:
             return []
         actions: list[dict] = []
         for candidate in self._candidates():
+            if mutation_id is not None and candidate.mutation_id != mutation_id:
+                continue
             try:
                 if candidate.status == "shadow":
                     self._record_evaluator_shadow(candidate)
@@ -88,5 +90,4 @@ class MutationLifecycle:
         }
         return [candidate for mid in sorted(ids)
                 if (candidate := self.lineage.candidate(mid)) is not None]
-
 

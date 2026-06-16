@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import os
 import shutil
 import subprocess
 import sys
@@ -19,11 +18,22 @@ RELEASES = ROOT / "release"
 
 MODEL_SOURCES = {
     "privacy-filter": Path.home() / ".opf" / "privacy_filter",
-    "emotion-wav2vec2": Path.home() / ".cache" / "huggingface" / "hub"
-    / "models--superb--wav2vec2-base-superb-er" / "snapshots",
-    "embedding-mpnet": Path.home() / ".cache" / "huggingface" / "hub"
-    / "models--sentence-transformers--paraphrase-multilingual-mpnet-base-v2" / "snapshots",
+    "emotion-wav2vec2": Path.home()
+    / ".cache"
+    / "huggingface"
+    / "hub"
+    / "models--superb--wav2vec2-base-superb-er"
+    / "snapshots",
+    "embedding-mpnet": Path.home()
+    / ".cache"
+    / "huggingface"
+    / "hub"
+    / "models--sentence-transformers--paraphrase-multilingual-mpnet-base-v2"
+    / "snapshots",
 }
+
+PRUNE_DIRECTORY_NAMES = {"__pycache__", "test", "tests", "testing"}
+PRUNE_RUNTIME_PACKAGES = {"librosa", "llvmlite", "llvmlite.libs", "numba"}
 
 
 def digest(path: Path) -> str:
@@ -56,16 +66,55 @@ def copy_models(target: Path) -> dict[str, int]:
             raise RuntimeError(f"required ML checkpoint missing: {source}")
         actual = latest_snapshot(source) if source.name == "snapshots" else source
         destination = target / name
-        shutil.copytree(actual, destination)
+        shutil.copytree(
+            actual,
+            destination,
+            ignore=shutil.ignore_patterns(".cache", "README.md", "*.md"),
+        )
         sizes[name] = sum(path.stat().st_size for path in destination.rglob("*") if path.is_file())
     return sizes
 
 
+def prune_runtime(root: Path) -> dict[str, int]:
+    removed = {"files": 0, "bytes": 0}
+    candidates = [
+        path
+        for path in root.rglob("*")
+        if path.is_dir()
+        and (
+            path.name in PRUNE_DIRECTORY_NAMES
+            or path.name in PRUNE_RUNTIME_PACKAGES
+            or any(path.name.startswith(f"{name}-") for name in PRUNE_RUNTIME_PACKAGES)
+        )
+    ]
+    for path in sorted(candidates, key=lambda item: len(item.parts), reverse=True):
+        if not path.exists():
+            continue
+        files = [item for item in path.rglob("*") if item.is_file()]
+        removed["files"] += len(files)
+        removed["bytes"] += sum(item.stat().st_size for item in files)
+        shutil.rmtree(path)
+    return removed
+
+
+def component_sizes(root: Path) -> dict[str, int]:
+    return {
+        path.name: sum(item.stat().st_size for item in path.rglob("*") if item.is_file())
+        for path in sorted(root.iterdir())
+        if path.is_dir()
+    }
+
+
 def build_pyinstaller() -> None:
-    for spec in ("build/seed.spec", "build/supervisor.spec"):
+    for spec in (
+        "packaging/pyinstaller/seed.spec",
+        "packaging/pyinstaller/supervisor.spec",
+    ):
         subprocess.run(
             [sys.executable, "-m", "PyInstaller", "--clean", "--noconfirm", spec],
-            cwd=ROOT, check=True)
+            cwd=ROOT,
+            check=True,
+        )
 
 
 def zip_tree(source: Path, target: Path) -> None:
@@ -75,12 +124,41 @@ def zip_tree(source: Path, target: Path) -> None:
                 archive.write(path, path.relative_to(source).as_posix())
 
 
+def finalize_installer(target: Path, version: str) -> None:
+    manifest_path = target / "release-manifest.json"
+    update_zip = target / f"SEED-{version}-runtime-update.zip"
+    installer = target / f"SEED-{version}-Setup-Unsigned.exe"
+    if not manifest_path.is_file() or not update_zip.is_file() or not installer.is_file():
+        raise RuntimeError("release manifest, update ZIP, or compiled installer missing")
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["installer"] = {
+        "file": installer.name,
+        "sha256": digest(installer),
+        "unsigned": True,
+    }
+    manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    (target / "SHA256SUMS.txt").write_text(
+        f"{digest(manifest_path)}  {manifest_path.name}\n"
+        f"{digest(update_zip)}  {update_zip.name}\n"
+        f"{digest(installer)}  {installer.name}\n",
+        encoding="ascii",
+    )
+    print(json.dumps({"installer": str(installer), "sha256": manifest["installer"]["sha256"]}))
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--version", required=True)
     parser.add_argument("--schema-version", type=int, default=1)
     parser.add_argument("--skip-build", action="store_true")
+    parser.add_argument("--finalize-installer", action="store_true")
     args = parser.parse_args(argv)
+
+    target = RELEASES / args.version
+    if args.finalize_installer:
+        finalize_installer(target, args.version)
+        return 0
 
     if not args.skip_build:
         build_pyinstaller()
@@ -89,11 +167,14 @@ def main(argv: list[str] | None = None) -> int:
     if not (runtime / "SEED.exe").is_file() or not (supervisor / "SEEDSupervisor.exe").is_file():
         raise RuntimeError("onedir builds missing")
 
-    target = RELEASES / args.version
     shutil.rmtree(target, ignore_errors=True)
     (target / "app").mkdir(parents=True)
     shutil.copytree(runtime, target / "app" / "runtime")
     shutil.copytree(supervisor, target / "app" / "supervisor")
+    pruned = prune_runtime(target / "app" / "runtime")
+    supervisor_pruned = prune_runtime(target / "app" / "supervisor")
+    pruned["files"] += supervisor_pruned["files"]
+    pruned["bytes"] += supervisor_pruned["bytes"]
     model_sizes = copy_models(target / "app" / "models")
     shutil.copy2(ROOT / "installer" / "TESTER_GUIDE.md", target / "TESTER_GUIDE.md")
 
@@ -106,23 +187,34 @@ def main(argv: list[str] | None = None) -> int:
         "data_schema_version": args.schema_version,
         "created_at": time.time(),
         "unsigned": True,
-        "layout": {"runtime": "app/runtime", "supervisor": "app/supervisor", "models": "app/models"},
+        "layout": {
+            "runtime": "app/runtime",
+            "supervisor": "app/supervisor",
+            "models": "app/models",
+        },
         "files": file_hashes,
         "update": {"file": update_zip.name, "sha256": digest(update_zip), "kind": "runtime-zip"},
         "model_bytes": model_sizes,
+        "component_bytes": component_sizes(target / "app"),
+        "pruned": pruned,
         "installed_bytes": sum((target / "app" / path).stat().st_size for path in file_hashes),
     }
     manifest_path = target / "release-manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     (target / "SHA256SUMS.txt").write_text(
-        f"{digest(manifest_path)}  {manifest_path.name}\n"
-        f"{digest(update_zip)}  {update_zip.name}\n",
-        encoding="ascii")
-    print(json.dumps({
-        "release": str(target), "files": len(file_hashes),
-        "installed_bytes": manifest["installed_bytes"],
-        "update_sha256": manifest["update"]["sha256"],
-    }))
+        f"{digest(manifest_path)}  {manifest_path.name}\n{digest(update_zip)}  {update_zip.name}\n",
+        encoding="ascii",
+    )
+    print(
+        json.dumps(
+            {
+                "release": str(target),
+                "files": len(file_hashes),
+                "installed_bytes": manifest["installed_bytes"],
+                "update_sha256": manifest["update"]["sha256"],
+            }
+        )
+    )
     return 0
 
 

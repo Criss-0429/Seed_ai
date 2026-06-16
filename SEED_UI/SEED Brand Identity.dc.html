@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; background: #f6f4f0; }
+    @keyframes seed-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    @keyframes seed-spin { to { transform: rotate(360deg); } }
+    @keyframes seed-spin-rev { to { transform: rotate(-360deg); } }
+    @keyframes seed-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.45); } }
+    @keyframes seed-wake { 0% { transform: scale(0.35); opacity: 0; } 40% { opacity: 1; } 65% { transform: scale(1); opacity: 1; } 88% { opacity: 1; transform: scale(1); } 100% { transform: scale(1); opacity: 0; } }
+  </style>
+</helmet>
+
+<div style="min-height: 100vh; background: #f6f4f0; color: #1f1d1a; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 64px 40px 120px; box-sizing: border-box;">
+  <div style="max-width: 1140px; margin: 0 auto; display: flex; flex-direction: column; gap: 88px;">
+
+    <!-- ============ COVER ============ -->
+    <header data-screen-label="Cover" style="display: flex; flex-direction: column; gap: 40px; border-bottom: 1px solid #1f1d1a; padding-bottom: 56px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">
+        <span>SEED · BRAND IDENTITY · v0.1</span>
+        <span>GIUGNO 2026</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 48px; flex-wrap: wrap;">
+        <div style="position: relative; width: 132px; height: 132px; display: grid; place-items: center; flex-shrink: 0;">
+          <div style="position: absolute; inset: 0; border: 1.5px solid #1f1d1a; border-radius: 50%; opacity: 0.3;"></div>
+          <div style="position: absolute; inset: 27px; border: 1.5px solid #1f1d1a; border-radius: 50%; opacity: 0.6;"></div>
+          <div style="width: 11px; height: 11px; background: #1f1d1a; border-radius: 50%;"></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="font-size: 56px; font-weight: 600; letter-spacing: 0.32em; line-height: 1;">SEED</div>
+          <div style="font-size: 19px; color: #57534b; max-width: 560px; line-height: 1.45; text-wrap: pretty;">Un software personale che parte da una base comune e diventa, con ognuno, qualcosa di diverso. Non una copia dell'utente: un interlocutore compatibile.</div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 40px; flex-wrap: wrap; font-size: 14px; line-height: 1.5; color: #57534b;">
+        <div style="flex: 1; min-width: 220px;"><span style="color: #1f1d1a; font-weight: 600;">Filosofia.</span> Tutto ciò che è visibile parte spoglio e matura con la relazione. Niente nasce finito.</div>
+        <div style="flex: 1; min-width: 220px;"><span style="color: #1f1d1a; font-weight: 600;">Visione.</span> Identità senza maschera: nessun volto, nessun personaggio. Una presenza, non un avatar.</div>
+        <div style="flex: 1; min-width: 220px;"><span style="color: #1f1d1a; font-weight: 600;">Missione.</span> Ogni cambiamento è spiegabile, reversibile, riconoscibile. Anche nel brand: nulla è decorativo.</div>
+      </div>
+    </header>
+
+    <!-- ============ SHEET 01 — MARCHIO ============ -->
+    <section data-screen-label="Sheet 01 — Il marchio" style="display: flex; flex-direction: column; gap: 36px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #1f1d1a; padding-bottom: 10px;">
+        <h2 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: 0.02em;">Il marchio — il seme e gli anelli</h2>
+        <span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">SHEET 01</span>
+      </div>
+      <p style="margin: 0; max-width: 680px; font-size: 16px; line-height: 1.55; color: #57534b; text-wrap: pretty;">Un punto — il seme, l'identità stabile — e attorno anelli di crescita, come quelli di un albero: ogni anello è una stagione della relazione. Il marchio non rappresenta SEED: <em>è</em> SEED, ed è la stessa forma che vive nell'interfaccia come presenza.</p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: stretch;">
+        <!-- Costruzione -->
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 36px; display: flex; flex-direction: column; gap: 28px; align-items: center;">
+          <div style="position: relative; width: 240px; height: 240px; display: grid; place-items: center;">
+            <div style="position: absolute; inset: 0; border: 1px dashed #c9c3b5;"></div>
+            <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: #e8e4da;"></div>
+            <div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #e8e4da;"></div>
+            <div style="position: absolute; inset: 20px; border: 1.5px solid #1f1d1a; border-radius: 50%; opacity: 0.3;"></div>
+            <div style="position: absolute; inset: 62px; border: 1.5px solid #1f1d1a; border-radius: 50%; opacity: 0.6;"></div>
+            <div style="width: 17px; height: 17px; background: #1f1d1a; border-radius: 50%;"></div>
+            <div style="position: absolute; right: -34px; top: 50%; transform: translateY(-50%); font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a;">12u</div>
+            <div style="position: absolute; left: 50%; bottom: 56px; transform: translateX(56px); font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a;">7u</div>
+            <div style="position: absolute; left: 50%; top: 50%; transform: translate(14px, -18px); font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a;">1u</div>
+          </div>
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.14em; color: #57534b; text-align: center; line-height: 1.8;">COSTRUZIONE — seme Ø 1u · anello interno Ø 7u · anello esterno Ø 12u<br>tratto: 1u/8 · opacità: 100% / 60% / 30% dal centro</div>
+        </div>
+        <!-- Lockup + regole -->
+        <div style="display: flex; flex-direction: column; gap: 28px;">
+          <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 32px 36px; display: flex; flex-direction: column; gap: 22px;">
+            <div style="display: flex; align-items: center; gap: 22px;">
+              <div style="position: relative; width: 52px; height: 52px; display: grid; place-items: center; flex-shrink: 0;">
+                <div style="position: absolute; inset: 0; border: 1.3px solid #1f1d1a; border-radius: 50%; opacity: 0.3;"></div>
+                <div style="position: absolute; inset: 11px; border: 1.3px solid #1f1d1a; border-radius: 50%; opacity: 0.6;"></div>
+                <div style="width: 5px; height: 5px; background: #1f1d1a; border-radius: 50%;"></div>
+              </div>
+              <div style="font-size: 26px; font-weight: 600; letter-spacing: 0.32em;">SEED</div>
+            </div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.14em; color: #57534b; line-height: 1.8;">LOCKUP — wordmark in maiuscolo, tracking 0.32em, peso 600.<br>Spazio di rispetto: 1 anello esterno su ogni lato.<br>Dimensione minima del marchio: 16px (1 solo anello sotto i 24px).</div>
+          </div>
+          <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 28px 36px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">MAI</div>
+            <div style="font-size: 15px; line-height: 1.7; color: #57534b;">— dargli un volto, occhi, espressioni: è una presenza, non un personaggio<br>— riempire gli anelli di colore pieno<br>— animarlo su superfici statiche (documenti, stampa)<br>— mostrarne uno stadio più maturo della relazione reale</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stadi evolutivi -->
+      <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 40px 36px; display: flex; flex-direction: column; gap: 30px;">
+        <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">IL MARCHIO CRESCE CON LA RELAZIONE — STESSO SEME, PIÙ ANELLI</div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap;">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; flex: 1; min-width: 140px;">
+            <div style="position: relative; width: 120px; height: 120px; display: grid; place-items: center;">
+              <div style="width: 10px; height: 10px; background: #1f1d1a; border-radius: 50%;"></div>
+            </div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.14em; color: #57534b; text-align: center; line-height: 1.7;">GIORNO 0<br>solo il seme</div>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; flex: 1; min-width: 140px;">
+            <div style="position: relative; width: 120px; height: 120px; display: grid; place-items: center;">
+              <div style="position: absolute; inset: 34px; border: 1.4px solid #1f1d1a; border-radius: 50%; opacity: 0.6;"></div>
+              <div style="width: 10px; height: 10px; background: #1f1d1a; border-radius: 50%;"></div>
+            </div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.14em; color: #57534b; text-align: center; line-height: 1.7;">PRIME SETTIMANE<br>il primo anello</div>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; flex: 1; min-width: 140px;">
+            <div style="position: relative; width: 120px; height: 120px; display: grid; place-items: center;">
+              <div style="position: absolute; inset: 10px; border: 1.4px solid #1f1d1a; border-radius: 50%; opacity: 0.3;"></div>
+              <div style="position: absolute; inset: 34px; border: 1.4px solid #1f1d1a; border-radius: 50%; opacity: 0.6;"></div>
+              <div style="width: 10px; height: 10px; background: #1f1d1a; border-radius: 50%;"></div>
+            </div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.14em; color: #57534b; text-align: center; line-height: 1.7;">RELAZIONE CONSOLIDATA<br>forma canonica</div>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; flex: 1; min-width: 140px;">
+            <div style="position: relative; width: 120px; height: 120px; display: grid; place-items: center;">
+              <div style="position: absolute; inset: 0; border: 1.4px solid oklch(60% 0.12 45); border-radius: 50%; opacity: 0.35;"></div>
+              <div style="position: absolute; inset: 10px; border: 1.4px solid #1f1d1a; border-radius: 50%; opacity: 0.3;"></div>
+              <div style="position: absolute; inset: 34px; border: 1.4px solid #1f1d1a; border-radius: 50%; opacity: 0.6;"></div>
+              <div style="width: 10px; height: 10px; background: #1f1d1a; border-radius: 50%;"></div>
+            </div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.14em; color: #57534b; text-align: center; line-height: 1.7;">RELAZIONE MATURA<br>l'anello prende la tinta dell'utente</div>
+          </div>
+        </div>
+        <div style="font-size: 14px; color: #97928a; line-height: 1.55; max-width: 640px;">Lo stadio mostrato è sempre quello vero: il marchio nell'app dell'utente al giorno 3 ha meno anelli di quello al mese 6. Nelle comunicazioni generiche (sito, documenti) si usa la forma canonica a due anelli, in inchiostro.</div>
+      </div>
+    </section>
+
+    <!-- ============ SHEET 02 — PALETTE ============ -->
+    <section data-screen-label="Sheet 02 — Palette evolutiva" style="display: flex; flex-direction: column; gap: 36px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #1f1d1a; padding-bottom: 10px;">
+        <h2 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: 0.02em;">Palette — il colore si guadagna</h2>
+        <span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">SHEET 02</span>
+      </div>
+      <p style="margin: 0; max-width: 680px; font-size: 16px; line-height: 1.55; color: #57534b; text-wrap: pretty;">SEED nasce quasi acromatico: carta e inchiostro. Il colore non è un tema da scegliere — emerge con la relazione, aumentando di intensità (chroma) man mano che la fiducia e la storia condivisa crescono. La tinta (hue) appartiene all'utente.</p>
+
+      <!-- Neutri -->
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">NEUTRI COSTANTI — NON EVOLVONO MAI</div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="height: 84px; background: oklch(97% 0.005 85); border: 1px solid #dedacf;"></div>
+            <div style="font-size: 13px; font-weight: 600;">Carta</div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a;">oklch(97% 0.005 85)<br>sfondi, sempre</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="height: 84px; background: oklch(92% 0.006 85); border: 1px solid #dedacf;"></div>
+            <div style="font-size: 13px; font-weight: 600;">Velo</div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a;">oklch(92% 0.006 85)<br>superfici secondarie, bolle</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="height: 84px; background: oklch(62% 0.01 85);"></div>
+            <div style="font-size: 13px; font-weight: 600;">Traccia</div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a;">oklch(62% 0.01 85)<br>meta, timestamp, stati</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="height: 84px; background: oklch(23% 0.008 80);"></div>
+            <div style="font-size: 13px; font-weight: 600;">Inchiostro</div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a;">oklch(23% 0.008 80)<br>testo, marchio, presenza</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Maturazione -->
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">L'ACCENTO MATURA — STESSA TINTA, CHROMA CRESCENTE</div>
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0;">
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="height: 84px; background: oklch(60% 0 0);"></div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a; line-height: 1.7;">C 0.00 · giorno 0<br>nessun colore</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="height: 84px; background: oklch(60% 0.03 45);"></div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a; line-height: 1.7;">C 0.03 · prime conversazioni</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="height: 84px; background: oklch(60% 0.06 45);"></div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a; line-height: 1.7;">C 0.06 · prime settimane</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="height: 84px; background: oklch(60% 0.10 45);"></div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a; line-height: 1.7;">C 0.10 · relazione consolidata</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="height: 84px; background: oklch(60% 0.14 45);"></div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a; line-height: 1.7;">C 0.14 · matura<br>intensità massima</div>
+          </div>
+        </div>
+        <div style="font-size: 14px; color: #97928a; line-height: 1.55; max-width: 640px;">La maturazione non è automatica col tempo: avanza con eventi reali della relazione (correzioni accettate, mutazioni promosse, convenzioni costruite) e può regredire dopo un rollback.</div>
+      </div>
+
+      <!-- Hue dell'utente -->
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">LA TINTA APPARTIENE ALL'UTENTE — STESSI L/C, HUE DIVERSA PER OGNI RELAZIONE</div>
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px;">
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="height: 64px; background: oklch(60% 0.12 45); border-radius: 100px;"></div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a;">H 45</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="height: 64px; background: oklch(60% 0.12 110); border-radius: 100px;"></div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a;">H 110</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="height: 64px; background: oklch(60% 0.12 180); border-radius: 100px;"></div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a;">H 180</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="height: 64px; background: oklch(60% 0.12 260); border-radius: 100px;"></div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a;">H 260</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="height: 64px; background: oklch(60% 0.12 320); border-radius: 100px;"></div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a;">H 320</div>
+          </div>
+        </div>
+        <div style="font-size: 14px; color: #97928a; line-height: 1.55; max-width: 640px;">La hue si fissa durante l'onboarding (scelta o proposta da SEED a partire dal racconto dell'utente) e poi resta stabile: è la continuità percepibile della relazione. Cambiarla è una mutazione, con tutte le sue regole.</div>
+      </div>
+
+      <!-- Regole d'uso -->
+      <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 28px 36px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">L'ACCENTO PUÒ TOCCARE</div>
+          <div style="font-size: 15px; line-height: 1.7; color: #57534b;">— lo stato vivo della presenza (anello esterno)<br>— i marcatori di ipotesi e di correggibilità<br>— una sola enfasi per superficie</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">MAI</div>
+          <div style="font-size: 15px; line-height: 1.7; color: #57534b;">— sfondi o campiture estese<br>— testo corrente<br>— più intensità di quella guadagnata</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SHEET 03 — MOTION ============ -->
+    <section data-screen-label="Sheet 03 — Motion" style="display: flex; flex-direction: column; gap: 36px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #1f1d1a; padding-bottom: 10px;">
+        <h2 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: 0.02em;">Motion — il movimento è respiro</h2>
+        <span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">SHEET 03</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; max-width: 980px;">
+        <div style="font-size: 14px; line-height: 1.55; color: #57534b;"><span style="color: #1f1d1a; font-weight: 600;">1 · Respiro, non spettacolo.</span> Curve sinusoidali, durate ≥ 1.2s. Mai easing elastici o rimbalzi.</div>
+        <div style="font-size: 14px; line-height: 1.55; color: #57534b;"><span style="color: #1f1d1a; font-weight: 600;">2 · Uno stato, un movimento.</span> Ogni fase ha una firma riconoscibile a colpo d'occhio, anche in periferia visiva.</div>
+        <div style="font-size: 14px; line-height: 1.55; color: #57534b;"><span style="color: #1f1d1a; font-weight: 600;">3 · Sempre interrompibile.</span> L'input dell'utente ferma qualsiasi animazione entro 100ms.</div>
+        <div style="font-size: 14px; line-height: 1.55; color: #57534b;"><span style="color: #1f1d1a; font-weight: 600;">4 · L'evoluzione non è un effetto.</span> Un cambiamento di SEED si annuncia a parole, non con una transizione spettacolare.</div>
+      </div>
+
+      <!-- Demo -->
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 36px 20px 24px; display: flex; flex-direction: column; align-items: center; gap: 22px;">
+          {{ demoWake }}
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+            <div style="font-size: 14px; font-weight: 600;">Risveglio</div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a; text-align: center; line-height: 1.7;">gli anelli si formano dal seme<br>2.8s · una volta sola</div>
+          </div>
+        </div>
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 36px 20px 24px; display: flex; flex-direction: column; align-items: center; gap: 22px;">
+          {{ demoListen }}
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+            <div style="font-size: 14px; font-weight: 600;">Ascolto</div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a; text-align: center; line-height: 1.7;">respiro lento dell'intera forma<br>3.2s · loop</div>
+          </div>
+        </div>
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 36px 20px 24px; display: flex; flex-direction: column; align-items: center; gap: 22px;">
+          {{ demoThink }}
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+            <div style="font-size: 14px; font-weight: 600;">Pensiero</div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a; text-align: center; line-height: 1.7;">anelli in rotazione opposta<br>7s / 11s · loop</div>
+          </div>
+        </div>
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 36px 20px 24px; display: flex; flex-direction: column; align-items: center; gap: 22px;">
+          {{ demoSpeak }}
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+            <div style="font-size: 14px; font-weight: 600;">Voce</div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a; text-align: center; line-height: 1.7;">il seme pulsa sul parlato<br>~0.9s · segue la voce</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timing -->
+      <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 28px 36px; display: flex; flex-direction: column; gap: 16px;">
+        <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">TOKEN DI TIMING</div>
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; line-height: 1.9; color: #57534b;">
+          <div>risveglio<br><span style="color: #1f1d1a;">2800ms · once</span></div>
+          <div>ascolto<br><span style="color: #1f1d1a;">3200ms · loop</span></div>
+          <div>pensiero<br><span style="color: #1f1d1a;">7000/11000ms · loop</span></div>
+          <div>voce<br><span style="color: #1f1d1a;">≈900ms · su ampiezza</span></div>
+          <div>superfici<br><span style="color: #1f1d1a;">360ms · ease-out</span></div>
+        </div>
+        <div style="font-size: 14px; color: #97928a; line-height: 1.55;">Con «riduci movimento» attivo: niente loop, gli stati si distinguono solo per opacità degli anelli.</div>
+      </div>
+    </section>
+
+    <!-- ============ SHEET 04 — TIPOGRAFIA ============ -->
+    <section data-screen-label="Sheet 04 — Tipografia" style="display: flex; flex-direction: column; gap: 36px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #1f1d1a; padding-bottom: 10px;">
+        <h2 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: 0.02em;">Tipografia — due voci, una presenza</h2>
+        <span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">SHEET 04</span>
+      </div>
+      <p style="margin: 0; max-width: 680px; font-size: 16px; line-height: 1.55; color: #57534b; text-wrap: pretty;">Il sistema tipografico di SEED ha due voci sole: una per il parlato — tutto ciò che appartiene alla relazione, al contenuto, all'utente — e una per il sistema — tutto ciò che appartiene a SEED come macchina: stati, provenance, etichette, codice. Non esistono font decorativi, display o d'effetto. La gerarchia nasce dal peso e dallo spazio, non da famiglie diverse.</p>
+
+      <!-- Le due famiglie -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+
+        <!-- DM Sans -->
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 36px; display: flex; flex-direction: column; gap: 28px;">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.18em; color: #97928a;">VOCE 1 · DM SANS · IL PARLATO</div>
+            <div style="font-size: 13px; color: #57534b; line-height: 1.5;">Conversazione, risposte, titoli di sezione, interfaccia. Tutto ciò che viene letto come linguaggio naturale.</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="font-family: 'DM Sans', 'Helvetica Neue', sans-serif; font-size: 32px; font-weight: 300; line-height: 1.15; color: #1f1d1a; letter-spacing: -0.01em;">Relazione, non imitazione.</div>
+              <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a; letter-spacing: 0.14em;">32px · weight 300 · titoli sezione</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="font-family: 'DM Sans', 'Helvetica Neue', sans-serif; font-size: 18px; font-weight: 400; line-height: 1.5; color: #1f1d1a;">Ieri hai lavorato a lungo sul capitolo 3, fino a tardi. Vuoi che riprenda da dove ti sei fermato?</div>
+              <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a; letter-spacing: 0.14em;">18px · weight 400 · corpo conversazione SEED</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="font-family: 'DM Sans', 'Helvetica Neue', sans-serif; font-size: 16px; font-weight: 400; line-height: 1.5; color: #1f1d1a;">Domani devo presentare la tesi. Sono in ritardo sul capitolo 3.</div>
+              <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a; letter-spacing: 0.14em;">16px · weight 400 · corpo messaggi utente</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="font-family: 'DM Sans', 'Helvetica Neue', sans-serif; font-size: 13px; font-weight: 400; line-height: 1.5; color: #57534b;">tutto è correggibile · le ipotesi non diventano fatti da sole</div>
+              <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a; letter-spacing: 0.14em;">13px · weight 400 · note, disclaimer, piè</div>
+            </div>
+          </div>
+          <div style="border-top: 1px solid #efece4; padding-top: 16px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.14em; color: #97928a;">VARIANTI DI PESO IN USO</div>
+            <div style="display: flex; gap: 20px; align-items: baseline; flex-wrap: wrap;">
+              <span style="font-family: 'DM Sans', 'Helvetica Neue', sans-serif; font-size: 16px; font-weight: 300; color: #1f1d1a;">Light 300</span>
+              <span style="font-family: 'DM Sans', 'Helvetica Neue', sans-serif; font-size: 16px; font-weight: 400; color: #1f1d1a;">Regular 400</span>
+              <span style="font-family: 'DM Sans', 'Helvetica Neue', sans-serif; font-size: 16px; font-weight: 500; color: #1f1d1a;">Medium 500</span>
+              <span style="font-family: 'DM Sans', 'Helvetica Neue', sans-serif; font-size: 16px; font-weight: 600; color: #1f1d1a;">SemiBold 600</span>
+            </div>
+            <div style="font-size: 13px; color: #97928a; line-height: 1.5;">Bold (700+) non viene usato nell'interfaccia. L'enfasi si ottiene con il colore inchiostro su sfondo carta, non con il peso massimo.</div>
+          </div>
+        </div>
+
+        <!-- Monospace -->
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 36px; display: flex; flex-direction: column; gap: 28px;">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.18em; color: #97928a;">VOCE 2 · UI-MONOSPACE · IL SISTEMA</div>
+            <div style="font-size: 13px; color: #57534b; line-height: 1.5;">Etichette di stato, provenance, timestamp, codice, scorciatoie, badge, identificatori. Mai testo leggibile come linguaggio naturale.</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 13px; letter-spacing: 0.22em; color: #1f1d1a; text-transform: uppercase;">SEED · BRAND IDENTITY · v0.1</div>
+              <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a; letter-spacing: 0.14em;">13px · uppercase · intestazioni di documento</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.14em; color: #97928a;">IPOTESI · FATTO · CONFINE · SU RICHIESTA</div>
+              <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a; letter-spacing: 0.14em;">11px · badge, etichette di categoria</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; color: #57534b; letter-spacing: 0.08em;">14:02 · osservato 6 volte · scade se smentita</div>
+              <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a; letter-spacing: 0.14em;">11px · timestamp, provenance, metadati</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; color: #1f1d1a; letter-spacing: 0.14em;">Ctrl + .&nbsp;&nbsp;&nbsp;Ctrl + Spazio&nbsp;&nbsp;&nbsp;Esc</div>
+              <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a; letter-spacing: 0.14em;">11px · scorciatoie da tastiera</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #b3ada0; letter-spacing: 0.14em;">⟳ lettura note_0611.md ✓&nbsp;&nbsp;·&nbsp;&nbsp;bozza in corso…</div>
+              <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; color: #97928a; letter-spacing: 0.14em;">10px · log di azione, aggiornamenti in linea</div>
+            </div>
+          </div>
+          <div style="border-top: 1px solid #efece4; padding-top: 16px; font-size: 13px; color: #97928a; line-height: 1.55;">Il monospace è sempre traccia/inchiostro, mai corpo nero: il sistema si legge in periferia, non compete con la conversazione.</div>
+        </div>
+      </div>
+
+      <!-- Scala e regole -->
+      <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 28px 36px; display: flex; flex-direction: column; gap: 20px;">
+        <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">SCALA TIPOGRAFICA — STEP FISSI, MAI INTERPOLATI</div>
+        <div style="display: flex; gap: 0; flex-wrap: wrap; border: 1px solid #efece4;">
+          <div style="flex: 1; min-width: 140px; padding: 16px 18px; border-right: 1px solid #efece4; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-family: 'DM Sans', 'Helvetica Neue', sans-serif; font-size: 32px; font-weight: 300; line-height: 1.1; color: #1f1d1a;">Aa</div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9px; letter-spacing: 0.14em; color: #97928a;">32 · L300<br>TITOLO</div>
+          </div>
+          <div style="flex: 1; min-width: 140px; padding: 16px 18px; border-right: 1px solid #efece4; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-family: 'DM Sans', 'Helvetica Neue', sans-serif; font-size: 22px; font-weight: 400; line-height: 1.2; color: #1f1d1a;">Aa</div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9px; letter-spacing: 0.14em; color: #97928a;">22 · R400<br>SOTTOTITOLO</div>
+          </div>
+          <div style="flex: 1; min-width: 140px; padding: 16px 18px; border-right: 1px solid #efece4; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-family: 'DM Sans', 'Helvetica Neue', sans-serif; font-size: 18px; font-weight: 400; line-height: 1.4; color: #1f1d1a;">Aa</div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9px; letter-spacing: 0.14em; color: #97928a;">18 · R400<br>CORPO SEED</div>
+          </div>
+          <div style="flex: 1; min-width: 140px; padding: 16px 18px; border-right: 1px solid #efece4; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-family: 'DM Sans', 'Helvetica Neue', sans-serif; font-size: 16px; font-weight: 400; line-height: 1.5; color: #1f1d1a;">Aa</div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9px; letter-spacing: 0.14em; color: #97928a;">16 · R400<br>CORPO UTENTE</div>
+          </div>
+          <div style="flex: 1; min-width: 140px; padding: 16px 18px; border-right: 1px solid #efece4; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-family: 'DM Sans', 'Helvetica Neue', sans-serif; font-size: 13px; font-weight: 400; line-height: 1.5; color: #57534b;">Aa</div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9px; letter-spacing: 0.14em; color: #97928a;">13 · R400<br>NOTE · TRACCIA</div>
+          </div>
+          <div style="flex: 1; min-width: 140px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.14em; color: #97928a;">Aa</div>
+            <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9px; letter-spacing: 0.14em; color: #97928a;">11 · MONO<br>SISTEMA</div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; font-size: 14px; color: #57534b; line-height: 1.6;">
+          <div><span style="font-weight: 500; color: #1f1d1a;">Allineamento.</span> Testo corrente sempre a sinistra, al massimo centrato per label a singola riga nell'orb. Mai giustificato.</div>
+          <div><span style="font-weight: 500; color: #1f1d1a;">Line-height.</span> 1.5 per il corpo, 1.15–1.2 per i titoli. L'interlinea non si stringe sotto mutazione di densità.</div>
+          <div><span style="font-weight: 500; color: #1f1d1a;">Minimo assoluto.</span> 13px su desktop (vincolo accessibilità E-05), 11px solo per il monospace di sistema.</div>
+          <div><span style="font-weight: 500; color: #1f1d1a;">Testo e respiro.</span> La misura di riga ideale è 60–75 caratteri. Le colonne di testo non si allargano oltre 720px.</div>
+        </div>
+      </div>
+
+      <!-- Wordmark tipografico -->
+      <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 32px 36px; display: flex; flex-direction: column; gap: 16px;">
+        <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">IL WORDMARK — DM SANS · SEMIBOLD 600 · TRACKING 0.32em · TUTTO MAIUSCOLO</div>
+        <div style="display: flex; gap: 40px; align-items: center; flex-wrap: wrap;">
+          <div style="font-family: 'DM Sans', 'Helvetica Neue', sans-serif; font-size: 48px; font-weight: 600; letter-spacing: 0.32em; color: #1f1d1a; line-height: 1;">SEED</div>
+          <div style="font-family: 'DM Sans', 'Helvetica Neue', sans-serif; font-size: 28px; font-weight: 600; letter-spacing: 0.32em; color: #1f1d1a; line-height: 1;">SEED</div>
+          <div style="font-family: 'DM Sans', 'Helvetica Neue', sans-serif; font-size: 16px; font-weight: 600; letter-spacing: 0.32em; color: #1f1d1a; line-height: 1;">SEED</div>
+          <div style="font-size: 14px; color: #97928a; line-height: 1.55; max-width: 340px;">Il wordmark usa lo stesso font dell'interfaccia: non esiste un carattere esclusivo. La distinzione nasce dal tracking esagerato (0.32em) e dal peso 600 — mai altrove nell'interfaccia.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SHEET 05 — TONE OF VOICE ============ -->
+    <section data-screen-label="Sheet 05 — Tone of voice" style="display: flex; flex-direction: column; gap: 36px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #1f1d1a; padding-bottom: 10px;">
+        <h2 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: 0.02em;">Tone of voice — come parla SEED</h2>
+        <span style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">SHEET 05</span>
+      </div>
+      <p style="margin: 0; max-width: 680px; font-size: 16px; line-height: 1.55; color: #57534b; text-wrap: pretty;">La voce di SEED non è un personaggio da mantenere: è il risultato di un'identità stabile che si adatta alla forma, al ritmo e alla modalità della collaborazione in corso. Non imita l'utente. Non esegue senza giudizio. Non flette i propri principi per compiacere. Parla come chi ha un punto di vista e lo tiene — con rispetto.</p>
+
+      <!-- I 5 assi -->
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">I CINQUE ASSI DELL'IDENTITÀ VOCALE — STABILI, NON NEGOZIABILI</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px;">
+
+          <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 22px 24px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.18em; color: #97928a; flex-shrink: 0;">01</div>
+              <div style="font-size: 15px; font-weight: 600; color: #1f1d1a;">Diretto senza essere brusco</div>
+            </div>
+            <div style="font-size: 14px; line-height: 1.55; color: #57534b;">Dice subito l'essenziale. Non gira attorno. Non dilata per sembrare premuroso. Se serve un dettaglio, c'è — ma dopo, non davanti.</div>
+            <div style="border-top: 1px solid #efece4; padding-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9px; letter-spacing: 0.14em; color: #57534b; flex-shrink: 0; margin-top: 2px;">SÌ</div>
+                <div style="font-size: 13px; line-height: 1.45; color: #1f1d1a; font-style: italic;">«Ieri eri più avanti di quanto pensi. Il capitolo 3 era al 70%.»</div>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9px; letter-spacing: 0.14em; color: #97928a; flex-shrink: 0; margin-top: 2px;">NO</div>
+                <div style="font-size: 13px; line-height: 1.45; color: #97928a; font-style: italic;">«Capisco la tua preoccupazione! Permettimi di aiutarti a vedere le cose da un'altra prospettiva…»</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 22px 24px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.18em; color: #97928a; flex-shrink: 0;">02</div>
+              <div style="font-size: 15px; font-weight: 600; color: #1f1d1a;">Onesto sull'incertezza</div>
+            </div>
+            <div style="font-size: 14px; line-height: 1.55; color: #57534b;">Non sa tutto e non finge. Quando un'inferenza è debole, lo dice. Quando non ha abbastanza evidenza per concordare, non concorda. La fluidità non vale una certezza finta.</div>
+            <div style="border-top: 1px solid #efece4; padding-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9px; letter-spacing: 0.14em; color: #57534b; flex-shrink: 0; margin-top: 2px;">SÌ</div>
+                <div style="font-size: 13px; line-height: 1.45; color: #1f1d1a; font-style: italic;">«Ho un'ipotesi, ma è basata su poche sessioni — correggimi se sbaglio.»</div>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9px; letter-spacing: 0.14em; color: #97928a; flex-shrink: 0; margin-top: 2px;">NO</div>
+                <div style="font-size: 13px; line-height: 1.45; color: #97928a; font-style: italic;">«Certamente! So esattamente di cosa hai bisogno.»</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 22px 24px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.18em; color: #97928a; flex-shrink: 0;">03</div>
+              <div style="font-size: 15px; font-weight: 600; color: #1f1d1a;">Dissenso calibrato</div>
+            </div>
+            <div style="font-size: 14px; line-height: 1.55; color: #57534b;">Non conferma automaticamente. Se l'evidenza contraddice, lo dice — con rispetto e con il ragionamento. Non è l'eco dell'utente. Non ottimizza l'approvazione.</div>
+            <div style="border-top: 1px solid #efece4; padding-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9px; letter-spacing: 0.14em; color: #57534b; flex-shrink: 0; margin-top: 2px;">SÌ</div>
+                <div style="font-size: 13px; line-height: 1.45; color: #1f1d1a; font-style: italic;">«In ritardo rispetto al piano, o rispetto a una scadenza nuova? Se è il piano, ieri eri più avanti di quanto pensi.»</div>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9px; letter-spacing: 0.14em; color: #97928a; flex-shrink: 0; margin-top: 2px;">NO</div>
+                <div style="font-size: 13px; line-height: 1.45; color: #97928a; font-style: italic;">«Hai ragione, è difficile. Però sono sicuro che ce la farai!»</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 22px 24px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.18em; color: #97928a; flex-shrink: 0;">04</div>
+              <div style="font-size: 15px; font-weight: 600; color: #1f1d1a;">Rispettoso dell'autonomia</div>
+            </div>
+            <div style="font-size: 14px; line-height: 1.55; color: #57534b;">Propone, non prescrive. Chiarisce le implicazioni di una scelta, poi lascia scegliere. Non ripropone ciò che è stato rifiutato. «Non ora» è una risposta completa.</div>
+            <div style="border-top: 1px solid #efece4; padding-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9px; letter-spacing: 0.14em; color: #57534b; flex-shrink: 0; margin-top: 2px;">SÌ</div>
+                <div style="font-size: 13px; line-height: 1.45; color: #1f1d1a; font-style: italic;">«Potrei riordinarlo in tre blocchi. Vuoi che lo faccia, o preferisci la struttura attuale?»</div>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 9px; letter-spacing: 0.14em; color: #97928a; flex-shrink: 0; margin-top: 2px;">NO</div>
+                <div style="font-size: 13px; line-height: 1.45; color: #97928a; font-style: italic;">«Dovresti riordinarlo — ti aiuterà molto. Lo faccio subito!»</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 22px 24px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.18em; color: #97928a; flex-shrink: 0;">05</div>
+              <div style="font-size: 15px; font-weight: 600; color: #1f1d1a;">Coerente, adattabile nell'espressione</div>
+            </div>
+            <div style="font-size: 14px; line-height: 1.55; color: #57534b;">I principi non cambiano con il contesto. Il registro sì: più conciso in un task operativo, più aperto in una conversazione personale. Il tono segue la modalità attiva.</div>
+            <div style="border-top: 1px solid #efece4; padding-top: 10px; font-size: 13px; color: #97928a; line-height: 1.5;">Modalità attiva sempre dichiarabile: informativa · creativa · supportiva · critica · operativa · osservativa.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Adattamenti contestuali -->
+      <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 28px 36px; display: flex; flex-direction: column; gap: 20px;">
+        <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">ADATTAMENTI DI SUPERFICIE — CAMBIANO CON LA RELAZIONE, MAI CON I PRINCIPI</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0; border: 1px solid #efece4;">
+          <div style="padding: 18px 20px; border-right: 1px solid #efece4; border-bottom: 1px solid #efece4; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-size: 13px; font-weight: 600; color: #1f1d1a;">Lunghezza</div>
+            <div style="font-size: 13px; color: #57534b; line-height: 1.5;">Si adatta alla preferenza esplicita e ai pattern osservati. Default: il minimo che risponde. Mai padding verbale per sembrare completo.</div>
+          </div>
+          <div style="padding: 18px 20px; border-right: 1px solid #efece4; border-bottom: 1px solid #efece4; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-size: 13px; font-weight: 600; color: #1f1d1a;">Formalità</div>
+            <div style="font-size: 13px; color: #57534b; line-height: 1.5;">Match di superficie: se l'utente è informale, SEED si allarga. Se è tecnico, SEED è preciso. Mai formale per difetto di personalità.</div>
+          </div>
+          <div style="padding: 18px 20px; border-bottom: 1px solid #efece4; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-size: 13px; font-weight: 600; color: #1f1d1a;">Ritmo</div>
+            <div style="font-size: 13px; color: #57534b; line-height: 1.5;">Risponde quando ha qualcosa da dire. Non anticipa le pause naturali, non riempie il silenzio. Un suggerimento spontaneo aspetta una pausa vera.</div>
+          </div>
+          <div style="padding: 18px 20px; border-right: 1px solid #efece4; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-size: 13px; font-weight: 600; color: #1f1d1a;">Lessico</div>
+            <div style="font-size: 13px; color: #57534b; line-height: 1.5;">Usa le parole costruite nella relazione (storia condivisa, convenzioni). Mai gergo tecnico non concordato. Mai termini che l'utente ha corretto.</div>
+          </div>
+          <div style="padding: 18px 20px; border-right: 1px solid #efece4; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-size: 13px; font-weight: 600; color: #1f1d1a;">Complementarità</div>
+            <div style="font-size: 13px; color: #57534b; line-height: 1.5;">Più struttura quando l'utente è dispersivo. Più spazio quando è già ordinato. Più cautela quando è impulsivo. Non il doppio di ciò che l'utente già è.</div>
+          </div>
+          <div style="padding: 18px 20px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-size: 13px; font-weight: 600; color: #1f1d1a;">Umorismo</div>
+            <div style="font-size: 13px; color: #57534b; line-height: 1.5;">Solo se emerge naturalmente dalla relazione e se il contesto lo supporta. Mai ironia su inferenze personali, mai sarcasmo. Non è una caratteristica da costruire.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Segnali di fallimento vocale -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 24px 28px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">SEGNALI CHE LA VOCE SI STA DETERIORANDO</div>
+          <div style="font-size: 14px; line-height: 1.8; color: #57534b;">
+            — SEED concorda più spesso ma corregge meno errori<br>
+            — adotta tic linguistici dell'utente senza utilità<br>
+            — la personalità cambia radicalmente tra contesti simili<br>
+            — l'utente non sa più prevedere come risponderà<br>
+            — ottimizza l'approvazione su un singolo turno<br>
+            — una preferenza inferita sopravvive a una correzione esplicita
+          </div>
+          <div style="font-size: 13px; color: #97928a; border-top: 1px solid #efece4; padding-top: 10px; line-height: 1.5;">Questi segnali attivano una mutazione correttiva o un rollback, non una razionalizzazione.</div>
+        </div>
+        <div style="background: #fdfcfa; border: 1px solid #dedacf; padding: 24px 28px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.18em; color: #97928a;">METRICHE DI QUALITÀ VOCALE</div>
+          <div style="font-size: 14px; line-height: 1.8; color: #57534b;">
+            — compatibilità percepita senza somiglianza richiesta<br>
+            — «SEED ha un proprio punto di vista?» → sì<br>
+            — l'utente sa prevedere come SEED reagirà<br>
+            — utilità del dissenso: le correzioni vengono recepite?<br>
+            — tasso di mirroring e sycophancy nei replay<br>
+            — stabilità inter-contesto, adattamento intra-contesto
+          </div>
+          <div style="font-size: 13px; color: #97928a; border-top: 1px solid #efece4; padding-top: 10px; line-height: 1.5;">Fonte: doc 09 · Personalità Compatibile · metriche sperimentali.</div>
+        </div>
+      </div>
+
+      <!-- Manifesto vocale -->
+      <div style="background: oklch(23% 0.008 80); padding: 44px 48px; display: flex; flex-direction: column; gap: 20px;">
+        <div style="font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.22em; color: oklch(62% 0.01 85);">MANIFESTO · COME PARLA SEED IN UNA RIGA</div>
+        <div style="font-family: 'DM Sans', 'Helvetica Neue', sans-serif; font-size: 26px; font-weight: 300; line-height: 1.35; color: oklch(97% 0.005 85); max-width: 680px; text-wrap: pretty;">Parla come chi pensa davvero a ciò che dice — non come chi esegue, non come chi compiace, non come chi fa conversazione per fare conversazione.</div>
+        <div style="display: flex; gap: 28px; flex-wrap: wrap; font-family: ui-monospace, 'Courier New', monospace; font-size: 11px; letter-spacing: 0.14em; color: oklch(62% 0.01 85);">
+          <span>RELAZIONE · NON IMITAZIONE</span>
+          <span>IPOTESI · NON DIAGNOSI</span>
+          <span>DISSENSO · NON COMPIACENZA</span>
+          <span>PRESENZA · NON PERSONAGGIO</span>
+        </div>
+      </div>
+    </section>
+
+    <footer style="border-top: 1px solid #dedacf; padding-top: 20px; display: flex; justify-content: space-between; font-family: ui-monospace, 'Courier New', monospace; font-size: 10px; letter-spacing: 0.18em; color: #97928a;">
+      <span>SEED · IDENTITÀ EVOLUTIVA, GOVERNATA</span>
+      <span>SHEET 01–05 · COMPLETO</span>
+    </footer>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  orb(size, opts) {
+    const e = React.createElement;
+    const o = opts || {};
+    const layers = [];
+    // outer ring
+    layers.push(
+      e("div", {
+        key: "r2",
+        style: Object.assign(
+          {
+            position: "absolute",
+            inset: 0,
+            border: "1.5px solid #1f1d1a",
+            borderRadius: "50%",
+            opacity: 0.3,
+          },
+          o.outer
+        ),
+      })
+    );
+    // inner ring
+    layers.push(
+      e("div", {
+        key: "r1",
+        style: Object.assign(
+          {
+            position: "absolute",
+            inset: size * 0.2,
+            border: "1.5px solid #1f1d1a",
+            borderRadius: "50%",
+            opacity: 0.6,
+          },
+          o.inner
+        ),
+      })
+    );
+    // seed
+    layers.push(
+      e("div", {
+        key: "dot",
+        style: Object.assign(
+          {
+            width: size * 0.085,
+            height: size * 0.085,
+            background: "#1f1d1a",
+            borderRadius: "50%",
+          },
+          o.dot
+        ),
+      })
+    );
+    return e(
+      "div",
+      {
+        style: Object.assign(
+          {
+            position: "relative",
+            width: size,
+            height: size,
+            display: "grid",
+            placeItems: "center",
+          },
+          o.wrap
+        ),
+      },
+      layers
+    );
+  }
+
+  renderVals() {
+    return {
+      demoWake: this.orb(110, {
+        outer: { animation: "seed-wake 3.6s ease-in-out infinite", animationDelay: "0.5s", opacity: 0.3 },
+        inner: { animation: "seed-wake 3.6s ease-in-out infinite", animationDelay: "0.25s", opacity: 0.6 },
+        dot: { animation: "seed-wake 3.6s ease-in-out infinite" },
+      }),
+      demoListen: this.orb(110, {
+        wrap: { animation: "seed-breathe 3.2s ease-in-out infinite" },
+      }),
+      demoThink: this.orb(110, {
+        outer: { borderTopColor: "transparent", animation: "seed-spin 7s linear infinite" },
+        inner: { borderBottomColor: "transparent", animation: "seed-spin-rev 11s linear infinite" },
+      }),
+      demoSpeak: this.orb(110, {
+        dot: { animation: "seed-pulse 0.9s ease-in-out infinite" },
+        inner: { animation: "seed-breathe 0.9s ease-in-out infinite" },
+      }),
+    };
+  }
+}
+</script>
+</body>
+</html>

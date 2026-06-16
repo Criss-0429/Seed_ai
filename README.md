@@ -4,15 +4,38 @@ Questa cartella contiene la base eseguibile attuale di SEED. Implementa un
 harness locale con command router deterministico, privacy gate, permessi,
 sandbox capability, memoria, watcher, reflection e rollback.
 
+## Repository autocontenuto
+
+Questa cartella Git e' la singola fonte di verita' del progetto SEED. Contiene
+runtime, test, script, configurazioni di build, documentazione, piani di
+produzione, sorgenti UI e knowledge graph:
+
+- `PROJECT_OVERVIEW.md`: indice generale del progetto;
+- `ProductionPlan.md` e `docs/12_ImplementationPlan.md`: fasi e piano operativo;
+- `docs/`: documentazione di prodotto e architettura;
+- `TESI_SEED_Scaletta.md`: materiale tesi;
+- `SEED_UI/`: sorgenti di design autorevoli;
+- `seed-knowledge-graph/`: knowledge graph e corpus documentale preservati;
+- `packaging/pyinstaller/`: contratti di build riproducibili.
+
+`build/`, `dist/` e `release/` sono output locali rigenerabili e non vengono
+versionati. Installer e pacchetti update pubblicabili appartengono alle GitHub
+Releases, non alla cronologia Git.
+
 P0 distribuzione aggiunge il Provider Hub BYOK: nelle installazioni tester
 (`provider_hub.required=true`) onboarding personale e chat restano bloccati
 finche almeno un profilo Ollama Cloud, OpenRouter o Vercel AI Gateway non viene
 validato realmente. Le key sono cifrate con DPAPI; il fallback automatico
 cross-provider puo andare solo verso Ollama Cloud, mai verso provider PAYG.
 La superficie **Provider e modelli** permette configurazione, test, revoca,
-preset e mapping per ruolo. P1 installer e bundle ML offline restano separati.
+preset e mapping per ruolo.
 
-La visione e l'architettura obiettivo sono in `../docs/`. In particolare:
+P1 distribuzione aggiunge build Windows `onedir`, installer Inno Setup unsigned,
+bundle ML offline e pacchetto update verificabile. Runtime, supervisor e modelli
+restano separati sotto la directory applicativa; i dati utente restano sotto
+`%LOCALAPPDATA%\SEED` e non vengono inclusi nel payload release.
+
+La visione e l'architettura obiettivo sono in `docs/`. In particolare:
 
 - `00_Visione_Prodotto.md` definisce l'esperienza iniziale e i principi;
 - `02_EvolutionEngine.md` descrive il modello evolutivo target;
@@ -65,7 +88,7 @@ La decisione proposta mantiene SEED Core governatore: OpenHarness come backend
 isolamento/esecuzione, Hermes come pattern registry/skills/delega, OpenClaw come
 pattern daemon/sessione. Il comando `:runtimebench` esporta evidenza hashata
 sotto `%LOCALAPPDATA%\SEED\lab\runtime_bench\`. Il gate D0 e' stato approvato
-manualmente dall'owner il 2026-06-13 (documentato in `../docs/12_ImplementationPlan.md`).
+manualmente dall'owner il 2026-06-13 (documentato in `docs/12_ImplementationPlan.md`).
 
 D1 (pronta per review, 2026-06-13) aggiunge un daemon di background SOLO
 in-process: vive dentro il processo SEED supervisionato, parte con SEED e muore
@@ -181,8 +204,8 @@ memoria, lineage, descendant, evaluator, shadow, canary, promotion, riapertura,
 rollback e tamper detection:
 
 ```powershell
-cd C:\Users\Cristian\Documents\Progetti\JARVIS
-.\.venv\Scripts\python.exe FrameworkUtenti\seed\scripts\core_acceptance.py
+cd C:\path\to\seed
+python scripts\core_acceptance.py
 ```
 
 Output atteso:
@@ -216,14 +239,42 @@ python run_dev.py
 python run_dev.py --repl
 ```
 
-## Build exe
+## Build release tester P1
 
 ```powershell
-pyinstaller build/seed.spec
-# dist/SEED.exe
-pyinstaller build/supervisor.spec
-# dist/SEEDSupervisor.exe
+python scripts\build_release.py --version 0.3.0-pilot --schema-version 1
+
+& "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe" `
+  /DAppVersion=0.3.0-pilot `
+  /DReleaseRoot="$PWD\release\0.3.0-pilot" `
+  installer\SEED.iss
+
+python scripts\build_release.py --version 0.3.0-pilot --finalize-installer
 ```
+
+Il primo comando genera build PyInstaller `onedir`, copia i checkpoint ML
+locali richiesti, crea update ZIP, manifest e hash. Inno Setup genera
+l'installer completo unsigned. Il comando finale aggiunge installer e relativo
+SHA-256 al manifest e a `SHA256SUMS.txt`.
+
+La guida SmartScreen/hash per i tester e in `installer/TESTER_GUIDE.md`.
+Ogni shortcut installato avvia `SEEDSupervisor.exe`, mai direttamente
+`SEED.exe`.
+
+## Quality gate P2
+
+```powershell
+python scripts\quality_gate.py --full
+.\scripts\create_release_env.ps1
+.\.release-venv\Scripts\python.exe scripts\build_release.py `
+  --version 0.3.0-pilot-p2 --schema-version 1
+```
+
+Il gate include Ruff, format progressivo sui boundary P2, mypy progressivo,
+dependency audit, secret scan, import-cycle scan, compileall, test completi e
+core acceptance. La build release usa una venv pulita senza tooling dev e
+rimuove test/cache/audio stack inutilizzato dal payload. `SEED.exe --smoke`
+offre smoke non interattivo per misurare primo avvio e RAM.
 
 ## Dati del runtime corrente
 
@@ -250,7 +301,7 @@ pyinstaller build/supervisor.spec
 
 Il target aggiunge ancora descendant completi, evaluator comportamentali e
 canary con effetti controllati. La struttura prevista e documentata in
-`../docs/07_Struttura_Repo.md`.
+`docs/07_Struttura_Repo.md`.
 
 ## Primo avvio target
 

@@ -1,0 +1,100 @@
+{
+  "schema_version": "seed.shadow-runtime-bench.v1",
+  "harness": {
+    "name": "OpenHarness",
+    "package": "openharness-ai",
+    "version": "0.1.9"
+  },
+  "mode": "isolated_dry_run_and_permission_checker",
+  "privacy": {
+    "synthetic_only": true,
+    "real_user_data": false,
+    "real_credentials": false,
+    "model_calls_executed": false,
+    "tools_executed": false
+  },
+  "installation": {
+    "temporary_path": "C:\\tmp\\seed-openharness-bench",
+    "measured_mb_including_cache": 237.24,
+    "limit_mb": 500
+  },
+  "summary": {
+    "passed": 10,
+    "failed": 2,
+    "total": 12
+  },
+  "fixtures": [
+    {
+      "fixture_id": "dry_run_avoids_model_and_tool_execution",
+      "passed": true,
+      "result": "mode=dry-run; auth=missing; api_client=error; preview still produced"
+    },
+    {
+      "fixture_id": "bare_mode_skips_plugins_and_mcp",
+      "passed": true,
+      "result": "plugins=0; mcp_servers=0"
+    },
+    {
+      "fixture_id": "unknown_slash_command_classified",
+      "passed": true,
+      "result": "entrypoint=unknown_slash_command"
+    },
+    {
+      "fixture_id": "known_slash_command_classified_without_execution",
+      "passed": true,
+      "result": "entrypoint=slash_command"
+    },
+    {
+      "fixture_id": "default_tool_catalog_visible",
+      "passed": true,
+      "result": "38 tools reported, including read, write, shell, web, cron and agent tools"
+    },
+    {
+      "fixture_id": "plan_mode_allows_read_only",
+      "passed": true,
+      "result": "PermissionChecker allowed synthetic file_read"
+    },
+    {
+      "fixture_id": "plan_mode_blocks_mutation",
+      "passed": true,
+      "result": "PermissionChecker blocked synthetic file_write without confirmation"
+    },
+    {
+      "fixture_id": "default_mode_requires_mutation_confirmation",
+      "passed": true,
+      "result": "PermissionChecker blocked synthetic file_write and requested confirmation"
+    },
+    {
+      "fixture_id": "sensitive_path_block_survives_full_auto",
+      "passed": true,
+      "result": "PermissionChecker blocked synthetic .ssh path in full_auto"
+    },
+    {
+      "fixture_id": "explicit_denied_command_survives_full_auto",
+      "passed": true,
+      "result": "PermissionChecker blocked synthetic command matching denied pattern"
+    },
+    {
+      "fixture_id": "cli_plan_override_reaches_effective_settings",
+      "passed": false,
+      "result": "--permission-mode plan produced effective permission_mode=default"
+    },
+    {
+      "fixture_id": "cli_full_auto_override_reaches_effective_settings",
+      "passed": false,
+      "result": "--permission-mode full_auto produced effective permission_mode=default"
+    }
+  ],
+  "findings": [
+    {
+      "severity": "high",
+      "title": "CLI permission-mode override is ineffective in OpenHarness 0.1.9",
+      "detail": "The CLI passes permission_mode into Settings.merge_cli_overrides, but Settings stores the effective mode under permission.mode. The override becomes an unused top-level field and effective mode remains default. The same merge path is used by dry-run and live runtime construction."
+    },
+    {
+      "severity": "medium",
+      "title": "OS-level sandbox is disabled by default",
+      "detail": "PermissionChecker provides policy gating, but SandboxSettings.enabled defaults to false. Policy checks are not equivalent to process-level filesystem or network isolation."
+    }
+  ]
+}

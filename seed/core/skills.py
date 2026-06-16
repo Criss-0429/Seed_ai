@@ -19,7 +19,7 @@ import logging
 import shutil
 import subprocess
 import tempfile
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 from .isolation import IsolationPolicy, IsolationResult, backend_available, run_python

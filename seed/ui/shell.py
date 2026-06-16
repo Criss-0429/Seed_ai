@@ -14,6 +14,8 @@ from pathlib import Path
 import sys
 import threading
 
+from seed import __version__
+
 log = logging.getLogger("seed.ui")
 
 _SURFACE = Path(__file__).resolve().parent / "surface"
@@ -57,6 +59,7 @@ class JsApi:
     def __init__(self, app):
         self._app = app
         self._window = None
+        self._allow_terminate = False
 
     def attach(self, window) -> None:
         self._window = window
@@ -78,6 +81,8 @@ class JsApi:
             "greeting": manifest.get("persona", {}).get("greeting", "Sono qui."),
             "window_mode": "full",
             "provider_hub": self._app.ui_provider_status(),
+            "operations": self._app.ui_operations(),
+            "app_version": __version__,
         }
 
     def get_manifest(self) -> dict:
@@ -146,9 +151,6 @@ class JsApi:
     def provider_revoke(self, provider: str) -> dict:
         return self._app.ui_provider_revoke(provider)
 
-    def create_backup(self) -> str:
-        return str(self._app.operations.create_backup())
-
     def explain_last(self) -> str:
         return self._app.ui_explain_last()
 
@@ -186,6 +188,51 @@ class JsApi:
     # --- orb state / daemon (U0/U1) -------------------------------------
     def daemon_status(self) -> dict:
         return self._app.run_daemon_review()
+
+    def windows_startup_status(self) -> dict:
+        return self._app.startup.status()
+
+    def set_windows_startup(self, enabled: bool, owner_approved: bool) -> dict:
+        return self._app.ui_set_windows_startup(enabled, owner_approved)
+
+    # --- P6 Adaptive Web Rendering (gated, default OFF) -----------------
+    def web_render_status(self) -> dict:
+        return self._app.ui_web_render_status()
+
+    def web_render_preview(self, source_mode: str, source_ref: str,
+                           provided_html: str = "",
+                           accessibility_needs: list | None = None,
+                           explicit_preferences: list | None = None,
+                           consent: bool = False) -> dict:
+        return self._app.ui_web_render_preview(
+            source_mode=source_mode, source_ref=source_ref,
+            provided_html=provided_html,
+            accessibility_needs=tuple(accessibility_needs or ()),
+            explicit_preferences=tuple(explicit_preferences or ()),
+            consent=bool(consent))
+
+    def web_render_promote(self, owner_approved: bool, persist: bool = False) -> dict:
+        return self._app.ui_web_render_promote(
+            owner_approved=bool(owner_approved), persist=bool(persist))
+
+    # --- P7 Selective Capability Forge (gated, default OFF) -------------
+    def forge_status(self) -> dict:
+        return self._app.ui_forge_status()
+
+    def forge_timeline(self) -> list:
+        return self._app.ui_forge_timeline()
+
+    def forge_grant_observation(self, source: str, on: bool = True) -> dict:
+        return self._app.ui_forge_grant_observation(source, bool(on))
+
+    def forge_forget_source(self, source: str) -> dict:
+        return self._app.ui_forge_forget_source(source)
+
+    def forge_suppress(self, goal: str, days: int = 30) -> dict:
+        return self._app.ui_forge_suppress(goal, int(days))
+
+    def forge_revoke_connection(self, connection_id: str) -> dict:
+        return self._app.ui_forge_revoke_connection(connection_id)
 
     # --- voice (facoltativo, U3) -----------------------------------------
     def voice_available(self) -> bool:
@@ -229,15 +276,38 @@ class JsApi:
             log.warning("minimize fallito: %s", exc)
             return {"ok": False, "error": str(exc)}
 
-    def window_close(self) -> dict:
+    def window_close(self, keep_heartbeat: bool) -> dict:
         if self._window is None:
             return {"ok": False}
         try:
+            if keep_heartbeat:
+                self._window.hide()
+                self._app.memory.add_event("window_hidden_for_heartbeat", {})
+                return {"ok": True, "action": "hidden", "heartbeat_running": True}
+            self._allow_terminate = True
             self._window.destroy()
-            return {"ok": True}
+            return {"ok": True, "action": "terminated", "heartbeat_running": False}
         except Exception as exc:
             log.warning("close fallito: %s", exc)
             return {"ok": False, "error": str(exc)}
+
+    def handle_native_closing(self) -> bool:
+        """Cancel native close when the owner chooses background heartbeat."""
+        if self._allow_terminate or self._window is None:
+            return True
+        try:
+            keep = bool(self._window.evaluate_js(
+                "confirm('Lasciare SEED attivo in background per mantenere heartbeat?\\n\\n"
+                "OK: mantieni heartbeat. Annulla: termina SEED.')"))
+            if keep:
+                self._window.hide()
+                self._app.memory.add_event("window_hidden_for_heartbeat", {})
+                return False
+            self._allow_terminate = True
+            return True
+        except Exception as exc:
+            log.warning("prompt chiusura nativa fallito: %s", exc)
+            return False
 
     def set_window_mode(self, mode: str) -> dict:
         if self._window is None:
@@ -292,7 +362,7 @@ class JsApi:
             return {"decision": "deny", "remember": False}
 
 
-def run_window(app) -> None:
+def run_window(app, *, start_hidden: bool = False) -> None:
     import webview  # pywebview
 
     api = JsApi(app)
@@ -302,10 +372,14 @@ def run_window(app) -> None:
         frameless=True, easy_drag=False,        # niente barra titolo del SO
         background_color="#f6f5f2")
     api.attach(window)
+    window.events.closing += api.handle_native_closing
 
     def _on_start():
         app.start_background()
         _start_overlay_hotkey(window)
+        if start_hidden:
+            window.hide()
+            app.memory.add_event("window_started_hidden_for_heartbeat", {})
 
     webview.start(_on_start, private_mode=False)
     app.shutdown()

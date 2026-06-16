@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from pathlib import Path
 
 from .supervisor import (
@@ -24,6 +23,8 @@ def main(argv: list[str] | None = None) -> int:
     actions.add_argument("--boot", action="store_true")
     parser.add_argument("--reason", default="manual supervisor recovery")
     parser.add_argument("--runtime", type=Path, help="runtime executable used by --boot")
+    parser.add_argument("--background", action="store_true",
+                        help="launch runtime hidden with heartbeat active")
     args = parser.parse_args(argv)
     try:
         supervisor = BootSupervisor(args.root)
@@ -40,12 +41,16 @@ def main(argv: list[str] | None = None) -> int:
             # Updater reale: applica un eventuale update staged prima del boot.
             update = supervisor.apply_pending_update(args.runtime)
             result = supervisor.boot(
-                SubprocessRuntimeLauncher([str(args.runtime)], seed_root=args.root)
+                SubprocessRuntimeLauncher(
+                    [str(args.runtime), *(["--background"] if args.background else [])],
+                    seed_root=args.root)
             )
             if update and update.get("applied") and result.status != "healthy":
                 rollback = supervisor.rollback_runtime_update(update)
                 retry = supervisor.boot(
-                    SubprocessRuntimeLauncher([str(args.runtime)], seed_root=args.root)
+                    SubprocessRuntimeLauncher(
+                        [str(args.runtime), *(["--background"] if args.background else [])],
+                        seed_root=args.root)
                 )
                 output = retry.public_dict()
                 output["pending_update"] = update

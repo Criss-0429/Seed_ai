@@ -10,13 +10,14 @@ from __future__ import annotations
 
 import json
 import logging
+import sys
 import time
-from pathlib import Path
 
 from . import config as config_mod
 from . import forbidden
 from .capabilities import CapabilityRegistry
 from .design_review import DesignReviewer
+from .directive_pack import build_directive_pack
 from .evolution import EvolutionEngine
 from . import calibration
 from . import shadow_review
@@ -29,7 +30,7 @@ from .onboarding import OnboardingEngine
 from .personality import PersonalityDecision, PersonalityRuntime
 from .permissions import PermissionBroker
 from .privacy import GateResult, PrivacyGate
-from .provider_hub import ProviderHub, ProviderHubError
+from .provider_hub import ProviderHub
 from . import retrieval
 from . import user_knowledge
 from .embeddings import LocalEmbedder
@@ -39,6 +40,9 @@ from .router import CommandRouter, Intent
 from . import salience
 from . import runtime_bench
 from .daemon import BackgroundDaemon
+from . import web_render
+from . import forge as forge_mod
+from .memory import _dpapi_encrypt, _dpapi_decrypt
 from . import worker as worker_mod
 from . import worker_sandbox
 from . import write_safe as write_safe_mod
@@ -48,6 +52,8 @@ from .brand import BrandEvolution
 from .mutation_lifecycle import MutationLifecycle
 from .operations import OperationsManager
 from .tool_builder import GovernedToolBuilder, ToolCandidate
+from .connections import CoreConnections
+from .startup import WindowsStartup
 from .scheduler import Scheduler
 from .telemetry import Telemetry
 from .voice import VoiceEngine
@@ -193,6 +199,8 @@ class SeedApp:
             audit=lambda ev, payload: self.memory.add_event(ev, payload),
             can_run=lambda: self.onboarding.complete,
         )
+        self.startup = WindowsStartup(
+            audit=lambda ev, payload: self.memory.add_event(ev, payload))
         # D2: worker adapter READ-only dietro permission broker + audit. Riceve
         # SOLO un provider di stato aggregato (review del daemon), mai config/key
         # o memoria grezza: per costruzione non puo' scrivere o leggere file/shell.
@@ -245,6 +253,26 @@ class SeedApp:
             enabled=self.cfg.evolution.lifecycle_enabled,
             canary_context=self.cfg.evolution.canary_context,
             audit=lambda ev, payload: self.memory.add_event(ev, payload))
+        # P7: Selective Capability Forge. Default OFF. Orchestratore degli engine
+        # (evidence/fitness/connector/builder/evaluator/connection/activation): con
+        # capability_forge.enabled=False espone solo lo stato e non osserva/costruisce/
+        # attiva nulla. Il vault usa il cipher locale (DPAPI); i tool generati non
+        # ricevono mai credenziali, solo handle tipizzati.
+        self.forge = forge_mod.CapabilityForge(
+            self.cfg.capability_forge, self.memory,
+            encrypt=lambda s: _dpapi_encrypt(s.encode("utf-8")),
+            decrypt=lambda b: _dpapi_decrypt(b).decode("utf-8"))
+        self.connections = CoreConnections(
+            tool_llm=self._tool_builder,
+            registry=self.registry,
+            tool_builder=self.tool_builder,
+            subagent=self.subagent,
+            daemon_review=self.run_daemon_review,
+            advance_canary=lambda mutation_id: self.ui_advance_mutations(
+                owner_approved_canary=True, mutation_id=mutation_id),
+            design_review=self._review_tool_candidate,
+            audit=lambda ev, payload: self.memory.add_event(ev, payload),
+        )
         self.brand = BrandEvolution(
             self.memory, self.evolution.ui_manifest,
             lambda manifest: self.evolution._save_json("ui_manifest.json", manifest),
@@ -337,7 +365,7 @@ class SeedApp:
             outcome, llm=self._conversation, runtime_model=None)
 
     def _breadth_response(self, delta: int) -> str:
-        value = self.research.adjust_breadth(delta)
+        self.research.adjust_breadth(delta)
         counts = self.research.tier_counts()
         label = {-1: "Restringo", 0: "Torno allo standard", 1: "Allargo"}[delta]
         return (f"{label}: da ora analizzo {counts['quick']} fonti per le "
@@ -533,7 +561,119 @@ class SeedApp:
     def run_daemon_review(self) -> dict:
         """D1: snapshot aggregato e rivedibile del daemon (stato, conteggi coda,
         flag dei confini). Nessun dato personale; non esegue azioni."""
-        return self.daemon.review()
+        return {**self.daemon.review(), "windows_startup": self.startup.status()}
+
+    def ui_set_windows_startup(self, enabled: bool, owner_approved: bool) -> dict:
+        """Opt-in/revoca startup per-utente. Mai servizio Windows o admin."""
+        return self.startup.set_enabled(bool(enabled), owner_approved=bool(owner_approved))
+
+    # --- P6 Adaptive Web Rendering (gated, default OFF) ----------------
+    def ui_web_render_status(self) -> dict:
+        """Stato dei gate P6. Tutto OFF di default; le fasi con rete/browser
+        restano separate e owner-gated."""
+        wr = self.cfg.web_render
+        return {
+            "enabled": wr.enabled,
+            "network_acquisition_enabled": wr.network_acquisition_enabled,
+            "browser_bridge_enabled": wr.browser_bridge_enabled,
+        }
+
+    def ui_web_render_preview(self, *, source_mode: str, source_ref: str,
+                              provided_html: str = "",
+                              accessibility_needs: tuple[str, ...] = (),
+                              explicit_preferences: tuple[str, ...] = (),
+                              consent: bool = False) -> dict:
+        """Pipeline P6 governata: acquire -> sanitize -> plan -> evaluate -> preview.
+        Fail-closed: nulla senza `web_render.enabled` e consenso esplicito. La rete
+        reale resta dietro i flag (fetch/bridge NON iniettati qui finche' owner non
+        li abilita). Nessuna persistenza; audit aggregato senza contenuto grezzo."""
+        if not self.cfg.web_render.enabled:
+            return {"ok": False, "reason": "web_render_disabled"}
+        if not consent:
+            return {"ok": False, "reason": "consent_required"}
+        request = web_render.RenderRequest(
+            source_mode=source_mode, source_ref=source_ref, consent_ref="ui-consent")
+        try:
+            acquired = web_render.acquire_source(
+                request, provided_html=provided_html or None,
+                allow_network=self.cfg.web_render.network_acquisition_enabled,
+                allow_browser=self.cfg.web_render.browser_bridge_enabled)
+        except web_render.WebRenderError as exc:
+            return {"ok": False, "reason": str(exc)}
+        raw = acquired["raw_html"]
+        clean, removed = web_render.sanitize_html(raw)
+        profile = web_render.AdaptationProfile(
+            accessibility_needs=tuple(accessibility_needs),
+            explicit_preferences=tuple(explicit_preferences),
+            provenance=source_ref, confidence=0.0)
+        plan = web_render.build_transform_plan(
+            profile, plan_id=f"wr-{abs(hash((source_ref, tuple(accessibility_needs))))}")
+        verdict = web_render.evaluate_transform_plan(plan)
+        if verdict["status"] != "pass":
+            return {"ok": False, "reason": "plan_blocked", "blocking": verdict["blocking"]}
+        safe = bool(clean.strip())
+        ratio = len(clean) / max(1, len(raw))
+        fidelity = web_render.classify_fidelity(
+            safe=safe, content_ratio=ratio, structure_certain=True)
+        preview = web_render.build_preview(
+            sanitized_adapted_html=clean, plan=plan, fidelity_level=fidelity,
+            sanitized_original_html=clean, provenance=source_ref)
+        result = web_render.RenderResult(
+            status="ok", fidelity_level=fidelity, preview_ref=plan.plan_id,
+            accessibility_report=verdict["accessibility_report"])
+        # candidate isolata temporanea, tenuta per un'eventuale promozione owner.
+        self._last_render_candidate = web_render.propose_render_candidate(
+            request, plan, result, candidate_id=plan.plan_id,
+            evidence=("ui_explicit_request",))
+        self._last_render_eval_passed = True
+        # audit AGGREGATO: solo modalita', fedelta', rimozioni, plan_id. Mai HTML.
+        self.memory.add_event("web_render_preview", {
+            "source_mode": source_mode, "fidelity": fidelity,
+            "removed": removed, "plan_id": plan.plan_id})
+        return {
+            "ok": True, "fidelity_level": fidelity,
+            "preview_document": preview["preview_document"],
+            "clean_html": clean,                # originale sanitizzato (per confronto)
+            "controls": list(preview["controls"]),
+            "removed": removed, "plan_id": plan.plan_id,
+            "accessibility_report": verdict["accessibility_report"],
+        }
+
+    def ui_web_render_promote(self, *, owner_approved: bool,
+                              persist: bool = False) -> dict:
+        """Promozione governata dell'ultima candidate di preview. Default = non
+        promosso; persiste solo se esplicito; mai generalizzata ad altri siti."""
+        cand = getattr(self, "_last_render_candidate", None)
+        if cand is None:
+            return {"promoted": False, "reason": "no_candidate"}
+        outcome = web_render.promote_render(
+            cand, owner_approved=bool(owner_approved),
+            evaluation_passed=getattr(self, "_last_render_eval_passed", False),
+            persist=bool(persist))
+        self.memory.add_event("web_render_promote", {
+            "plan_id": cand.plan_id, "promoted": outcome["promoted"],
+            "reason": outcome["reason"], "persistent": outcome["persistent"]})
+        return outcome
+
+    # --- P7 Selective Capability Forge (gated, default OFF) ------------
+    def ui_forge_status(self) -> dict:
+        return self.forge.status()
+
+    def ui_forge_timeline(self) -> list[dict]:
+        """`SEED ha imparato/deciso X perche...` in linguaggio comprensibile."""
+        return self.forge.timeline()
+
+    def ui_forge_grant_observation(self, source: str, on: bool = True) -> dict:
+        return self.forge.grant_observation(source, bool(on))
+
+    def ui_forge_forget_source(self, source: str) -> dict:
+        return self.forge.forget_source(source)
+
+    def ui_forge_suppress(self, goal: str, days: int = 30) -> dict:
+        return self.forge.suppress_learning(goal, time.time() + max(1, int(days)) * 86400)
+
+    def ui_forge_revoke_connection(self, connection_id: str) -> dict:
+        return self.forge.revoke_connection(connection_id)
 
     # --- UI surfaces (U2/U3) -------------------------------------------
     def ui_user_model(self) -> list[dict]:
@@ -595,6 +735,26 @@ class SeedApp:
                     out.append(data)
         return out
 
+    def _review_tool_candidate(self, spec: dict, candidate: ToolCandidate) -> str:
+        """Independent, read-only design review for a staged generated tool."""
+        pack = build_directive_pack(
+            feature="P3 Tool Builder Da Chat",
+            scope="generated capability",
+            candidate={
+                "manifest": spec,
+                "test_report": {
+                    "audit_passed": candidate.audit_passed,
+                    "test_passed": candidate.test_passed,
+                    "violations": list(candidate.violations),
+                },
+                "permission_delta": spec.get("risk_class", ""),
+                "rollback_plan": "none: installation remains owner-gated",
+            },
+        )
+        review = self.design_reviewer.review(
+            pack, self.models, candidate_id=candidate.capability_id, shadow=False)
+        return review.verdict
+
     def ui_tool_install(self, capability_id: str, owner_approved: bool) -> dict:
         """Approva e installa una tool candidate (gate reale: owner + reviewer +
         audit/test passati). Mai self-install."""
@@ -609,11 +769,13 @@ class SeedApp:
             capability_id=review["capability_id"], candidate_dir=target,
             audit_passed=review["audit_passed"], test_passed=review["test_passed"],
             violations=tuple(review.get("violations", [])))
+        design_passed = bool(review.get("design_review_passed", False))
         ok, errors = self.tool_builder.install(
             candidate, owner_approved=bool(owner_approved),
-            reviewer_passed=bool(review["audit_passed"] and review["test_passed"]))
+            reviewer_passed=design_passed)
         return {"ok": ok, "errors": errors,
-                "capability_id": review["capability_id"]}
+                "capability_id": review["capability_id"],
+                "design_review_passed": design_passed}
 
     def ui_mutation_status(self) -> dict:
         """Mutation lifecycle: proposte di promozione (owner-gated) + stato."""
@@ -628,13 +790,14 @@ class SeedApp:
             "owner_gate": "la promozione finale resta approvazione owner",
         }
 
-    def ui_advance_mutations(self, owner_approved_canary: bool = False) -> list[dict]:
+    def ui_advance_mutations(self, owner_approved_canary: bool = False,
+                             mutation_id: str | None = None) -> list[dict]:
         """Avanza il lifecycle su evidenza reale (shadow->canary->proposta), con
         un canary probe basato sull'esito dell'evaluator indipendente registrato.
         Non promuove mai: scrive proposte owner-gated."""
         return self.mutation_lifecycle.advance(
             owner_approved_canary=bool(owner_approved_canary),
-            canary_probe=self._canary_probe)
+            canary_probe=self._canary_probe, mutation_id=mutation_id)
 
     def _canary_probe(self, candidate, context_id: str):
         """Probe canary su evidenza REALE: consulta l'ultimo esito dell'evaluator
@@ -665,13 +828,20 @@ class SeedApp:
 
     def ui_operations(self) -> dict:
         """Gestione operativa: backup disponibili, update pending, piano uninstall."""
+        from seed import __version__
+
         ops = self.operations
         backups = sorted(p.name for p in ops.backups.iterdir()
                          if p.is_dir()) if ops.backups.exists() else []
         pending = (ops.updates / "pending_update.json")
         return {
+            "app_version": __version__,
+            "install_mode": "installed" if getattr(sys, "frozen", False) else "development",
             "backups": backups,
             "pending_update": pending.is_file(),
+            "update_apply": "al prossimo avvio supervisionato",
+            "recovery_available": bool(backups),
+            "data_preserved_during_update": True,
             "uninstall_plan": ops.uninstall_plan(remove_personal_data=False),
         }
 
@@ -993,6 +1163,14 @@ class SeedApp:
             )
             return control
         conversation_text, explicit_mode = self.personality.prepare_text(red.text)
+
+        connected = self.connections.handle(conversation_text)
+        if connected is not None:
+            self.memory.add_episode("chat", {"role": "assistant", "text": connected},
+                                    category="chat")
+            self._write_trace({"p3_connection": True, "llm_used": True,
+                               "latency_s": round(time.time() - t0, 2)})
+            return connected
 
         route = self.router.try_route(conversation_text)
         if route is not None:

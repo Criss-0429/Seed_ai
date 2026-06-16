@@ -60,7 +60,6 @@ def test_write_requires_owner_approval():
 def test_container_tier_blocked_when_unavailable():
     # forziamo il tier container con un contract write e policy senza container
     policy = ws.SandboxPolicy(isolation_tier="container", container_available=False)
-    c = _contract(side_effect_type="write", risk_class="write")
     # select_isolation_tier dà restricted_subprocess; container si valuta solo se
     # esplicitamente richiesto: verifichiamo il ramo via policy non disponibile
     assert policy.container_available is False

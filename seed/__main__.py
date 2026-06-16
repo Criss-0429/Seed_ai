@@ -48,6 +48,10 @@ def main() -> int:
     from .core import forbidden
     emit_health_signal_from_env(forbidden.seed_data_dir())
 
+    if "--smoke" in argv:
+        app.shutdown()
+        return 0
+
     if "--repl" in argv:
         app.repl()
         return 0
@@ -59,7 +63,7 @@ def main() -> int:
         print(f"pywebview non disponibile ({exc}); avvio REPL.")
         app.repl()
         return 0
-    run_window(app)
+    run_window(app, start_hidden="--background" in argv)
     return 0
 
 

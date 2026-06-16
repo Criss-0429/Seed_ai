@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SEED</title>
+<link rel="icon" href="../../../assets/seed-mark.svg" type="image/svg+xml">
 <!-- Design da FrameworkUtenti/SEED_UI/SEED Prototype.dc.html (+ Brand Identity).
      Reimplementato in JS vanilla (niente React/CDN, niente complete del prototipo):
      app Python/pywebview, 100% offline; la chat passa dal backend
@@ -41,6 +42,20 @@
   button { font-family: var(--sans); }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
+  /* P6 resa adattiva */
+  .wr-l { display: block; font-size: 13px; color: var(--mut); margin: 4px 0 6px; }
+  .wr-ta { border: 1px solid var(--line); border-radius: 10px; padding: 10px;
+    background: var(--app); resize: vertical; }
+  .wr-needs { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+  .wr-chk { display: flex; align-items: center; gap: 6px; font-size: 13px;
+    border: 1px solid var(--line); border-radius: 100px; padding: 8px 12px; min-height: 32px; }
+  .wr-bar { display: flex; gap: 8px; align-items: center; margin-top: 12px; }
+  .wr-bar .chip { min-height: 44px; }   /* A-01: target ampi, controlli sempre accessibili */
+  .wr-status { flex: 1; font-size: 13px; color: var(--mut); }
+  .wr-note { font-size: 12px; color: var(--mut-2); margin: 6px 0; }
+  .wr-frame { width: 100%; height: 52vh; border: 1px solid var(--line);
+    border-radius: 12px; background: #fff; }
+
   @keyframes sd-breathe  { 0%,100%{transform:scale(1)} 50%{transform:scale(1.045)} }
   @keyframes sd-breathe2 { 0%,100%{transform:scale(1)} 50%{transform:scale(1.09)} }
   @keyframes sd-spin     { to { transform: rotate(360deg) } }
@@ -60,6 +75,18 @@
     justify-content: space-between; padding: 0 8px 0 16px; border-bottom: 1px solid var(--line-soft);
     user-select: none; -webkit-user-select: none; }
   .brandmark { font-family: var(--mono); font-size: 11px; letter-spacing: .22em; color: var(--mut); }
+  .brandlock { display: flex; align-items: center; gap: 8px; }
+  .brandlock img { width: 22px; height: 22px; border-radius: 6px; }
+  #operational-status { flex-shrink: 0; min-height: 27px; padding: 5px 16px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    border-bottom: 1px solid var(--line-soft); font-family: var(--mono);
+    font-size: 10px; letter-spacing: .07em; color: var(--mut); }
+  #operational-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--mut-2); }
+  #operational-status[data-kind="loading"]::before { background: var(--accent); animation: sd-pulse 1.2s ease-in-out infinite; }
+  #operational-status[data-kind="ready"]::before, #operational-status[data-kind="fallback"]::before { background: oklch(60% .09 145); }
+  #operational-status[data-kind="offline"]::before, #operational-status[data-kind="quota"]::before { background: oklch(68% .12 75); }
+  #operational-status[data-kind="error"]::before { background: oklch(58% .16 28); }
   .windowmodes { display: flex; align-items: center; gap: 5px; }
   .windowmodes .wsep { width: 1px; height: 18px; background: var(--line); margin: 0 4px; }
   /* i bottoni non sono area di drag */
@@ -95,6 +122,17 @@
   .presence .orbbtn { background: transparent; border: none; cursor: pointer; padding: 4px; }
   .presence .stato { height: 13px; font-family: var(--mono); font-size: 10px;
     letter-spacing: .26em; color: oklch(66% 0.04 var(--sd-hue)); }
+  .onboarding-card { display: none; border: 1px solid var(--line); border-radius: 14px;
+    padding: 16px 18px; background: oklch(96% .006 85); gap: 11px; }
+  .onboarding-card.open { display: flex; flex-direction: column; }
+  .onboarding-card h2 { margin: 0; font-size: 18px; font-weight: 450; }
+  .onboarding-card p { margin: 0; color: var(--mut); font-size: 13px; line-height: 1.45; }
+  .onboarding-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .onboarding-step { border: 1px solid var(--line); border-radius: 10px; padding: 9px;
+    font-family: var(--mono); font-size: 9px; line-height: 1.45; color: var(--mut); }
+  .onboarding-step.done { border-color: oklch(76% .06 145); color: oklch(45% .08 145); }
+  .onboarding-card button { align-self: flex-start; border: 1px solid var(--line);
+    background: var(--app); border-radius: 100px; padding: 7px 13px; cursor: pointer; color: var(--ink); }
 
   .msg { display: flex; flex-direction: column; gap: 6px; animation: sd-rise .4s ease-out both; }
   .msg.user .bubble { align-self: flex-end; max-width: 80%; background: var(--bubble);
@@ -306,6 +344,10 @@
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; }
   }
+  @media (max-width: 620px) {
+    .onboarding-steps { grid-template-columns: 1fr; }
+    #provider-indicator { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -317,7 +359,7 @@
 
   <!-- title bar custom (finestra frameless): trascinabile + controlli -->
   <div class="titlebar pywebview-drag-region">
-    <span class="brandmark">SEED</span>
+    <span class="brandlock"><img src="../../../assets/seed-mark.svg" alt=""><span class="brandmark">SEED</span></span>
     <div class="windowmodes">
       <span class="brandmark" id="provider-indicator">provider non configurato</span>
       <button class="ctrlbtn" id="presence-btn" title="Presenza pura">presenza</button>
@@ -328,6 +370,7 @@
       <button class="wbtn wclose" id="close-btn" title="Chiudi">&#10005;</button>
     </div>
   </div>
+  <div id="operational-status" data-kind="loading" role="status" aria-live="polite">avvio locale in corso</div>
 
   <!-- conversation -->
   <div id="scroll" class="seed-scroll">
@@ -336,6 +379,12 @@
         <button class="orbbtn" id="orb-btn" title="parla con SEED"><span id="orb-sigil"></span></button>
         <div class="stato" id="stato"></div>
       </div>
+      <section class="onboarding-card" id="onboarding-card" aria-labelledby="onboarding-title">
+        <h2 id="onboarding-title">Prepariamo SEED insieme</h2>
+        <p>La chat si sblocca dopo un provider validato. Memoria, osservazione e voce restano sotto il tuo controllo.</p>
+        <div class="onboarding-steps" id="onboarding-steps"></div>
+        <button id="onboarding-provider">configura provider e modelli</button>
+      </section>
       <div id="messages"></div>
       <div class="thinking" id="thinking" style="display:none">
         <div class="spin"><div class="ring"></div><div class="core"></div></div>
@@ -452,10 +501,35 @@
     </div>
   </div>
 
-  <div id="toast"></div>
+  <!-- P6: resa adattiva (isolata, reversibile). Anteprima in iframe sandbox:
+       niente script, niente rete; l'originale non viene modificato. -->
+  <div class="scrim top" id="wr-scrim">
+    <div class="panel seed-scroll" id="wr-card">
+      <div class="panelhead">
+        <div class="toprow"><span class="k">RESA ADATTIVA</span><button class="esc" data-close>Esc ✕</button></div>
+        <span class="title">Ripresenta una pagina, isolata e reversibile</span>
+      </div>
+      <div id="wr-body"></div>
+      <div class="selnote">isolata: script e rete disattivati · l'originale non viene modificato · attivazione owner-gated</div>
+    </div>
+  </div>
 
-  <div id="perm"><div class="box">
-    <h3>SEED chiede un permesso</h3>
+  <!-- P7: capability apprese. Cosa SEED ha imparato/deciso, in chiaro. -->
+  <div class="scrim top" id="forge-scrim">
+    <div class="panel seed-scroll" id="forge-card">
+      <div class="panelhead">
+        <div class="toprow"><span class="k">CAPABILITY APPRESE</span><button class="esc" data-close>Esc ✕</button></div>
+        <span class="title">Cosa SEED ha imparato (o deciso di non imparare) per te</span>
+      </div>
+      <div id="forge-body"></div>
+      <div class="selnote">mai auto-espansione di autorita' · nuove connessioni chieste in chiaro · effetti irreversibili sempre a conferma · default OFF</div>
+    </div>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <div id="perm" role="dialog" aria-modal="true" aria-labelledby="perm-title"><div class="box">
+    <h3 id="perm-title">Vuoi consentire questa azione?</h3>
     <p id="perm-what"></p><p id="perm-why"></p>
     <div class="btns">
       <button data-d="once">Solo stavolta</button>
@@ -520,20 +594,57 @@ async function init() {
   if (_inited || !window.pywebview) return; _inited = true;
   api = window.pywebview.api;
   setOrb('idle');
+  setOperationalState('loading', 'avvio locale in corso');
   try {
     const [m, state] = await Promise.all([api.get_manifest(), api.initial_state()]);
     applyManifest(m);
     renderProviderIndicator(state.provider_hub);
+    renderOnboarding(state);
     addMsg('seed', state.onboarding_complete ? state.greeting : state.opening_prompt);
-  } catch (e) { addMsg('seed', 'Sono qui.'); }
+    setOperationalState(state.provider_hub && state.provider_hub.ready ? 'ready' : 'offline',
+      state.provider_hub && state.provider_hub.ready ? 'pronto' : 'configura un provider per usare la chat remota');
+  } catch (e) {
+    addMsg('seed', 'Sono qui.');
+    setOperationalState('error', 'avvio incompleto: apri Sistema per verificare');
+  }
   try { if (!(await api.voice_available())) $('#mic-toggle').title = 'voce non disponibile'; } catch (e) {}
 }
+function setOperationalState(kind, message) {
+  const el = $('#operational-status');
+  el.dataset.kind = kind;
+  el.textContent = message;
+}
+function classifyOperationalError(value) {
+  const text = String(value || '').toLowerCase();
+  if (text.includes('quota') || text.includes('rate limit') || text.includes('429')) return 'quota';
+  if (text.includes('offline') || text.includes('network') || text.includes('connection') || text.includes('timeout')) return 'offline';
+  return 'error';
+}
+function renderOnboarding(state) {
+  const card = $('#onboarding-card');
+  card.classList.toggle('open', !state.onboarding_complete);
+  if (state.onboarding_complete) return;
+  const providerReady = !!(state.provider_hub && state.provider_hub.ready);
+  const phase = state.onboarding_phase || 'consent';
+  const steps = [
+    ['1 · provider validato', providerReady],
+    ['2 · privacy e consensi', phase !== 'consent'],
+    ['3 · conoscenza iniziale', phase === 'complete'],
+  ];
+  $('#onboarding-steps').innerHTML = steps.map(([label, done]) =>
+    `<div class="onboarding-step ${done ? 'done' : ''}">${done ? 'completato' : 'da fare'}<br>${label}</div>`).join('');
+}
+$('#onboarding-provider').onclick = () => openProviders();
 function renderProviderIndicator(status) {
   const el = $('#provider-indicator');
   if (!status || !status.ready) { el.textContent = 'provider non configurato'; return; }
   const active = (status.profiles || []).find(p => p.active);
   const model = active && active.roles ? active.roles.conversation : '';
-  el.textContent = active ? `${active.label} · ${model || 'modello da scegliere'}` : 'provider non configurato';
+  const fallbackReady = active && active.provider !== 'ollama_cloud'
+    && (status.profiles || []).some(p => p.provider === 'ollama_cloud' && p.validated);
+  el.textContent = active
+    ? `${active.label} · ${model || 'modello da scegliere'}${fallbackReady ? ' · fallback Ollama pronto' : ''}`
+    : 'provider non configurato';
 }
 function applyManifest(m) {
   const t = (m && m.theme) || {}; const r = document.documentElement.style;
@@ -582,12 +693,24 @@ async function send(text) {
   }
   $('#input').value = ''; $('#input').style.height = 'auto';
   setOrb('ack'); $('#thinking').style.display = 'flex';
+  setOperationalState('loading', 'richiesta ricevuta · lavoro in corso');
   $('#scroll').scrollTop = $('#scroll').scrollHeight;
   await new Promise(resolve => setTimeout(resolve, 0));
   setOrb('thinking');
   let reply = '';
-  try { reply = await api.send_message(t); }
-  catch (e) { reply = 'Qualcosa non ha funzionato nel mio ragionamento. Te lo dico invece di restare in silenzio.'; }
+  try {
+    reply = await api.send_message(t);
+    setOperationalState('ready', 'risposta pronta');
+  } catch (e) {
+    const kind = classifyOperationalError(e);
+    const labels = {
+      quota: 'quota provider esaurita · cambia provider o attendi il rinnovo',
+      offline: 'provider non raggiungibile · i controlli locali restano disponibili',
+      error: 'richiesta non riuscita · nessuna azione nascosta eseguita',
+    };
+    setOperationalState(kind, labels[kind]);
+    reply = 'Qualcosa non ha funzionato nel mio ragionamento. Te lo dico invece di restare in silenzio.';
+  }
   $('#thinking').style.display = 'none';
   addMsg('seed', reply || '…');
   $('#voice-lastseed').textContent = reply || '…';
@@ -683,11 +806,140 @@ const SURFACES = [
   { glyph: '⊘', title: 'Permessi e privacy', sub: 'cosa posso osservare', open: openPerms },
   { glyph: '⌥', title: 'Evoluzione', sub: 'proposte, versioni e rollback', open: openEvolution },
   { glyph: '⚙', title: 'Sistema', sub: 'tool, mutazioni, backup e update', open: openSystem },
+  { glyph: '▭', title: 'Resa adattiva', sub: 'ripresenta una pagina, isolata e reversibile', open: openWebRender },
+  { glyph: '◇', title: 'Capability apprese', sub: 'cosa SEED ha imparato e perche', open: openForge },
 ];
+// P6: resa adattiva. Anteprima in iframe sandbox (niente script/rete), originale
+// separato e non modificato, attivazione owner-gated. Segue P0-P5 (controlli
+// sempre accessibili, stato visibile, target ampi, reduce-motion dal documento).
+const WR_NEEDS = [
+  ['larger_text', 'testo piu grande'],
+  ['high_contrast', 'alto contrasto'],
+  ['reduce_motion', 'meno animazioni'],
+  ['readable_spacing', 'spaziatura leggibile'],
+  ['strong_focus', 'focus evidente'],
+];
+let _wrLast = null;
+async function openWebRender() {
+  closeSurfaces(); $('#wr-scrim').classList.add('open');
+  const body = $('#wr-body'); body.innerHTML = '<div class="selnote">Caricamento…</div>';
+  let st; try { st = await api.web_render_status(); }
+  catch (e) { body.innerHTML = '<div class="selnote">Resa adattiva non raggiungibile.</div>'; return; }
+  if (!st.enabled) {
+    body.innerHTML = '<div class="selnote">Capability OFF di default. L\'owner puo abilitarla '
+      + '(config <code>web_render.enabled</code>). Acquisizione di rete e bridge browser '
+      + 'restano gate separati.</div>';
+    return;
+  }
+  body.innerHTML = `
+    <label class="wr-l">HTML della pagina da ripresentare (modalita locale, nessuna rete)</label>
+    <textarea id="wr-html" class="seed-input wr-ta" rows="4" placeholder="incolla qui l'HTML…"></textarea>
+    <div id="wr-needs" class="wr-needs"></div>
+    <div class="acts"><button id="wr-go" class="close">Anteprima isolata</button></div>
+    <div id="wr-stage"></div>`;
+  const needs = $('#wr-needs');
+  WR_NEEDS.forEach(([id, label]) => {
+    const w = document.createElement('label'); w.className = 'wr-chk';
+    w.innerHTML = `<input type="checkbox" value="${id}"> ${label}`;
+    needs.appendChild(w);
+  });
+  $('#wr-go').onclick = async () => {
+    const html = $('#wr-html').value.trim();
+    if (!html) { flash('Incolla prima un HTML.'); return; }
+    const chosen = $$('#wr-needs input:checked').map(c => c.value);
+    setOperationalState('loading', 'anteprima adattata in preparazione');
+    let res;
+    try { res = await api.web_render_preview('html', 'documento fornito', html, chosen, [], true); }
+    catch (e) { flash('Anteprima non riuscita.'); return; }
+    if (!res.ok) { flash('Anteprima bloccata: ' + (res.reason || '')); setOperationalState('error', res.reason || 'bloccata'); return; }
+    _wrLast = res;
+    setOperationalState('ready', `anteprima pronta · fedelta ${res.fidelity_level}`);
+    renderWrStage(res, false);
+  };
+}
+function _wrOriginalDoc(cleanHtml) {
+  return '<!DOCTYPE html><html lang="it"><head><meta charset="utf-8">'
+    + '<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'">'
+    + '<style>body{font-family:system-ui;margin:24px;max-width:70ch;color:#23211e}</style></head><body>'
+    + cleanHtml + '</body></html>';
+}
+function renderWrStage(res, showOriginal) {
+  const stage = $('#wr-stage');
+  const rem = res.removed || {};
+  const removedTxt = `rimossi: ${rem.scripts||0} script · ${rem.event_handlers||0} handler · `
+    + `${rem.remote_resources||0} risorse remote · ${rem.unsafe_urls||0} url non sicuri`;
+  stage.innerHTML = `
+    <div class="wr-bar" role="toolbar" aria-label="Controlli anteprima">
+      <span class="wr-status" aria-live="polite">${showOriginal ? 'Originale (non modificato)' : 'Adattato'} · fedelta: ${res.fidelity_level}</span>
+      <button id="wr-compare" class="chip">${showOriginal ? 'Vedi adattato' : 'Confronta originale'}</button>
+      <button id="wr-promote" class="chip">Mantieni (owner)</button>
+      <button id="wr-exit" class="chip">Esci</button>
+    </div>
+    <div class="wr-note">${removedTxt}</div>
+    <iframe id="wr-frame" class="wr-frame" sandbox="" title="Anteprima isolata"></iframe>`;
+  $('#wr-frame').srcdoc = showOriginal ? _wrOriginalDoc(res.clean_html || '') : res.preview_document;
+  $('#wr-compare').onclick = () => renderWrStage(res, !showOriginal);
+  $('#wr-exit').onclick = () => closeSurfaces();
+  $('#wr-promote').onclick = async () => {
+    if (!confirm('Mantenere questa resa adattata? Resta temporanea salvo tua conferma; mai estesa ad altri siti.')) return;
+    const out = await api.web_render_promote(true, false);
+    flash(out.promoted ? 'Resa mantenuta (temporanea).' : 'Non mantenuta: ' + (out.reason || ''));
+  };
+}
+
+// P7: capability apprese. Mostra cosa SEED ha imparato/deciso (anche "non
+// imparare") e i controlli. Default OFF: con forge spento mostra solo la nota.
+async function openForge() {
+  closeSurfaces(); $('#forge-scrim').classList.add('open');
+  const body = $('#forge-body'); body.innerHTML = '<div class="selnote">Caricamento…</div>';
+  let st; try { st = await api.forge_status(); }
+  catch (e) { body.innerHTML = '<div class="selnote">Forge non raggiungibile.</div>'; return; }
+  if (!st.enabled) {
+    body.innerHTML = '<div class="selnote">Capability Forge OFF di default. L\'owner puo '
+      + 'abilitarla (config <code>capability_forge.enabled</code>). Osservazione, '
+      + 'costruzione e attivazione restano gate separati; mai auto-espansione di autorita.</div>';
+    return;
+  }
+  let tl = []; try { tl = await api.forge_timeline(); } catch (e) { tl = []; }
+  body.innerHTML = '';
+  const note = document.createElement('div'); note.className = 'wr-note';
+  note.textContent = `evidenze locali: ${st.evidence_count} · apprese: ${st.learned} · `
+    + `auto-attivazione: ${st.auto_activation_enabled ? 'on' : 'off'}`;
+  body.appendChild(note);
+  if (!tl.length) {
+    const n = document.createElement('div'); n.className = 'selnote';
+    n.textContent = 'Nessuna capability appresa. SEED costruisce solo con fitness reale; "non imparare" e un esito valido.';
+    body.appendChild(n);
+  }
+  tl.forEach(e => {
+    const row = document.createElement('div'); row.className = 'prow';
+    const lbl = document.createElement('div'); lbl.className = 'lbl';
+    const t = document.createElement('span'); t.className = 't'; t.textContent = e.capability_id;
+    const s = document.createElement('span'); s.className = 's';
+    s.textContent = `${e.state} · ${e.why}`;
+    lbl.appendChild(t); lbl.appendChild(s); row.appendChild(lbl); body.appendChild(row);
+  });
+  const acts = document.createElement('div'); acts.className = 'acts';
+  const inp = document.createElement('input'); inp.className = 'seed-input';
+  inp.id = 'forge-src'; inp.placeholder = 'sorgente da dimenticare';
+  const btn = document.createElement('button'); btn.className = 'close';
+  btn.textContent = 'Dimentica osservazioni';
+  btn.onclick = async () => {
+    const s = inp.value.trim(); if (!s) return;
+    const r = await api.forge_forget_source(s);
+    flash(`Dimenticate ${r.purged} evidenze.`); openForge();
+  };
+  acts.appendChild(inp); acts.appendChild(btn); body.appendChild(acts);
+}
+
 async function openProviders() {
   const box = $('#pr-rows'); box.innerHTML = '';
   let status;
-  try { status = await api.provider_status(); } catch (e) { flash('Provider Hub non disponibile'); return; }
+  try { status = await api.provider_status(); }
+  catch (e) {
+    setOperationalState(classifyOperationalError(e), 'Provider Hub non raggiungibile');
+    flash('Provider Hub non disponibile'); return;
+  }
   renderProviderIndicator(status);
   for (const spec of status.providers || []) {
     const profile = (status.profiles || []).find(p => p.provider === spec.provider);
@@ -704,8 +956,11 @@ async function openProviders() {
       const key = prompt(`Inserisci API key ${spec.label}. Verrà validata realmente e cifrata con DPAPI.`);
       if (!key) return;
       flash('Validazione provider in corso…');
+      setOperationalState('loading', `validazione ${spec.label} in corso`);
       const out = await api.provider_validate(spec.provider, key, null);
       flash(out.ok ? 'Provider validato' : `Validazione fallita: ${out.error}`);
+      setOperationalState(out.ok ? 'ready' : classifyOperationalError(out.error),
+        out.ok ? `${spec.label} pronto` : `validazione non riuscita: ${out.error}`);
       if (out.ok) { addMsg('seed', 'Provider validato. Possiamo continuare l’onboarding.'); openProviders(); }
     };
     acts.appendChild(configure);
@@ -756,7 +1011,14 @@ function openSelector() { renderSelector(); closeSurfaces(); $('#sel-scrim').cla
 function closeSurfaces() { $$('.scrim').forEach(s => s.classList.remove('open')); }
 $('#ctrl-btn').onclick = () => $('#sel-scrim').classList.contains('open') ? closeSurfaces() : openSelector();
 $('#min-btn').onclick = () => { if (api && api.window_minimize) api.window_minimize(); };
-$('#close-btn').onclick = () => { if (api && api.window_close) api.window_close(); };
+$('#close-btn').onclick = async () => {
+  if (!api || !api.window_close) return;
+  const keep = confirm(
+    'Vuoi lasciare SEED attivo in background per mantenere heartbeat e Ctrl+Spazio?\n\n' +
+    'OK: nascondi la finestra e mantieni heartbeat.\nAnnulla: termina completamente SEED.'
+  );
+  await api.window_close(keep);
+};
 
 function collapseOverlay() {
   document.body.classList.remove('ov-answer');
@@ -864,7 +1126,7 @@ async function openEvolution() {
       <button class="chip">rollback</button>`;
     row.querySelector('.t').textContent = version;
     row.querySelector('button').onclick = async () => {
-      if (!confirm(`Ripristinare la versione ${version}?`)) return;
+      if (!confirm(`Tornare alla versione ${version}? Prima del ripristino SEED conserva lo stato attuale come punto di recupero.`)) return;
       const ok = await api.rollback(version, '');
       flash(ok ? 'Rollback eseguito. Riavvia SEED per applicare ogni componente.' : 'Rollback non riuscito.');
       openEvolution();
@@ -880,11 +1142,11 @@ function _sysSection(title) {
 async function openSystem() {
   const box = $('#sys-rows'); box.innerHTML = '<div class="selnote">Caricamento…</div>';
   $('#sys-scrim').classList.add('open');
-  let tools = [], mut = {}, ops = {}, del = {};
+  let tools = [], mut = {}, ops = {}, del = {}, startup = {};
   try {
-    [tools, mut, ops, del] = await Promise.all([
+    [tools, mut, ops, del, startup] = await Promise.all([
       api.tool_candidates(), api.mutation_status(),
-      api.operations_status(), api.delegation_status()]);
+      api.operations_status(), api.delegation_status(), api.windows_startup_status()]);
   } catch (e) { box.innerHTML = '<div class="selnote">Sistema non raggiungibile.</div>'; return; }
   box.innerHTML = '';
 
@@ -936,13 +1198,28 @@ async function openSystem() {
   // --- OPERAZIONI ---
   box.appendChild(_sysSection('OPERAZIONI'));
   const opsInfo = document.createElement('div'); opsInfo.className = 'prow';
-  opsInfo.innerHTML = `<div class="lbl"><span class="t">Backup: ${(ops.backups||[]).length}</span>
-    <span class="s">update pending: ${ops.pending_update ? 'sì (al prossimo boot)' : 'no'}</span></div>`;
+  opsInfo.innerHTML = `<div class="lbl"><span class="t">SEED ${ops.app_version || 'versione non disponibile'} · ${ops.install_mode === 'installed' ? 'installato' : 'ambiente sviluppo'}</span>
+    <span class="s">${ops.pending_update ? 'aggiornamento verificato pronto: si applica ' + ops.update_apply : 'nessun aggiornamento in attesa'} · backup ${(ops.backups||[]).length} · recovery ${ops.recovery_available ? 'disponibile' : 'da creare'}</span></div>`;
   box.appendChild(opsInfo);
   const bk = document.createElement('button'); bk.className = 'close'; bk.textContent = 'crea backup ora';
   bk.onclick = async () => { const path = await api.create_backup(); flash('Backup creato.'); openSystem(); };
   box.appendChild(bk);
   box.appendChild(_note(`delega sub-agent: ${del.enabled ? 'attiva' : 'disattivata'} · owner-gated`));
+
+  // --- HEARTBEAT / STARTUP ---
+  box.appendChild(_sysSection('HEARTBEAT'));
+  const sr = document.createElement('div'); sr.className = 'prow';
+  sr.innerHTML = `<div class="lbl"><span class="t">Avvia SEED con Windows</span>
+    <span class="s">profilo utente · nessun servizio Windows · disattivabile</span></div>
+    <button class="toggle ${startup.enabled ? 'on' : ''}"><span class="knob"></span></button>`;
+  sr.querySelector('.toggle').onclick = async () => {
+    const enabling = !startup.enabled;
+    if (enabling && !confirm('Avviare SEED automaticamente all’accesso Windows? Puoi disattivarlo in ogni momento.')) return;
+    const out = await api.set_windows_startup(enabling, true);
+    flash(out.ok ? (enabling ? 'Avvio con Windows attivato.' : 'Avvio con Windows disattivato.') : `Bloccato: ${out.error}`);
+    openSystem();
+  };
+  box.appendChild(sr);
 }
 function _note(text) { const d = document.createElement('div'); d.className = 'selnote'; d.textContent = text; return d; }
 
@@ -970,8 +1247,8 @@ document.addEventListener('keydown', e => {
 // ---- permission dialog (P0, chiamata sincrona dal Python) ----
 let permResolve = null;
 window.seedAskPermission = function (req) {
-  $('#perm-what').textContent = `${req.capability} (${req.risk}) su: ${req.scope}`;
-  $('#perm-why').textContent = 'Motivo: ' + (req.reason || 'non specificato');
+  $('#perm-what').textContent = `SEED vuole usare ${req.capability} nell’ambito “${req.scope}”. Rischio dichiarato: ${req.risk}.`;
+  $('#perm-why').textContent = 'Perché lo chiede: ' + (req.reason || 'motivo non specificato; nega se non è chiaro');
   $('#perm').classList.add('open');
   return new Promise(resolve => { permResolve = resolve; });
 };

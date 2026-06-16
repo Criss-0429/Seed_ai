@@ -105,8 +105,8 @@ def _protect(data: bytes) -> bytes:
     blob_in = DATA_BLOB(len(data), ctypes.cast(buf, ctypes.POINTER(ctypes.c_char)))
     blob_out = DATA_BLOB()
     ok = ctypes.windll.crypt32.CryptProtectData(
-        ctypes.byref(blob_in), "SEED Provider Hub", None, None, None, 0,
-        ctypes.byref(blob_out))
+        ctypes.byref(blob_in), "SEED Provider Hub", None, None, None, 0, ctypes.byref(blob_out)
+    )
     if not ok:
         raise ProviderHubError("DPAPI encryption failed")
     try:
@@ -126,7 +126,8 @@ def _unprotect(data: bytes) -> bytes:
     blob_in = DATA_BLOB(len(data), ctypes.cast(buf, ctypes.POINTER(ctypes.c_char)))
     blob_out = DATA_BLOB()
     ok = ctypes.windll.crypt32.CryptUnprotectData(
-        ctypes.byref(blob_in), None, None, None, None, 0, ctypes.byref(blob_out))
+        ctypes.byref(blob_in), None, None, None, None, 0, ctypes.byref(blob_out)
+    )
     if not ok:
         raise ProviderHubError("DPAPI decryption failed")
     try:
@@ -160,26 +161,30 @@ class ProviderHub:
         profiles = []
         for provider, profile in sorted(data["profiles"].items()):
             spec = PROVIDERS[provider]
-            profiles.append({
-                "provider": provider,
-                "label": spec["label"],
-                "pricing": spec["pricing"],
-                "dashboard_url": spec["dashboard_url"],
-                "validated": bool(profile.get("validated_at")),
-                "validated_at": profile.get("validated_at"),
-                "models": list(profile.get("models", [])),
-                "roles": dict(profile.get("roles", {})),
-                "active": provider == data.get("active_provider"),
-                "has_key": bool(profile.get("key_dpapi")),
-            })
+            profiles.append(
+                {
+                    "provider": provider,
+                    "label": spec["label"],
+                    "pricing": spec["pricing"],
+                    "dashboard_url": spec["dashboard_url"],
+                    "validated": bool(profile.get("validated_at")),
+                    "validated_at": profile.get("validated_at"),
+                    "models": list(profile.get("models", [])),
+                    "roles": dict(profile.get("roles", {})),
+                    "active": provider == data.get("active_provider"),
+                    "has_key": bool(profile.get("key_dpapi")),
+                }
+            )
         return {
             "schema_version": SCHEMA_VERSION,
             "ready": self.ready,
             "active_provider": data.get("active_provider", ""),
             "profiles": profiles,
             "providers": [
-                {"provider": key, **{k: v for k, v in spec.items()
-                                    if k != "automatic_fallback_target"}}
+                {
+                    "provider": key,
+                    **{k: v for k, v in spec.items() if k != "automatic_fallback_target"},
+                }
                 for key, spec in PROVIDERS.items()
             ],
             "fallback_policy": "ollama_cloud_only",
@@ -278,7 +283,7 @@ class ProviderHub:
             raise ProviderHubError("validated provider required")
         return ProviderRuntime(
             provider=selected,
-            base_url=PROVIDERS[selected]["base_url"],
+            base_url=str(PROVIDERS[selected]["base_url"]),
             api_key=_decrypted(profile["key_dpapi"]),
             roles=dict(profile["roles"]),
         )
@@ -329,22 +334,28 @@ class ProviderHub:
 
     def _list_models(self, provider: str, api_key: str) -> list[str]:
         response = self._request(
-            "GET", f"{PROVIDERS[provider]['base_url']}/models",
-            headers=self._headers(api_key), timeout=30)
+            "GET",
+            f"{PROVIDERS[provider]['base_url']}/models",
+            headers=self._headers(api_key),
+            timeout=30,
+        )
         response.raise_for_status()
         payload = response.json()
-        models = sorted({
-            str(item.get("id", "")).strip()
-            for item in payload.get("data", [])
-            if isinstance(item, dict) and item.get("id")
-        })
+        models = sorted(
+            {
+                str(item.get("id", "")).strip()
+                for item in payload.get("data", [])
+                if isinstance(item, dict) and item.get("id")
+            }
+        )
         if not models:
             raise ProviderHubError("provider returned no models")
         return models
 
     def _test_conversation(self, provider: str, api_key: str, model: str) -> None:
         response = self._request(
-            "POST", f"{PROVIDERS[provider]['base_url']}/chat/completions",
+            "POST",
+            f"{PROVIDERS[provider]['base_url']}/chat/completions",
             headers=self._headers(api_key),
             json={
                 "model": model,
@@ -364,9 +375,7 @@ class ProviderHub:
         return {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
 
     @staticmethod
-    def _validated_roles(
-        provider: str, roles: dict[str, str], models: list[str]
-    ) -> dict[str, str]:
+    def _validated_roles(provider: str, roles: dict[str, str], models: list[str]) -> dict[str, str]:
         del provider
         if not isinstance(roles, dict):
             raise ProviderHubError("roles must be an object")
@@ -387,7 +396,9 @@ class ProviderHub:
         if not self.path.exists():
             return {"schema_version": SCHEMA_VERSION, "active_provider": "", "profiles": {}}
         data = json.loads(self.path.read_text(encoding="utf-8"))
-        if data.get("schema_version") != SCHEMA_VERSION or not isinstance(data.get("profiles"), dict):
+        if data.get("schema_version") != SCHEMA_VERSION or not isinstance(
+            data.get("profiles"), dict
+        ):
             raise ProviderHubError("invalid provider hub store")
         for provider in data["profiles"]:
             self._require_provider(provider)

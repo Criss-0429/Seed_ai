@@ -81,7 +81,7 @@
     "heartbeat_seconds": 60,
     "cooldown_seconds": 1800,
     "min_net_value": 0.0,
-    "_note": "D1. Daemon SOLO in-process: parte con SEED, muore alla chiusura. Nessun servizio OS, auto-start o always-on. Heartbeat reviewable + coda proattivita' persistente con cooldown/suppression/silenzio di default. ZERO azioni agentiche di scrittura."
+    "_note": "D1. Daemon SOLO in-process: parte con SEED, muore alla terminazione completa. Avvio Windows solo opt-in per utente, nessun servizio OS. Chiudendo la finestra l'utente sceglie se mantenere heartbeat in background. Heartbeat reviewable + cooldown/suppression/silenzio di default. ZERO azioni agentiche di scrittura."
   },
   "worker": {
     "enabled": true,
@@ -104,5 +104,20 @@
     "isolation_available": false,
     "isolation_backend": "process",
     "_note": "D5. Skills procedurali (ricette = sequenze di capability allowlistate) + delega a sub-agenti isolati. Default OFF. Install richiede audit + reviewer + owner gate: nessun self-install. Task graph IR validato (no cicli, capability allowlistate). Delega gated, isolamento reale (worktree/container) = futuro."
+  },
+  "web_render": {
+    "enabled": false,
+    "network_acquisition_enabled": false,
+    "browser_bridge_enabled": false,
+    "_note": "P6 Adaptive Web Rendering. Default OFF. Fase P6.0 (fondazione): solo contratti + sanitizzazione HTML/URL + classificazione fedelta' + fitness gate (genera solo se batte 'non fare nulla'/browser), NESSUNA rete/browser. Capability generativa ed emergente da salienza/fitness del singolo utente, mai hardcoded; puo' non essere mai generata. Acquisizione con consenso, generatore di piano tipizzato, preview isolata (script/rete OFF) e promozione governata = P6.1+ owner-gated."
+  },
+  "capability_forge": {
+    "enabled": false,
+    "auto_activation_enabled": false,
+    "observation_min_occurrences": 3,
+    "observation_min_sessions": 2,
+    "sensitive_min_occurrences": 5,
+    "sensitive_min_sessions": 3,
+    "_note": "P7 Selective Capability Forge. Default OFF. Fase P7.0 (fondazione): solo contratti V2, lifecycle FSM, authority subset check fail-closed, secret discard e migrazione conservativa V1 (i tool esistenti NON diventano auto-attivi). NESSUN cambiamento runtime. Regola cardine: mai auto-espansione di autorita' - auto_activation solo se l'autorita' richiesta e' sottoinsieme di quella concessa; nuova autorita'/effetti irreversibili = consenso umano. Evidence engine, fitness, connector vetting/MCP, builder, evaluator, connection broker/OAuth/vault e activation authority = P7.1+ owner-gated."
   }
 }

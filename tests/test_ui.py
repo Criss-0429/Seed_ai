@@ -120,7 +120,20 @@ def test_jsapi_exposes_surface_methods(tmp_path, monkeypatch):
     assert isinstance(jsapi.user_model(), list)
     assert "observation" in jsapi.permissions()
     assert isinstance(jsapi.daemon_status(), dict)
-    assert jsapi.initial_state()["onboarding_complete"] is False
+    initial = jsapi.initial_state()
+    assert initial["onboarding_complete"] is False
+    assert initial["app_version"]
+    assert initial["operations"]["data_preserved_during_update"] is True
+    app.shutdown()
+
+
+def test_operations_surface_exposes_install_update_and_recovery_state(tmp_path, monkeypatch):
+    app = _app(tmp_path, monkeypatch)
+    status = app.ui_operations()
+    assert status["install_mode"] == "development"
+    assert status["update_apply"] == "al prossimo avvio supervisionato"
+    assert status["data_preserved_during_update"] is True
+    assert status["recovery_available"] is False
     app.shutdown()
 
 def test_jsapi_voice_bridge_and_window_modes(tmp_path, monkeypatch):
@@ -260,3 +273,44 @@ def test_surface_connects_onboarding_voice_modes_and_evolution():
     for token in ("initial_state", "voice_message", "voice_reply_audio",
                   "set_window_mode", "openEvolution", "Ctrl + Spazio"):
         assert token in html
+
+
+def test_surface_has_p4_onboarding_operational_states_and_human_recovery_copy():
+    html = _SURFACE.read_text(encoding="utf-8")
+    assert 'id="onboarding-card"' in html and "renderOnboarding" in html
+    assert 'id="operational-status"' in html and 'aria-live="polite"' in html
+    for state in ("loading", "ready", "error", "offline", "quota", "fallback"):
+        assert state in html
+    assert "fallback Ollama pronto" in html
+    assert "punto di recupero" in html
+    assert "Vuoi consentire questa azione?" in html
+
+
+def test_surface_uses_local_brand_asset():
+    html = _SURFACE.read_text(encoding="utf-8")
+    assert "../../../assets/seed-mark.svg" in html
+
+
+def test_surface_has_web_render_adaptive_surface_isolated_and_gated():
+    html = _SURFACE.read_text(encoding="utf-8")
+    # voce nel selettore + superficie
+    assert "Resa adattiva" in html and "openWebRender" in html and 'id="wr-scrim"' in html
+    # anteprima ISOLATA: iframe sandbox vuoto (niente script/rete)
+    assert 'id="wr-frame"' in html and 'sandbox=""' in html
+    # controlli sempre accessibili (P0/B-03): confronto, mantieni-owner, esci
+    assert 'id="wr-compare"' in html and 'id="wr-promote"' in html and 'id="wr-exit"' in html
+    # bridge gated verso il backend
+    for m in ("web_render_status", "web_render_preview", "web_render_promote"):
+        assert m in html
+    # stato visibile (B-01) + nessun asset remoto introdotto
+    assert 'class="wr-status"' in html and 'aria-live="polite"' in html
+
+
+def test_surface_has_capability_forge_surface_gated():
+    html = _SURFACE.read_text(encoding="utf-8")
+    assert "Capability apprese" in html and "openForge" in html and 'id="forge-scrim"' in html
+    # bridge gated verso il backend P7
+    for m in ("forge_status", "forge_timeline", "forge_forget_source"):
+        assert m in html
+    # principi P7 dichiarati in chiaro nella superficie
+    assert "auto-espansione di autorita" in html and "default OFF" in html

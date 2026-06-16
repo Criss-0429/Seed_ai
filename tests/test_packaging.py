@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ast
+import importlib.util
 from pathlib import Path
 
 
@@ -10,12 +11,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_pyinstaller_uses_package_entrypoint():
-    spec = (ROOT / "build" / "seed.spec").read_text(encoding="utf-8")
-    assert "['../build_entry.py']" in spec
+    spec = (ROOT / "packaging" / "pyinstaller" / "seed.spec").read_text(encoding="utf-8")
+    assert "['../../build_entry.py']" in spec
     assert "['../seed/__main__.py']" not in spec
     assert "'tiktoken_ext.openai_public'" in spec
     assert "COLLECT(" in spec
     assert "exclude_binaries=True" in spec
+    assert "icon='../../assets/seed.ico'" in spec
+    assert "('../../assets', 'assets')" in spec
 
 
 def test_build_entry_imports_seed_main_as_package():
@@ -29,12 +32,19 @@ def test_build_entry_imports_seed_main_as_package():
     assert imports
 
 
+def test_runtime_has_noninteractive_smoke_mode():
+    source = (ROOT / "seed" / "__main__.py").read_text(encoding="utf-8")
+    assert 'if "--smoke" in argv:' in source
+    assert "app.shutdown()" in source
+
+
 def test_supervisor_pyinstaller_uses_package_entrypoint():
-    spec = (ROOT / "build" / "supervisor.spec").read_text(encoding="utf-8")
-    assert "['../supervisor_entry.py']" in spec
+    spec = (ROOT / "packaging" / "pyinstaller" / "supervisor.spec").read_text(encoding="utf-8")
+    assert "['../../supervisor_entry.py']" in spec
     assert "console=True" in spec
     assert "COLLECT(" in spec
     assert "exclude_binaries=True" in spec
+    assert "icon='../../assets/seed.ico'" in spec
 
 
 def test_supervisor_entry_imports_cli_as_package():
@@ -62,6 +72,17 @@ def test_inno_shortcuts_always_launch_supervisor_and_preserve_data():
     assert '--boot --runtime ""{app}\\runtime\\SEED.exe""' in installer
     assert "{localappdata}\\SEED" in installer
     assert "DelTree" in installer and "RemoveData" in installer
+    assert "UninstallSilent" in installer
+    assert "MB_DEFBUTTON2" in installer
+    assert "SetupIconFile=..\\assets\\seed.ico" in installer
+    assert 'IconFilename: "{app}\\runtime\\SEED.exe"' in installer
+
+
+def test_brand_assets_are_local_and_packaged():
+    assert (ROOT / "assets" / "seed-mark.svg").is_file()
+    icon = (ROOT / "assets" / "seed.ico").read_bytes()
+    assert icon[:6] == b"\x00\x00\x01\x00\x01\x00"
+    assert len(icon) > 22
 
 
 def test_release_builder_requires_all_three_ml_bundles():
@@ -71,3 +92,30 @@ def test_release_builder_requires_all_three_ml_bundles():
     assert '"embedding-mpnet"' in script
     assert "release-manifest.json" in script
     assert "SHA256SUMS.txt" in script
+    assert "finalize_installer" in script
+    assert '"installer"' in script
+    assert "prune_runtime" in script
+
+
+def test_runtime_pruning_removes_tests_caches_and_unused_audio_stack(tmp_path):
+    spec = importlib.util.spec_from_file_location(
+        "build_release", ROOT / "scripts" / "build_release.py"
+    )
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    for relative in (
+        "torch/testing/example.py",
+        "pkg/__pycache__/cached.pyc",
+        "librosa/module.py",
+        "llvmlite.libs/native.dll",
+        "keep/runtime.py",
+    ):
+        path = tmp_path / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"x")
+
+    removed = module.prune_runtime(tmp_path)
+
+    assert removed == {"files": 4, "bytes": 4}
+    assert (tmp_path / "keep" / "runtime.py").is_file()

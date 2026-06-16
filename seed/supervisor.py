@@ -118,13 +118,15 @@ class SubprocessRuntimeLauncher:
     def __call__(self, version_id: str, health_file: Path, token: str) -> ProcessHandle:
         env = os.environ.copy()
         env.update(self.env)
-        env.update({
-            "SEED_SUPERVISED": "1",
-            "SEED_BOOT_VERSION": version_id,
-            "SEED_DATA_ROOT": str(self.seed_root),
-            "SEED_HEALTH_FILE": str(health_file),
-            "SEED_HEALTH_TOKEN": token,
-        })
+        env.update(
+            {
+                "SEED_SUPERVISED": "1",
+                "SEED_BOOT_VERSION": version_id,
+                "SEED_DATA_ROOT": str(self.seed_root),
+                "SEED_HEALTH_FILE": str(health_file),
+                "SEED_HEALTH_TOKEN": token,
+            }
+        )
         return subprocess.Popen(self.command, env=env)  # noqa: S603
 
 
@@ -187,9 +189,7 @@ class BootSupervisor:
         return version
 
     def active_version(self) -> str:
-        pointer = _read_json_object(
-            self.active_root / "current_version.json", "active pointer"
-        )
+        pointer = _read_json_object(self.active_root / "current_version.json", "active pointer")
         if pointer.get("schema_version") != "seed.active-version.v1":
             raise VersionIntegrityError("unsupported active pointer schema")
         version_id = str(pointer.get("version_id") or "")
@@ -220,9 +220,7 @@ class BootSupervisor:
                 self.known_good()
         except Exception as exc:
             self._log("boot_blocked", {"boot_id": boot_id, "reason": str(exc)})
-            return BootResult(
-                "seed.boot-result.v1", boot_id, "", "", "blocked", False, str(exc)
-            )
+            return BootResult("seed.boot-result.v1", boot_id, "", "", "blocked", False, str(exc))
 
         self._log("boot_started", {"boot_id": boot_id, "version_id": requested})
         healthy, reason, process = self._launch_and_wait(
@@ -232,14 +230,25 @@ class BootSupervisor:
             self._mark_known_good(requested, boot_id)
             self._log("boot_healthy", {"boot_id": boot_id, "version_id": requested})
             return BootResult(
-                "seed.boot-result.v1", boot_id, requested, requested,
-                "healthy", False, reason, process,
+                "seed.boot-result.v1",
+                boot_id,
+                requested,
+                requested,
+                "healthy",
+                False,
+                reason,
+                process,
             )
 
         self._stop(process)
-        self._log("boot_unhealthy", {
-            "boot_id": boot_id, "version_id": requested, "reason": reason,
-        })
+        self._log(
+            "boot_unhealthy",
+            {
+                "boot_id": boot_id,
+                "version_id": requested,
+                "reason": reason,
+            },
+        )
         try:
             known_good = self.known_good()
         except Exception as exc:
@@ -248,8 +257,13 @@ class BootSupervisor:
         if known_good is None or known_good.version_id == requested:
             self._log("fallback_blocked", {"boot_id": boot_id, "reason": reason})
             return BootResult(
-                "seed.boot-result.v1", boot_id, requested, requested,
-                "failed", False, reason,
+                "seed.boot-result.v1",
+                boot_id,
+                requested,
+                requested,
+                "failed",
+                False,
+                reason,
             )
 
         try:
@@ -262,7 +276,12 @@ class BootSupervisor:
             fallback_reason = f"{reason}; fallback restore failed: {exc}"
             self._log("fallback_failed", {"boot_id": boot_id, "reason": fallback_reason})
             return BootResult(
-                "seed.boot-result.v1", boot_id, requested, "", "failed", True,
+                "seed.boot-result.v1",
+                boot_id,
+                requested,
+                "",
+                "failed",
+                True,
                 fallback_reason,
             )
 
@@ -271,21 +290,35 @@ class BootSupervisor:
         )
         if healthy:
             self._mark_known_good(known_good.version_id, boot_id)
-            self._log("fallback_healthy", {
-                "boot_id": boot_id,
-                "requested_version": requested,
-                "version_id": known_good.version_id,
-            })
+            self._log(
+                "fallback_healthy",
+                {
+                    "boot_id": boot_id,
+                    "requested_version": requested,
+                    "version_id": known_good.version_id,
+                },
+            )
             return BootResult(
-                "seed.boot-result.v1", boot_id, requested, known_good.version_id,
-                "healthy", True, fallback_reason, fallback_process,
+                "seed.boot-result.v1",
+                boot_id,
+                requested,
+                known_good.version_id,
+                "healthy",
+                True,
+                fallback_reason,
+                fallback_process,
             )
         self._stop(fallback_process)
         final_reason = f"active unhealthy: {reason}; fallback unhealthy: {fallback_reason}"
         self._log("fallback_unhealthy", {"boot_id": boot_id, "reason": final_reason})
         return BootResult(
-            "seed.boot-result.v1", boot_id, requested, known_good.version_id,
-            "failed", True, final_reason,
+            "seed.boot-result.v1",
+            boot_id,
+            requested,
+            known_good.version_id,
+            "failed",
+            True,
+            final_reason,
         )
 
     def apply_pending_update(self, runtime_path: Path) -> dict | None:
@@ -339,11 +372,20 @@ class BootSupervisor:
             applied = updates_dir / "applied"
             applied.mkdir(parents=True, exist_ok=True)
             marker.replace(applied / f"{time.time_ns()}-pending_update.json")
-            self._log("update_applied", {
-                "version": data.get("sha256"), "runtime": runtime_path.name,
-                "backup": backup.name})
-            return {"applied": True, "runtime": str(runtime_path),
-                    "backup": str(backup), "kind": kind}
+            self._log(
+                "update_applied",
+                {
+                    "version": data.get("sha256"),
+                    "runtime": runtime_path.name,
+                    "backup": backup.name,
+                },
+            )
+            return {
+                "applied": True,
+                "runtime": str(runtime_path),
+                "backup": str(backup),
+                "kind": kind,
+            }
         except (OSError, SupervisorError, ValueError) as exc:
             self._log("update_apply_failed", {"reason": str(exc)})
             failed = updates_dir / "failed"
@@ -365,9 +407,13 @@ class BootSupervisor:
             _replace_tree(backup, runtime.parent)
         else:
             shutil.copy2(backup, runtime)
-        self._log("update_rolled_back", {
-            "runtime": runtime.name, "backup": backup.name,
-        })
+        self._log(
+            "update_rolled_back",
+            {
+                "runtime": runtime.name,
+                "backup": backup.name,
+            },
+        )
         return {"rolled_back": True, "runtime": str(runtime)}
 
     def manual_recover(self, version_id: str, reason: str) -> str:

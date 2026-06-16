@@ -131,9 +131,9 @@ class EvolutionConfig:
 
 @dataclass
 class DaemonConfig:
-    """D1: daemon di background, SOLO in-process (vive dentro SEED supervisionato,
-    parte con SEED e muore alla chiusura). NON e' un servizio OS, nessun
-    auto-start, nessun always-on. Default silenzio + cooldown + suppression."""
+    """D1: daemon di background, SOLO in-process (vive dentro SEED supervisionato
+    e muore alla terminazione completa). NON e' un servizio OS. L'app puo essere
+    avviata al login solo con consenso per-utente. Default silenzio + cooldown."""
     enabled: bool = True            # daemon in-process; nessun servizio OS
     heartbeat_seconds: int = 60     # battito reviewable entro la sessione
     cooldown_seconds: int = 1800    # >=30 min tra due emit: niente raffica
@@ -176,6 +176,30 @@ class SkillsConfig:
 
 
 @dataclass
+class WebRenderConfig:
+    """P6 Adaptive Web Rendering. Default OFF. La fase fondazionale P6.0 NON tocca
+    la rete o il browser: solo contratti, sanitizzazione e gate locali. Le fasi
+    con acquisizione reale (P6.1+) restano separate e owner-gated."""
+    enabled: bool = False               # default OFF: nessun renderer attivo
+    network_acquisition_enabled: bool = False   # P6.1+, mai attivo in P6.0
+    browser_bridge_enabled: bool = False        # P6.1+, opt-in revocabile
+
+
+@dataclass
+class CapabilityForgeConfig:
+    """P7 Selective Capability Forge. Default OFF. P7.0 = solo contratti, policy,
+    lifecycle e migrazione conservativa V1: NESSUN cambiamento di runtime. Le fasi
+    P7.1+ (evidence, fitness, connector vetting, builder, evaluator, connection
+    broker, activation authority) restano gate separati e owner-gated."""
+    enabled: bool = False
+    auto_activation_enabled: bool = False        # mai auto-espansione di autorita'
+    observation_min_occurrences: int = 3
+    observation_min_sessions: int = 2
+    sensitive_min_occurrences: int = 5
+    sensitive_min_sessions: int = 3
+
+
+@dataclass
 class SeedConfig:
     user_alias: str = "utente"     # alias scelto dall'utente, NON il nome reale
     llm: LLMConfig = field(default_factory=LLMConfig)
@@ -190,6 +214,8 @@ class SeedConfig:
     worker: WorkerConfig = field(default_factory=WorkerConfig)
     observation: ObservationConfig = field(default_factory=ObservationConfig)
     skills: SkillsConfig = field(default_factory=SkillsConfig)
+    web_render: WebRenderConfig = field(default_factory=WebRenderConfig)
+    capability_forge: CapabilityForgeConfig = field(default_factory=CapabilityForgeConfig)
 
     def redacted_summary(self) -> dict:
         """Versione loggabile: key sostituite da presenza/assenza."""
@@ -211,6 +237,12 @@ class SeedConfig:
                             "sensitive_excluded": self.observation.sensitive_excluded},
             "skills": {"enabled": self.skills.enabled,
                        "delegation_enabled": self.skills.delegation_enabled},
+            "web_render": {"enabled": self.web_render.enabled,
+                           "network_acquisition_enabled":
+                               self.web_render.network_acquisition_enabled},
+            "capability_forge": {"enabled": self.capability_forge.enabled,
+                                 "auto_activation_enabled":
+                                     self.capability_forge.auto_activation_enabled},
             "evolution": {"enabled": self.evolution.enabled},
             "research": {
                 "enabled": self.research.enabled,
@@ -237,6 +269,8 @@ def _from_dict(d: dict) -> SeedConfig:
                                ("worker", cfg.worker),
                                ("observation", cfg.observation),
                                ("skills", cfg.skills),
+                               ("web_render", cfg.web_render),
+                               ("capability_forge", cfg.capability_forge),
                                ("provider_hub", cfg.provider_hub)):
         for k, v in d.get(section, {}).items():
             if hasattr(cls_field, k):

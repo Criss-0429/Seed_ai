@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: oklch(94% 0.004 85); }
+    * { box-sizing: border-box; }
+    ::selection { background: oklch(88% 0.02 85); }
+    .seed-scroll::-webkit-scrollbar { width: 9px; }
+    .seed-scroll::-webkit-scrollbar-thumb { background: oklch(85% 0.006 85); border-radius: 100px; border: 3px solid transparent; background-clip: content-box; }
+    .seed-input { font-family: 'DM Sans', sans-serif; font-size: 16px; color: oklch(23% 0.008 80); background: transparent; border: none; outline: none; width: 100%; }
+    .seed-input::placeholder { color: oklch(68% 0.01 85); }
+    @keyframes sd-breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.045); } }
+    @keyframes sd-breathe2 { 0%,100% { transform: scale(1); } 50% { transform: scale(1.09); } }
+    @keyframes sd-spin { to { transform: rotate(360deg); } }
+    @keyframes sd-spinr { to { transform: rotate(-360deg); } }
+    @keyframes sd-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.5); } }
+    @keyframes sd-pulsering { 0%,100% { transform: scale(1); opacity: 0.65; } 50% { transform: scale(1.12); opacity: 0.9; } }
+    @keyframes sd-wake { 0% { transform: scale(0.3); opacity: 0; } 55% { transform: scale(1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes sd-rise { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes sd-fade { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes sd-dots { 0%,100% { opacity: 0.25; } 50% { opacity: 1; } }
+  </style>
+</helmet>
+
+<div style="height: 100vh; width: 100vw; background: oklch(94% 0.004 85); display: grid; place-items: center; font-family: 'DM Sans', sans-serif;">
+  <!-- ====== APP WINDOW ====== -->
+  <div style="position: relative; width: min(1100px, 100vw); height: min(760px, 100vh); background: oklch(97% 0.005 85); border: 1px solid oklch(88% 0.006 85); border-radius: 14px; box-shadow: 0 30px 80px -30px oklch(40% 0.02 85 / 0.45), 0 2px 8px oklch(40% 0.02 85 / 0.08); overflow: hidden; display: flex; flex-direction: column;">
+
+    <!-- title bar -->
+    <div style="flex-shrink: 0; height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-bottom: 1px solid oklch(93% 0.005 85);">
+      <div style="display: flex; align-items: center; gap: 11px;">
+        <div style="display: flex; gap: 7px;">
+          <div style="width: 11px; height: 11px; border-radius: 50%; background: oklch(89% 0.006 85);"></div>
+          <div style="width: 11px; height: 11px; border-radius: 50%; background: oklch(89% 0.006 85);"></div>
+          <div style="width: 11px; height: 11px; border-radius: 50%; background: oklch(89% 0.006 85);"></div>
+        </div>
+        <span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.22em; color: oklch(62% 0.01 85);">SEED</span>
+      </div>
+      <button onClick="{{ openSelector }}" style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: oklch(68% 0.01 85); background: transparent; border: 1px solid oklch(90% 0.006 85); border-radius: 7px; padding: 4px 10px; cursor: pointer;" style-hover="{{ hintHover }}">Ctrl + .</button>
+    </div>
+
+    <!-- ====== CONVERSATION ====== -->
+    <div ref="{{ scrollRef }}" class="seed-scroll" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center;">
+      <div style="width: 100%; max-width: 660px; padding: 30px 28px 18px; display: flex; flex-direction: column; gap: 26px;">
+
+        <!-- presence header -->
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 9px; padding-top: 6px;">
+          <button onClick="{{ enterVoice }}" title="parla con SEED" style="background: transparent; border: none; cursor: pointer; padding: 4px;">{{ orbSigil }}</button>
+          <div style="height: 13px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.26em; color: oklch(66% 0.04 var(--sd-hue, 45));">{{ statoLabel }}</div>
+        </div>
+
+        <!-- messages -->
+        <sc-for list="{{ messages }}" as="m" hint-placeholder-count="2">
+          <div style="display: flex; flex-direction: column; gap: 6px; animation: sd-rise 0.4s ease-out both;">
+            <sc-if value="{{ m.isUser }}" hint-placeholder-val="{{ false }}">
+              <div style="align-self: flex-end; max-width: 80%; background: oklch(92.5% 0.006 85); border-radius: 16px 16px 5px 16px; padding: 11px 15px; font-size: 16px; line-height: 1.5; color: oklch(28% 0.008 80); white-space: pre-wrap;">{{ m.text }}</div>
+            </sc-if>
+            <sc-if value="{{ m.isSeed }}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; gap: 12px; align-items: flex-start; max-width: 92%;">
+                <div style="flex-shrink: 0; margin-top: 6px; width: 15px; height: 15px; display: grid; place-items: center; position: relative;">
+                  <div style="position: absolute; inset: 0; border: 1.2px solid oklch(62% 0.06 var(--sd-hue, 45)); border-radius: 50%; opacity: 0.5;"></div>
+                  <div style="width: 3.5px; height: 3.5px; background: oklch(23% 0.008 80); border-radius: 50%;"></div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 7px;">
+                  <div style="font-size: 17px; line-height: 1.55; color: oklch(23% 0.008 80); white-space: pre-wrap; text-wrap: pretty;">{{ m.text }}</div>
+                  <div style="display: flex; align-items: center; gap: 13px; flex-wrap: wrap;">
+                    <sc-if value="{{ m.hasHyp }}" hint-placeholder-val="{{ false }}">
+                      <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: oklch(58% 0.1 var(--sd-hue, 45)); border: 1px dashed oklch(70% 0.09 var(--sd-hue, 45)); border-radius: 100px; padding: 2px 8px;">NUOVA IPOTESI ↘</span>
+                    </sc-if>
+                    <button onClick="{{ m.onWhy }}" style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; color: oklch(62% 0.01 85); background: transparent; border: none; border-bottom: 1px dashed oklch(74% 0.01 85); padding: 0 0 1px; cursor: pointer;">{{ m.whyLabel }}</button>
+                  </div>
+                  <sc-if value="{{ m.whyOpen }}" hint-placeholder-val="{{ false }}">
+                    <div style="background: oklch(95.5% 0.005 85); border-left: 2px solid oklch(70% 0.06 var(--sd-hue, 45)); border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: 14px; line-height: 1.5; color: oklch(45% 0.01 85); animation: sd-fade 0.3s ease-out; max-width: 460px;">{{ m.why }}</div>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+
+        <!-- thinking indicator -->
+        <sc-if value="{{ busy }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <div style="flex-shrink: 0; width: 15px; height: 15px; display: grid; place-items: center; position: relative;">
+              <div style="position: absolute; inset: 0; border: 1.2px solid oklch(62% 0.06 var(--sd-hue, 45)); border-top-color: transparent; border-radius: 50%; animation: sd-spin 1.1s linear infinite;"></div>
+              <div style="width: 3.5px; height: 3.5px; background: oklch(23% 0.008 80); border-radius: 50%;"></div>
+            </div>
+            <span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; color: oklch(66% 0.01 85);">STO PENSANDO<span style="animation: sd-dots 1.4s ease-in-out infinite;"> ···</span></span>
+          </div>
+        </sc-if>
+
+      </div>
+    </div>
+
+    <!-- ====== INPUT BAR ====== -->
+    <div style="flex-shrink: 0; padding: 14px 28px 20px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+      <div style="width: 100%; max-width: 660px; display: flex; align-items: flex-end; gap: 11px; background: oklch(97% 0.005 85); border: 1.5px solid oklch(88% 0.006 85); border-radius: 22px; padding: 9px 9px 9px 18px;" style-focus-within="{{ inputFocusStyle }}">
+        <textarea ref="{{ inputRef }}" class="seed-input" rows="1" placeholder="scrivi a SEED…" onInput="{{ onInputGrow }}" onKeyDown="{{ onInputKey }}" style="resize: none; line-height: 1.5; max-height: 120px; padding: 4px 0;"></textarea>
+        <button onClick="{{ enterVoice }}" title="passa alla voce" style="flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%; border: 1px solid oklch(90% 0.006 85); background: transparent; cursor: pointer; display: grid; place-items: center;" style-hover="{{ iconHover }}">
+          <div style="position: relative; width: 16px; height: 16px; display: grid; place-items: center;">
+            <div style="position: absolute; inset: 0; border: 1.3px solid oklch(50% 0.01 85); border-radius: 50%; opacity: 0.45;"></div>
+            <div style="width: 4px; height: 4px; background: oklch(40% 0.01 85); border-radius: 50%;"></div>
+          </div>
+        </button>
+        <button onClick="{{ sendClick }}" title="invia" style="flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%; border: none; background: oklch(23% 0.008 80); cursor: pointer; display: grid; place-items: center; color: oklch(97% 0.005 85); font-size: 16px;" style-hover="{{ sendHover }}">↑</button>
+      </div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: oklch(74% 0.01 85); display: flex; gap: 16px;">
+        <span>↵ invia</span>
+        <span>Ctrl + . &nbsp;superfici</span>
+        <span>Esc &nbsp;chiudi</span>
+      </div>
+    </div>
+
+    <!-- ====== VOICE OVERLAY ====== -->
+    <sc-if value="{{ voiceActive }}" hint-placeholder-val="{{ false }}">
+      <div style="position: absolute; inset: 0; background: oklch(97% 0.005 85); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 34px; padding: 40px; animation: sd-fade 0.4s ease-out;">
+        <button onClick="{{ exitVoice }}" style="position: absolute; top: 18px; right: 20px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: oklch(60% 0.01 85); background: transparent; border: 1px solid oklch(90% 0.006 85); border-radius: 8px; padding: 6px 12px; cursor: pointer;">torna alla scrittura · Esc</button>
+        <div style="height: 16px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.3em; color: oklch(66% 0.05 var(--sd-hue, 45));">{{ voiceStato }}</div>
+        {{ orbBig }}
+        <div style="min-height: 64px; max-width: 540px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+          <div style="font-size: 20px; line-height: 1.45; color: oklch(23% 0.008 80); text-align: center; text-wrap: pretty;">{{ voiceLastSeed }}</div>
+          <sc-if value="{{ voiceTranscript }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size: 16px; line-height: 1.4; color: oklch(60% 0.01 85); text-align: center; font-style: italic;">{{ voiceTranscript }}</div>
+          </sc-if>
+        </div>
+        <div style="width: 100%; max-width: 460px; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+          <button onMouseDown="{{ micDown }}" onMouseUp="{{ micUp }}" onMouseLeave="{{ micUp }}" style="display: flex; align-items: center; gap: 12px; border: 1.5px solid oklch(86% 0.006 85); background: oklch(97% 0.005 85); border-radius: 100px; padding: 13px 26px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 15px; color: oklch(35% 0.01 85);" style-active="{{ micActiveStyle }}">
+            <span style="position: relative; width: 18px; height: 18px; display: grid; place-items: center;">
+              <span style="position: absolute; inset: 0; border: 1.3px solid oklch(45% 0.06 var(--sd-hue, 45)); border-radius: 50%;"></span>
+              <span style="width: 4px; height: 4px; background: oklch(40% 0.01 85); border-radius: 50%;"></span>
+            </span>
+            tieni premuto per parlare
+          </button>
+          <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
+            <div style="flex: 1; height: 1px; background: oklch(91% 0.006 85);"></div>
+            <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; color: oklch(74% 0.01 85);">OPPURE</span>
+            <div style="flex: 1; height: 1px; background: oklch(91% 0.006 85);"></div>
+          </div>
+          <div style="width: 100%; display: flex; align-items: center; gap: 10px; border: 1.5px solid oklch(88% 0.006 85); border-radius: 100px; padding: 8px 8px 8px 18px;">
+            <input ref="{{ voiceInputRef }}" class="seed-input" placeholder="…o scrivi qui" onKeyDown="{{ onVoiceKey }}">
+            <button onClick="{{ voiceSendClick }}" style="flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; border: none; background: oklch(23% 0.008 80); cursor: pointer; color: oklch(97% 0.005 85); font-size: 15px;">↑</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ====== SURFACE SELECTOR (Ctrl+.) ====== -->
+    <sc-if value="{{ showSelector }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeSurface }}" style="position: absolute; inset: 0; background: oklch(96% 0.005 85 / 0.55); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); display: grid; place-items: center; animation: sd-fade 0.25s ease-out;">
+        <div onClick="{{ stop }}" style="width: 340px; background: oklch(97.5% 0.005 85); border: 1px solid oklch(88% 0.006 85); border-radius: 14px; box-shadow: 0 24px 60px -24px oklch(40% 0.02 85 / 0.5); overflow: hidden; animation: sd-rise 0.3s ease-out;">
+          <div style="padding: 14px 18px 10px; border-bottom: 1px solid oklch(93% 0.005 85); display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: oklch(64% 0.01 85);">SUPERFICI</span>
+            <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: oklch(76% 0.01 85);">Ctrl + .</span>
+          </div>
+          <sc-for list="{{ surfaceItems }}" as="s" hint-placeholder-count="3">
+            <button onClick="{{ s.onClick }}" style="width: 100%; display: flex; align-items: center; gap: 13px; padding: 13px 18px; background: transparent; border: none; border-bottom: 1px solid oklch(94.5% 0.005 85); cursor: pointer; text-align: left;" style-hover="{{ rowHover }}">
+              <span style="font-family: 'DM Mono', monospace; font-size: 11px; color: oklch(66% 0.04 var(--sd-hue, 45)); width: 16px;">{{ s.glyph }}</span>
+              <span style="display: flex; flex-direction: column; gap: 1px;">
+                <span style="font-size: 15px; color: oklch(26% 0.008 80);">{{ s.title }}</span>
+                <span style="font-family: 'DM Mono', monospace; font-size: 10px; color: oklch(70% 0.01 85);">{{ s.sub }}</span>
+              </span>
+            </button>
+          </sc-for>
+          <div style="padding: 11px 18px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.04em; color: oklch(74% 0.01 85); line-height: 1.5;">…oppure chiedimelo: «mostrami cosa sai di me»</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ====== HIDDEN SURFACE: USER MODEL ====== -->
+    <sc-if value="{{ showUserModel }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeSurface }}" style="position: absolute; inset: 0; background: oklch(96% 0.005 85 / 0.55); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: flex-start; padding: 36px 0; overflow-y: auto; animation: sd-fade 0.25s ease-out;">
+        <div onClick="{{ stop }}" class="seed-scroll" style="width: 480px; max-height: 100%; background: oklch(97.5% 0.005 85); border: 1px solid oklch(88% 0.006 85); border-radius: 14px; box-shadow: 0 24px 60px -24px oklch(40% 0.02 85 / 0.5); display: flex; flex-direction: column; animation: sd-rise 0.3s ease-out;">
+          <div style="position: sticky; top: 0; background: oklch(97.5% 0.005 85); padding: 18px 22px 13px; border-bottom: 1px solid oklch(93% 0.005 85); display: flex; flex-direction: column; gap: 3px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: oklch(64% 0.01 85);">MODELLO UTENTE</span>
+              <button onClick="{{ closeSurface }}" style="font-family: 'DM Mono', monospace; font-size: 11px; color: oklch(64% 0.01 85); background: transparent; border: none; cursor: pointer;">Esc ✕</button>
+            </div>
+            <span style="font-size: 21px; font-weight: 400; color: oklch(23% 0.008 80);">Cosa penso di sapere di te</span>
+          </div>
+          <sc-for list="{{ userRows }}" as="u" hint-placeholder-count="4">
+            <div style="padding: 14px 22px; border-bottom: 1px solid oklch(94.5% 0.005 85); display: flex; flex-direction: column; gap: 7px;">
+              <div style="display: flex; align-items: flex-start; gap: 10px;">
+                <span style="flex: 1; font-size: 15.5px; line-height: 1.4; color: oklch(26% 0.008 80);">{{ u.claim }}</span>
+                <span style="flex-shrink: 0; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; border-radius: 100px; padding: 2px 8px; border: {{ u.badgeBorder }}; color: {{ u.badgeColor }};">{{ u.type }}</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; font-family: 'DM Mono', monospace; font-size: 10px; color: oklch(68% 0.01 85);">
+                <span style="letter-spacing: 0.12em; color: oklch(40% 0.01 85);">{{ u.dots }}</span>
+                <span>{{ u.prov }}</span>
+              </div>
+              <sc-if value="{{ u.isHyp }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; gap: 14px; padding-top: 1px;">
+                  <button onClick="{{ u.onConfirm }}" style="font-family: 'DM Mono', monospace; font-size: 10px; color: oklch(45% 0.01 85); background: transparent; border: none; border-bottom: 1px dashed oklch(72% 0.01 85); cursor: pointer; padding: 0 0 1px;">è vero</button>
+                  <button onClick="{{ u.onRemove }}" style="font-family: 'DM Mono', monospace; font-size: 10px; color: oklch(45% 0.01 85); background: transparent; border: none; border-bottom: 1px dashed oklch(72% 0.01 85); cursor: pointer; padding: 0 0 1px;">non è così</button>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+          <div style="padding: 14px 22px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.04em; color: oklch(72% 0.01 85); line-height: 1.6;">tutto è correggibile · le ipotesi non diventano fatti da sole · ciò che correggi sparisce subito</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ====== HIDDEN SURFACE: PERMISSIONS ====== -->
+    <sc-if value="{{ showPerms }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeSurface }}" style="position: absolute; inset: 0; background: oklch(96% 0.005 85 / 0.55); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: flex-start; padding: 36px 0; overflow-y: auto; animation: sd-fade 0.25s ease-out;">
+        <div onClick="{{ stop }}" class="seed-scroll" style="width: 480px; max-height: 100%; background: oklch(97.5% 0.005 85); border: 1px solid oklch(88% 0.006 85); border-radius: 14px; box-shadow: 0 24px 60px -24px oklch(40% 0.02 85 / 0.5); display: flex; flex-direction: column; animation: sd-rise 0.3s ease-out;">
+          <div style="position: sticky; top: 0; background: oklch(97.5% 0.005 85); padding: 18px 22px 13px; border-bottom: 1px solid oklch(93% 0.005 85); display: flex; flex-direction: column; gap: 3px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: oklch(64% 0.01 85);">PERMESSI E PRIVACY</span>
+              <button onClick="{{ closeSurface }}" style="font-family: 'DM Mono', monospace; font-size: 11px; color: oklch(64% 0.01 85); background: transparent; border: none; cursor: pointer;">Esc ✕</button>
+            </div>
+            <span style="font-size: 21px; font-weight: 400; color: oklch(23% 0.008 80);">Cosa posso osservare</span>
+          </div>
+          <sc-for list="{{ permRows }}" as="p" hint-placeholder-count="4">
+            <div style="padding: 15px 22px; border-bottom: 1px solid oklch(94.5% 0.005 85); display: flex; align-items: center; gap: 14px;">
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-size: 15.5px; color: oklch(26% 0.008 80);">{{ p.label }}</span>
+                <span style="font-family: 'DM Mono', monospace; font-size: 10px; color: oklch(70% 0.01 85);">{{ p.sub }}</span>
+              </div>
+              <sc-if value="{{ p.isToggle }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ p.onToggle }}" style="flex-shrink: 0; width: 42px; height: 23px; border-radius: 100px; border: 1.4px solid oklch(40% 0.01 85); background: transparent; position: relative; cursor: pointer; padding: 0;">
+                  <span style="position: absolute; top: 2px; width: 15px; height: 15px; border-radius: 50%; transition: all 0.18s ease; left: {{ p.knobLeft }}; background: {{ p.knobBg }}; border: {{ p.knobBorder }};"></span>
+                </button>
+              </sc-if>
+              <sc-if value="{{ p.isChip }}" hint-placeholder-val="{{ false }}">
+                <span style="flex-shrink: 0; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; color: oklch(45% 0.01 85); border: 1px solid oklch(82% 0.01 85); border-radius: 100px; padding: 4px 9px;">SU RICHIESTA</span>
+              </sc-if>
+            </div>
+          </sc-for>
+          <div style="padding: 15px 22px; display: flex; gap: 11px;">
+            <button style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; color: oklch(40% 0.01 85); border: 1px solid oklch(84% 0.01 85); background: transparent; border-radius: 100px; padding: 7px 14px; cursor: pointer;">esporta tutto</button>
+            <button style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; color: oklch(55% 0.13 28); border: 1px dashed oklch(70% 0.12 28); background: transparent; border-radius: 100px; padding: 7px 14px; cursor: pointer;">cancella tutto</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ====== TOAST ====== -->
+    <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+      <div style="position: absolute; bottom: 92px; left: 50%; transform: translateX(-50%); background: oklch(23% 0.008 80); color: oklch(95% 0.005 85); font-size: 13px; padding: 9px 18px; border-radius: 100px; box-shadow: 0 10px 30px -10px oklch(20% 0.02 85 / 0.5); animation: sd-rise 0.3s ease-out; white-space: nowrap;">{{ toast }}</div>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;accentHue&quot;: { &quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 45, &quot;min&quot;: 0, &quot;max&quot;: 360, &quot;tsType&quot;: &quot;number&quot; },
+  &quot;relationship&quot;: { &quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;in crescita&quot;, &quot;options&quot;: [&quot;nuovo&quot;, &quot;in crescita&quot;, &quot;consolidato&quot;, &quot;maturo&quot;], &quot;tsType&quot;: &quot;string&quot; },
+  &quot;reducedMotion&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot; }
+}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.scrollRef = React.createRef();
+    this.inputRef = React.createRef();
+    this.voiceInputRef = React.createRef();
+    this.state = {
+      messages: [
+        {
+          id: 1,
+          role: "seed",
+          text: "Sono qui. Riprendiamo dalla tesi, o c'è altro per la testa?",
+          why: "Riapro il filo che avevamo lasciato invece di chiedere «come posso aiutarti»: ti farebbe ripartire da zero ogni volta. So che il capitolo 3 era in lavorazione — ma è un'ipotesi, non un fatto.",
+          hypothesis: null,
+          whyOpen: false,
+        },
+      ],
+      busy: false,
+      surface: null,
+      voiceActive: false,
+      orb: "idle",
+      transcript: "",
+      toast: null,
+      userModel: [
+        { id: "u1", claim: "Ti chiami Cristian", type: "FATTO", conf: 5, prov: "me l'hai detto · onboarding", kind: "fact" },
+        { id: "u2", claim: "Preferisci risposte dirette, senza preamboli", type: "PREFERENZA", conf: 4, prov: "esplicita · 12 mag", kind: "pref" },
+        { id: "u3", claim: "Stai scrivendo la tesi, è la priorità di giugno", type: "IPOTESI", conf: 3, prov: "conversazione · 2 giu", kind: "hyp" },
+        { id: "u4", claim: "Lavori meglio la mattina presto", type: "IPOTESI", conf: 2, prov: "6 sessioni osservate · scade se smentita", kind: "hyp" },
+      ],
+      perms: { observe: true, files: "ask", remote: true, mic: false },
+      speechSupported: false,
+    };
+    this._toastT = null;
+    this._mid = 2;
+  }
+
+  componentDidMount() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    this.setState({ speechSupported: !!SR });
+    this._onKey = (e) => {
+      if (e.ctrlKey && (e.key === "." || e.code === "Period")) {
+        e.preventDefault();
+        this.setState((s) => ({ surface: s.surface === "selector" ? null : "selector", voiceActive: false }));
+      } else if (e.key === "Escape") {
+        if (this.state.voiceActive) this.setState({ voiceActive: false, orb: "idle" });
+        else if (this.state.surface) this.setState({ surface: null });
+      }
+    };
+    window.addEventListener("keydown", this._onKey);
+    this._syncHue();
+    this._scrollDown();
+  }
+  _syncHue() {
+    try { document.documentElement.style.setProperty("--sd-hue", String(this._hue())); } catch (e) {}
+  }
+  componentWillUnmount() {
+    window.removeEventListener("keydown", this._onKey);
+    if (this._rec) try { this._rec.stop(); } catch (e) {}
+  }
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.messages !== this.state.messages || prevState.busy !== this.state.busy) this._scrollDown();
+  }
+  _scrollDown() {
+    const el = this.scrollRef.current;
+    if (el) requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
+  }
+
+  _reduced() {
+    if (this.props.reducedMotion) return true;
+    try { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) { return false; }
+  }
+  _hue() { return this.props.accentHue != null ? this.props.accentHue : 45; }
+  _chroma() {
+    const map = { "nuovo": 0.025, "in crescita": 0.07, "consolidato": 0.11, "maturo": 0.145 };
+    return map[this.props.relationship] != null ? map[this.props.relationship] : 0.07;
+  }
+  _accent(l, cMul) { return "oklch(" + (l || 62) + "% " + (this._chroma() * (cMul == null ? 1 : cMul)).toFixed(3) + " " + this._hue() + ")"; }
+
+  buildOrb(size, st, reduced, accent) {
+    const e = React.createElement;
+    const ink = "oklch(23% 0.008 80)";
+    const thin = Math.max(1.2, size * 0.013);
+    const outer = { position: "absolute", inset: 0, border: thin + "px solid " + accent, borderRadius: "50%", opacity: 0.5, boxSizing: "border-box" };
+    const inner = { position: "absolute", inset: size * 0.22, border: thin + "px solid " + ink, borderRadius: "50%", opacity: 0.65, boxSizing: "border-box" };
+    const dot = { width: Math.max(5, size * 0.085), height: Math.max(5, size * 0.085), background: ink, borderRadius: "50%" };
+    let wrapAnim = "none";
+    if (!reduced) {
+      if (st === "idle") wrapAnim = "sd-breathe 3.6s ease-in-out infinite";
+      else if (st === "listening") wrapAnim = "sd-breathe2 1.7s ease-in-out infinite";
+      if (st === "thinking") {
+        outer.borderTopColor = "transparent"; outer.animation = "sd-spin 6.5s linear infinite";
+        inner.borderBottomColor = "transparent"; inner.animation = "sd-spinr 10s linear infinite";
+      } else if (st === "speaking") {
+        dot.animation = "sd-pulse 0.85s ease-in-out infinite";
+        inner.animation = "sd-pulsering 0.85s ease-in-out infinite";
+      } else if (st === "listening") {
+        outer.opacity = 0.7;
+      }
+    } else {
+      if (st === "thinking") { outer.borderStyle = "dashed"; outer.opacity = 0.7; }
+      else if (st === "listening") { outer.opacity = 0.8; inner.opacity = 0.85; }
+      else if (st === "speaking") { dot.width = dot.height = Math.max(7, size * 0.13); }
+      else { outer.opacity = 0.4; inner.opacity = 0.6; }
+    }
+    return e("div", { style: { position: "relative", width: size, height: size, display: "grid", placeItems: "center", animation: wrapAnim } },
+      e("div", { key: "o", style: outer }),
+      e("div", { key: "i", style: inner }),
+      e("div", { key: "d", style: dot })
+    );
+  }
+
+  _flash(msg) {
+    if (this._toastT) clearTimeout(this._toastT);
+    this.setState({ toast: msg });
+    this._toastT = setTimeout(() => this.setState({ toast: null }), 2600);
+  }
+
+  _parse(raw) {
+    if (!raw) return { reply: "", why: null, hypothesis: null };
+    let t = String(raw).trim().replace(/^```(json)?/i, "").replace(/```$/, "").trim();
+    try { const o = JSON.parse(t); return { reply: o.reply || "", why: o.why || null, hypothesis: o.hypothesis || null }; } catch (e) {}
+    const m = t.match(/\{[\s\S]*\}/);
+    if (m) { try { const o = JSON.parse(m[0]); return { reply: o.reply || "", why: o.why || null, hypothesis: o.hypothesis || null }; } catch (e) {} }
+    return { reply: t, why: null, hypothesis: null };
+  }
+
+  async send(text) {
+    const t = (text || "").trim();
+    if (!t || this.state.busy) return;
+    const um = this.state.userModel.map((u) => "- " + u.claim + " [" + u.type.toLowerCase() + "]").join("\n");
+    const sys = "Sei SEED: una presenza software personale, non un assistente servile. Hai un punto di vista e lo tieni, con rispetto.\n" +
+      "CINQUE PRINCIPI VOCALI (non negoziabili): 1) diretto senza essere brusco — dici subito l'essenziale; 2) onesto sull'incertezza — se un'inferenza è debole lo dici, non fingi sicurezza; 3) dissenso calibrato — NON concordi in automatico; se l'evidenza contraddice, lo fai notare; 4) rispettoso dell'autonomia — proponi, non prescrivi; 5) coerente nei principi, adattabile nel registro.\n" +
+      "VIETATO: entusiasmo esclamativo, «Certamente!», sycophancy, lodi gratuite, emoji, padding verbale. Conciso: il minimo che risponde davvero. Marca ogni ipotesi come ipotesi.\n" +
+      "Rispondi SEMPRE in italiano.\n" +
+      "Quello che credo di sapere sull'utente finora:\n" + (um || "(ancora poco)") + "\n" +
+      "Restituisci SOLO un oggetto JSON valido, niente altro testo:\n" +
+      '{"reply": "la tua risposta", "why": "una frase: perché rispondi così — l\'evidenza o il ragionamento dietro", "hypothesis": "se da questo scambio hai inferito qualcosa di NUOVO e plausibile sull\'utente, scrivilo in prima persona breve es. \'Lavori meglio la sera\'; se non c\'è nulla di nuovo metti null"}';
+
+    const hist = this.state.messages.slice(-8).map((m) => ({ role: m.role === "seed" ? "assistant" : "user", content: m.text }));
+    const userMsg = { id: this._mid++, role: "user", text: t, whyOpen: false };
+    this.setState((s) => ({ messages: [...s.messages, userMsg], busy: true, orb: "thinking", transcript: "" }));
+    if (this.inputRef.current) { this.inputRef.current.value = ""; this.inputRef.current.style.height = "auto"; }
+
+    let parsed;
+    try {
+      const res = await window.claude.complete({ messages: [{ role: "user", content: sys + "\n\n[CONVERSAZIONE]" }, ...hist, { role: "user", content: t }] });
+      parsed = this._parse(res);
+    } catch (err) {
+      parsed = { reply: "Qualcosa non ha funzionato nel raggiungere il mio ragionamento. Riprova tra un momento — e se continua, è un problema mio, non tuo.", why: "Errore tecnico nella chiamata al modello. Te lo dico invece di restare in silenzio o inventare una risposta.", hypothesis: null };
+    }
+    if (!parsed.reply) parsed.reply = "…";
+
+    const seedMsg = { id: this._mid++, role: "seed", text: parsed.reply, why: parsed.why, hypothesis: parsed.hypothesis, whyOpen: false, hasHyp: !!parsed.hypothesis };
+    this.setState((s) => {
+      let umodel = s.userModel;
+      if (parsed.hypothesis) {
+        const exists = umodel.some((u) => u.claim.toLowerCase().trim() === parsed.hypothesis.toLowerCase().trim());
+        if (!exists) umodel = [...umodel, { id: "h" + this._mid, claim: parsed.hypothesis, type: "IPOTESI", conf: 1, prov: "inferito ora · in conversazione", kind: "hyp" }];
+      }
+      return { messages: [...s.messages, seedMsg], busy: false, orb: "speaking", userModel: umodel };
+    });
+    setTimeout(() => { if (this.state.orb === "speaking") this.setState({ orb: this.state.voiceActive ? "listening" : "idle" }); }, 1400);
+  }
+
+  renderVals() {
+    this._syncHue();
+    const reduced = this._reduced();
+    const accent = this._accent(62, 1);
+    const hue = this._hue();
+    const statoMap = { idle: "", listening: "ASCOLTO", thinking: "PENSIERO", speaking: "VOCE" };
+
+    const messages = this.state.messages.map((m) => ({
+      isUser: m.role === "user",
+      isSeed: m.role === "seed",
+      text: m.text,
+      hasHyp: !!m.hasHyp,
+      whyOpen: !!m.whyOpen,
+      why: m.why || "",
+      whyLabel: m.whyOpen ? "nascondi" : "perché?",
+      onWhy: () => this.setState((s) => ({ messages: s.messages.map((x) => x.id === m.id ? { ...x, whyOpen: !x.whyOpen } : x) })),
+    }));
+
+    const dots = (n) => "●●●●●".slice(0, n) + "○○○○○".slice(0, 5 - n);
+    const userRows = this.state.userModel.map((u) => {
+      const isHyp = u.kind === "hyp";
+      return {
+        claim: u.claim, type: u.type, dots: dots(u.conf), prov: u.prov, isHyp,
+        badgeColor: isHyp ? "oklch(56% 0.11 " + hue + ")" : "oklch(40% 0.01 85)",
+        badgeBorder: isHyp ? "1px dashed oklch(70% 0.09 " + hue + ")" : "1px solid oklch(82% 0.01 85)",
+        onConfirm: () => this.setState((s) => ({ userModel: s.userModel.map((x) => x.id === u.id ? { ...x, conf: 5, type: "CONFERMATO", kind: "fact", prov: "confermato da te" } : x) }), () => this._flash("Ricevuto — non è più un'ipotesi.")),
+        onRemove: () => this.setState((s) => ({ userModel: s.userModel.filter((x) => x.id !== u.id) }), () => this._flash("Fatto. Non lo do più per assunto.")),
+      };
+    });
+
+    const p = this.state.perms;
+    const knob = (on) => ({ knobLeft: on ? "21px" : "2px", knobBg: on ? "oklch(23% 0.008 80)" : "transparent", knobBorder: on ? "none" : "1.4px solid oklch(40% 0.01 85)" });
+    const permRows = [
+      Object.assign({ label: "Osservare quali app uso", sub: "solo titoli finestra · mai contenuti", isToggle: true, onToggle: () => this._togglePerm("observe") }, knob(p.observe)),
+      { label: "Leggere i file di lavoro", sub: "chiede ogni volta · cartella per cartella", isChip: true },
+      Object.assign({ label: "Inviare contenuto al modello remoto", sub: "passa dal privacy gate · zona C", isToggle: true, onToggle: () => this._togglePerm("remote") }, knob(p.remote)),
+      Object.assign({ label: "Microfono", sub: "attivo solo col push-to-talk", isToggle: true, onToggle: () => this._togglePerm("mic") }, knob(p.mic)),
+    ];
+
+    const surfaceItems = [
+      { glyph: "◉", title: "Cosa penso di sapere di te", sub: "il modello utente, correggibile", onClick: () => this.setState({ surface: "usermodel" }) },
+      { glyph: "⊘", title: "Permessi e privacy", sub: "cosa posso osservare", onClick: () => this.setState({ surface: "permissions" }) },
+      { glyph: "⌥", title: "Evoluzione", sub: "mutazioni e lineage · prossimamente", onClick: () => this._flash("Superficie in arrivo — non ancora attiva.") },
+    ];
+
+    const lastSeed = [...this.state.messages].reverse().find((m) => m.role === "seed");
+
+    return {
+      orbSigil: this.buildOrb(34, this.state.orb, reduced, accent),
+      orbBig: this.buildOrb(150, this.state.orb, reduced, accent),
+      statoLabel: statoMap[this.state.orb] || "",
+      voiceStato: statoMap[this.state.orb] || "PRONTO",
+      messages,
+      busy: this.state.busy,
+      voiceActive: this.state.voiceActive,
+      voiceLastSeed: lastSeed ? lastSeed.text : "Sono qui.",
+      voiceTranscript: this.state.transcript,
+      showSelector: this.state.surface === "selector",
+      showUserModel: this.state.surface === "usermodel",
+      showPerms: this.state.surface === "permissions",
+      surfaceItems, userRows, permRows,
+      toast: this.state.toast,
+      scrollRef: this.scrollRef,
+      inputRef: this.inputRef,
+      voiceInputRef: this.voiceInputRef,
+      openSelector: () => this.setState((s) => ({ surface: s.surface === "selector" ? null : "selector" })),
+      closeSurface: () => this.setState({ surface: null }),
+      stop: (e) => { e.stopPropagation(); },
+      enterVoice: () => this.setState({ voiceActive: true, surface: null, orb: "listening" }),
+      exitVoice: () => this.setState({ voiceActive: false, orb: "idle" }),
+      sendClick: () => this.send(this.inputRef.current ? this.inputRef.current.value : ""),
+      voiceSendClick: () => { const v = this.voiceInputRef.current; if (v) { this.send(v.value); v.value = ""; } },
+      onInputKey: (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); this.send(this.inputRef.current.value); } },
+      onVoiceKey: (e) => { if (e.key === "Enter") { e.preventDefault(); const v = this.voiceInputRef.current; this.send(v.value); v.value = ""; } },
+      onInputGrow: (e) => { const t = e.target; t.style.height = "auto"; t.style.height = Math.min(120, t.scrollHeight) + "px"; },
+      micDown: () => this._micStart(),
+      micUp: () => this._micStop(),
+      hintHover: { background: "oklch(94% 0.005 85)" },
+      rowHover: { background: "oklch(95% 0.005 85)" },
+      iconHover: { background: "oklch(95% 0.005 85)" },
+      sendHover: { background: "oklch(32% 0.01 80)" },
+      micActiveStyle: { borderColor: accent, background: "oklch(96% 0.01 " + hue + ")" },
+      inputFocusStyle: { borderColor: "oklch(70% 0.02 85)" },
+    };
+  }
+
+  _togglePerm(k) {
+    this.setState((s) => ({ perms: { ...s.perms, [k]: !s.perms[k] } }), () => {
+      const on = this.state.perms[k];
+      const names = { observe: "Osservazione app", remote: "Invio al modello remoto", mic: "Microfono" };
+      this._flash(names[k] + (on ? " · attivo" : " · disattivato"));
+    });
+  }
+
+  _micStart() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    this.setState({ orb: "listening", transcript: "" });
+    if (!SR) { this._flash("Riconoscimento vocale non disponibile qui — scrivi pure."); return; }
+    try {
+      const rec = new SR();
+      this._rec = rec;
+      rec.lang = "it-IT"; rec.interimResults = true; rec.continuous = false;
+      rec.onresult = (ev) => {
+        let txt = "";
+        for (let i = 0; i < ev.results.length; i++) txt += ev.results[i][0].transcript;
+        this.setState({ transcript: txt });
+        if (ev.results[ev.results.length - 1].isFinal) this._lastFinal = txt;
+      };
+      rec.onerror = () => { this._flash("Microfono non raggiungibile qui — scrivi pure."); this.setState({ orb: "listening" }); };
+      rec.start();
+    } catch (e) { this._flash("Microfono non raggiungibile qui — scrivi pure."); }
+  }
+  _micStop() {
+    if (this._rec) { try { this._rec.stop(); } catch (e) {} this._rec = null; }
+    const txt = (this.state.transcript || this._lastFinal || "").trim();
+    this._lastFinal = "";
+    if (txt) this.send(txt);
+    else this.setState({ orb: this.state.voiceActive ? "listening" : "idle" });
+  }
+}
+</script>
+</body>
+</html>

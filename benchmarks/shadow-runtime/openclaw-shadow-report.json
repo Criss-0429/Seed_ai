@@ -1,0 +1,64 @@
+{
+  "schema_version": "seed.shadow-runtime-bench.v1",
+  "harness": {
+    "name": "OpenClaw",
+    "repository": "openclaw/openclaw",
+    "version": "2026.6.2",
+    "commit": "356385045f8e94329421a5eb7c476875afb2be0b"
+  },
+  "mode": "sparse_source_only_with_minimal_vitest_runner",
+  "privacy": {
+    "synthetic_only": true,
+    "real_user_data": false,
+    "real_credentials": false,
+    "model_calls_executed": false,
+    "gateway_started": false,
+    "live_tools_executed": false
+  },
+  "environment": {
+    "required_node": ">=22.19.0",
+    "available_node": "22.17.0",
+    "full_runtime_executed": false,
+    "measured_mb": 213.48,
+    "limit_mb": 500
+  },
+  "results": [
+    {
+      "suite": "normalization_sessions_allowlists_heartbeat_tokens",
+      "passed": 131,
+      "failed": 0
+    },
+    {
+      "suite": "heartbeat_policy_and_message_access",
+      "passed": 144,
+      "failed": 0,
+      "not_executed": 1,
+      "note": "One command-auth suite required the excluded external @openclaw/fs-safe package."
+    },
+    {
+      "suite": "exec_policy_analysis_source_only",
+      "passed": 131,
+      "failed": 4,
+      "not_evaluable": 65,
+      "note": "Four failures use POSIX executable paths on native Windows; the remaining policy/sandbox suites require @openclaw/fs-safe."
+    }
+  ],
+  "findings": [
+    {
+      "severity": "high",
+      "title": "OpenClaw is not safe-by-default as a SEED execution boundary",
+      "detail": "Static source inspection shows sandbox mode defaults to off when absent, while tools.exec security is documented as full on the normal host and deny only on the sandbox host."
+    },
+    {
+      "severity": "medium",
+      "title": "Full Windows runtime could not be evaluated",
+      "detail": "The installed Node version is below OpenClaw's required minimum and the benchmark intentionally avoided installing the full monorepo or starting its gateway."
+    },
+    {
+      "severity": "positive",
+      "title": "Heartbeat and session patterns are strong",
+      "detail": "Lifecycle cancellation, bounded session storage, parent ownership, channel allowlists, heartbeat cooldown, active hours, visibility, wake scheduling and message access passed the selected source-only suites."
+    }
+  ],
+  "verdict": "Use OpenClaw only as the primary design reference for heartbeat and session lifecycle. Do not embed it as SEED runtime or trust it as a safety boundary with default configuration."
+}

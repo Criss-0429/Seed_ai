@@ -17,6 +17,7 @@ from seed.core import daemon as daemon_mod  # noqa: E402
 from seed.core.daemon import (  # noqa: E402
     BackgroundDaemon, DaemonError, ProactivityCandidate, build_heartbeat,
     decide_proactivity, governed_net_value, HeartbeatStats,
+    heartbeat_health, STALE_FACTOR,
 )
 from seed.core.app import SeedApp  # noqa: E402
 from seed.core.memory import Memory  # noqa: E402
@@ -262,6 +263,63 @@ def test_review_snapshot_is_aggregate(tmp_path):
     assert review["queue_status_counts"].get("queued") == 1
     assert "topic_ref" not in json.dumps(review)
     mem.close()
+
+
+# --- heartbeat health derivata (indicatore di stato) ----------------------
+def test_heartbeat_health_stopped_healthy_stale():
+    hb = 60.0
+    stopped = heartbeat_health(running=False, last_heartbeat_at=1000.0,
+                               now=1010.0, heartbeat_seconds=hb)
+    assert stopped["health"] == "stopped" and stopped["heartbeat_stale"] is False
+    assert stopped["seconds_since_heartbeat"] == 10.0
+
+    healthy = heartbeat_health(running=True, last_heartbeat_at=2000.0,
+                               now=2000.0 + hb, heartbeat_seconds=hb)
+    assert healthy["health"] == "healthy" and healthy["heartbeat_stale"] is False
+
+    stale = heartbeat_health(running=True, last_heartbeat_at=2000.0,
+                             now=2000.0 + hb * STALE_FACTOR + 1, heartbeat_seconds=hb)
+    assert stale["health"] == "stale" and stale["heartbeat_stale"] is True
+
+
+def test_heartbeat_health_running_without_any_beat_is_stale():
+    h = heartbeat_health(running=True, last_heartbeat_at=None,
+                         now=5.0, heartbeat_seconds=60.0)
+    assert h["health"] == "stale" and h["seconds_since_heartbeat"] is None
+
+
+# --- persistenza ultimo battito (review/UI dopo riavvio) ------------------
+def test_review_exposes_health_and_persisted_last_heartbeat(tmp_path):
+    mem = Memory(tmp_path / "d.db")
+    daemon = BackgroundDaemon(mem, clock=_Clock(2000.0))
+    daemon.enqueue(_candidate())
+    daemon._tick()
+
+    review = daemon.review()
+    # _tick manuale non avvia il thread: il loop non gira -> stopped, ma il
+    # battito e' persistito e i secondi trascorsi sono calcolati.
+    assert review["health"] == "stopped"
+    assert review["seconds_since_heartbeat"] == 0.0
+    assert review["last_heartbeat"]["tick"] == 1
+    assert review["last_heartbeat"]["decisions"]["emitted"] == 1
+    assert "topic_ref" not in json.dumps(review)
+    mem.close()
+
+
+def test_persisted_heartbeat_survives_reopen_and_stays_aggregate(tmp_path):
+    db = tmp_path / "d.db"
+    mem = Memory(db)
+    daemon = BackgroundDaemon(mem, clock=_Clock(2000.0))
+    daemon.enqueue(_candidate(topic_ref="knowledge:99"))
+    daemon._tick()
+    mem.close()
+
+    reopened = Memory(db)
+    beat = reopened.last_heartbeat()
+    assert beat is not None and beat["tick"] == 1
+    assert beat["write_actions"] == 0 and beat["os_service"] is False
+    assert "knowledge:99" not in json.dumps(beat)   # nessun ref opaco nel battito
+    reopened.close()
 
 
 def test_daemon_command_is_local_and_returns_review():

@@ -15,7 +15,7 @@ from pathlib import Path, PurePosixPath
 from typing import Any
 
 from .descendant import DescendantBuilder, DescendantIntegrityError
-from .lineage import LineageError, LineageStore, MutationCandidate
+from .lineage import LineageStore, MutationCandidate
 
 
 _SAFE_COMPONENT = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")

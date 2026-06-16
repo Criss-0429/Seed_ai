@@ -1,0 +1,377 @@
+{
+  "seed/core/__init__.py": {
+    "mtime": 1781110927.695858,
+    "ast_hash": "d84c2772c9d9a5d21cb6d267fb34b78e",
+    "semantic_hash": "d84c2772c9d9a5d21cb6d267fb34b78e"
+  },
+  "seed/core/acceptance.py": {
+    "mtime": 1781210300.2322996,
+    "ast_hash": "c893fe0d759a21e92110546eebf29c04",
+    "semantic_hash": "c893fe0d759a21e92110546eebf29c04"
+  },
+  "seed/core/app.py": {
+    "mtime": 1781308736.2855916,
+    "ast_hash": "d82840ef8b449b53da1b5b638571ebd4",
+    "semantic_hash": "d82840ef8b449b53da1b5b638571ebd4"
+  },
+  "seed/core/capabilities.py": {
+    "mtime": 1781110645.3402915,
+    "ast_hash": "ae916d08585a7b2795f7aab7010eca8a",
+    "semantic_hash": "ae916d08585a7b2795f7aab7010eca8a"
+  },
+  "seed/core/config.py": {
+    "mtime": 1781110459.8446825,
+    "ast_hash": "c12e19f7d59c2a69507724ba49a13308",
+    "semantic_hash": "c12e19f7d59c2a69507724ba49a13308"
+  },
+  "seed/core/descendant.py": {
+    "mtime": 1781188656.5833704,
+    "ast_hash": "3e23dfec83e8dfccb28870a3ff15e65b",
+    "semantic_hash": "3e23dfec83e8dfccb28870a3ff15e65b"
+  },
+  "seed/core/evaluator.py": {
+    "mtime": 1781189253.962801,
+    "ast_hash": "e956ff2a8bda15eb3cac1af7fce54828",
+    "semantic_hash": "e956ff2a8bda15eb3cac1af7fce54828"
+  },
+  "seed/core/evolution.py": {
+    "mtime": 1781250172.333084,
+    "ast_hash": "faa2090952231afdd0d458fcca607ad1",
+    "semantic_hash": "faa2090952231afdd0d458fcca607ad1"
+  },
+  "seed/core/forbidden.py": {
+    "mtime": 1781214925.0010877,
+    "ast_hash": "d6291a41fa376bfc5d0d545acda68d90",
+    "semantic_hash": "d6291a41fa376bfc5d0d545acda68d90"
+  },
+  "seed/core/lineage.py": {
+    "mtime": 1781191015.6002195,
+    "ast_hash": "caba258a9e5918da1d80d4b61bdaf984",
+    "semantic_hash": "caba258a9e5918da1d80d4b61bdaf984"
+  },
+  "seed/core/living_profile.py": {
+    "mtime": 1781280672.1406074,
+    "ast_hash": "65a28d7ed8b856d92650eed7e28300f6",
+    "semantic_hash": "65a28d7ed8b856d92650eed7e28300f6"
+  },
+  "seed/core/llm.py": {
+    "mtime": 1781213728.6609359,
+    "ast_hash": "0de89e7e33daa95039e82bc91decaf0d",
+    "semantic_hash": "0de89e7e33daa95039e82bc91decaf0d"
+  },
+  "seed/core/memory.py": {
+    "mtime": 1781280671.86111,
+    "ast_hash": "68d684a37092600464b13cadf9117bb4",
+    "semantic_hash": "68d684a37092600464b13cadf9117bb4"
+  },
+  "seed/core/onboarding.py": {
+    "mtime": 1781250743.7817593,
+    "ast_hash": "ebf8e4582bf32ddcf7ef86a4436ff596",
+    "semantic_hash": "ebf8e4582bf32ddcf7ef86a4436ff596"
+  },
+  "seed/core/permissions.py": {
+    "mtime": 1781110577.2864008,
+    "ast_hash": "4513179f7e91462452cc6e828c792140",
+    "semantic_hash": "4513179f7e91462452cc6e828c792140"
+  },
+  "seed/core/personality.py": {
+    "mtime": 1781282459.1202981,
+    "ast_hash": "d99f44935c52dba2719bd2062a388c1d",
+    "semantic_hash": "d99f44935c52dba2719bd2062a388c1d"
+  },
+  "seed/core/privacy.py": {
+    "mtime": 1781251058.8967068,
+    "ast_hash": "816a7ae8286076162414743e87e51747",
+    "semantic_hash": "816a7ae8286076162414743e87e51747"
+  },
+  "seed/core/promotion.py": {
+    "mtime": 1781191188.771364,
+    "ast_hash": "1404f319d4cd48844364b562d8a67510",
+    "semantic_hash": "1404f319d4cd48844364b562d8a67510"
+  },
+  "seed/core/router.py": {
+    "mtime": 1781275388.133974,
+    "ast_hash": "a1cf138a785ab73bea1d4cb4b0d5a381",
+    "semantic_hash": "a1cf138a785ab73bea1d4cb4b0d5a381"
+  },
+  "seed/core/runtime_bench.py": {
+    "mtime": 1781309652.8106985,
+    "ast_hash": "89dc82d954c355356302627f1cb7ce3d",
+    "semantic_hash": "89dc82d954c355356302627f1cb7ce3d"
+  },
+  "seed/core/salience.py": {
+    "mtime": 1781280672.0071418,
+    "ast_hash": "1f7ebb25db90eb70a721ba778d70e58c",
+    "semantic_hash": "1f7ebb25db90eb70a721ba778d70e58c"
+  },
+  "seed/core/sandbox.py": {
+    "mtime": 1781110611.4095402,
+    "ast_hash": "564ac07dc03e11e658250ba8fece1487",
+    "semantic_hash": "564ac07dc03e11e658250ba8fece1487"
+  },
+  "seed/core/scheduler.py": {
+    "mtime": 1781279617.993228,
+    "ast_hash": "9f4c6073d540946074b8c9d6eb3d6283",
+    "semantic_hash": "9f4c6073d540946074b8c9d6eb3d6283"
+  },
+  "seed/core/telemetry.py": {
+    "mtime": 1781280672.3988774,
+    "ast_hash": "215dc7dbaa91c5fbda32bb13c5fec41a",
+    "semantic_hash": "215dc7dbaa91c5fbda32bb13c5fec41a"
+  },
+  "seed/core/user_knowledge.py": {
+    "mtime": 1781279590.8460882,
+    "ast_hash": "906f5016940ab3cd123bfcd9fe8ad316",
+    "semantic_hash": "906f5016940ab3cd123bfcd9fe8ad316"
+  },
+  "seed/core/voice.py": {
+    "mtime": 1781110779.0202203,
+    "ast_hash": "816677e6ea222dac8d304488ef37df9a",
+    "semantic_hash": "816677e6ea222dac8d304488ef37df9a"
+  },
+  "seed/core/watcher.py": {
+    "mtime": 1781250678.239062,
+    "ast_hash": "98a80a207115939b7f56564d270bc6b5",
+    "semantic_hash": "98a80a207115939b7f56564d270bc6b5"
+  },
+  "seed/tests/test_evaluator.py": {
+    "mtime": 1781189335.4429698,
+    "ast_hash": "5de933f3bd9c9f78c60795a1c5cb3df0",
+    "semantic_hash": "5de933f3bd9c9f78c60795a1c5cb3df0"
+  },
+  "seed/tests/test_living_profile.py": {
+    "mtime": 1781279784.6784532,
+    "ast_hash": "2f4676ed945dc34b40c93a14db27f7a9",
+    "semantic_hash": "2f4676ed945dc34b40c93a14db27f7a9"
+  },
+  "seed/tests/test_onboarding.py": {
+    "mtime": 1781251059.1630917,
+    "ast_hash": "bfd7020862c82364e43e8ce978ec0ac0",
+    "semantic_hash": "bfd7020862c82364e43e8ce978ec0ac0"
+  },
+  "seed/tests/test_personality.py": {
+    "mtime": 1781282459.2353673,
+    "ast_hash": "34710cd201b0f0e997c486a20825598f",
+    "semantic_hash": "34710cd201b0f0e997c486a20825598f"
+  },
+  "seed/tests/test_promotion.py": {
+    "mtime": 1781191202.2294116,
+    "ast_hash": "ac8968911c7535c03b0c6ce5622941b7",
+    "semantic_hash": "ac8968911c7535c03b0c6ce5622941b7"
+  },
+  "seed/tests/test_recall.py": {
+    "mtime": 1781279671.817799,
+    "ast_hash": "09613247ce3aaf0976bb53fc68b7265f",
+    "semantic_hash": "09613247ce3aaf0976bb53fc68b7265f"
+  },
+  "seed/tests/test_runtime_bench.py": {
+    "mtime": 1781309652.929346,
+    "ast_hash": "13f23328a545f0ed85092df84b00e49b",
+    "semantic_hash": "13f23328a545f0ed85092df84b00e49b"
+  },
+  "seed/tests/test_salience.py": {
+    "mtime": 1781280874.0020132,
+    "ast_hash": "89123d7e1222950d426f0e7d6ba34616",
+    "semantic_hash": "89123d7e1222950d426f0e7d6ba34616"
+  },
+  "seed/tests/test_scheduler.py": {
+    "mtime": 1781279672.0897634,
+    "ast_hash": "617ec2dba7b05fa5036762e3e30704b6",
+    "semantic_hash": "617ec2dba7b05fa5036762e3e30704b6"
+  },
+  "seed/tests/test_user_knowledge.py": {
+    "mtime": 1781279671.6820276,
+    "ast_hash": "0f91d2fd476c779d999ce67466c034fc",
+    "semantic_hash": "0f91d2fd476c779d999ce67466c034fc"
+  },
+  "jarvis/official/DESIGN_PRINCIPLES.md": {
+    "mtime": 1777651722.8961973,
+    "ast_hash": "dfa257900a1d50c4ce816057972dc840",
+    "semantic_hash": "dfa257900a1d50c4ce816057972dc840"
+  },
+  "jarvis/official/JARVIS_v6_AGENT_ECOSYSTEM.md": {
+    "mtime": 1777651863.5656254,
+    "ast_hash": "1581c2baa81b12ef6850db32015c3a7f",
+    "semantic_hash": "1581c2baa81b12ef6850db32015c3a7f"
+  },
+  "jarvis/official/JARVIS_v6_WORKFLOW.md": {
+    "mtime": 1777651795.2555206,
+    "ast_hash": "ece7f1243f657ae9e660d509410eaaad",
+    "semantic_hash": "ece7f1243f657ae9e660d509410eaaad"
+  },
+  "jarvis/wiki/Agent_Harness_Best_Practices.md": {
+    "mtime": 1779742967.8575864,
+    "ast_hash": "fe59e43c119e8754e427419033cbb078",
+    "semantic_hash": "fe59e43c119e8754e427419033cbb078"
+  },
+  "jarvis/wiki/Jarvis_User_Knowledge_Ontology.md": {
+    "mtime": 1779742968.2897985,
+    "ast_hash": "1c0a591b45225258f33c9bd886b315ca",
+    "semantic_hash": "1c0a591b45225258f33c9bd886b315ca"
+  },
+  "jarvis/wiki/M3_Memory.md": {
+    "mtime": 1777063457.060992,
+    "ast_hash": "11a288a34bd6df9ab9b9ff4e8a549e1b",
+    "semantic_hash": "11a288a34bd6df9ab9b9ff4e8a549e1b"
+  },
+  "jarvis/wiki/Runtime_Harness_Adaptation.md": {
+    "mtime": 1780524670.1639683,
+    "ast_hash": "ceb33e36806de5a4fd1ce4275ec15ef5",
+    "semantic_hash": "ceb33e36806de5a4fd1ce4275ec15ef5"
+  },
+  "seed/docs/00_Visione_Prodotto.md": {
+    "mtime": 1781168446.7624483,
+    "ast_hash": "1c21e05e86f0e2db7d0ad879a5c4e401",
+    "semantic_hash": "1c21e05e86f0e2db7d0ad879a5c4e401"
+  },
+  "seed/docs/01_Architettura.md": {
+    "mtime": 1781256901.6780071,
+    "ast_hash": "2d42750d04356be17b019221c78ddf3c",
+    "semantic_hash": "2d42750d04356be17b019221c78ddf3c"
+  },
+  "seed/docs/02_EvolutionEngine.md": {
+    "mtime": 1781256901.803662,
+    "ast_hash": "4a43c9b2568d1bf5bfe13aefcf54fe7a",
+    "semantic_hash": "4a43c9b2568d1bf5bfe13aefcf54fe7a"
+  },
+  "seed/docs/03_PrivacyGate.md": {
+    "mtime": 1781168682.052037,
+    "ast_hash": "b22c4d4b8b6a46233a7c3100edced78c",
+    "semantic_hash": "b22c4d4b8b6a46233a7c3100edced78c"
+  },
+  "seed/docs/04_Sandbox_Sicurezza.md": {
+    "mtime": 1781168734.6181653,
+    "ast_hash": "f8f93f6599591241fab107124ccc8df1",
+    "semantic_hash": "f8f93f6599591241fab107124ccc8df1"
+  },
+  "seed/docs/05_ActivityWatcher.md": {
+    "mtime": 1781168789.3824873,
+    "ast_hash": "cb24b150ea64a8a388870ef3416dfd76",
+    "semantic_hash": "cb24b150ea64a8a388870ef3416dfd76"
+  },
+  "seed/docs/06_Esperimento.md": {
+    "mtime": 1781168602.5503135,
+    "ast_hash": "b258599572eea086f342d0f35b605738",
+    "semantic_hash": "b258599572eea086f342d0f35b605738"
+  },
+  "seed/docs/09_Personalita_Compatibile.md": {
+    "mtime": 1781168789.572913,
+    "ast_hash": "14cddc557c981948852d109b842a00d8",
+    "semantic_hash": "14cddc557c981948852d109b842a00d8"
+  },
+  "seed/docs/11_Contratto_Mutazione.md": {
+    "mtime": 1781168447.2713454,
+    "ast_hash": "504c0c660aca445ccc2395052c57a9aa",
+    "semantic_hash": "504c0c660aca445ccc2395052c57a9aa"
+  },
+  "docs/05_ActivityWatcher.md": {
+    "mtime": 1781282429.818367,
+    "ast_hash": "b01f5ec1a792ec983d7f12c8317b587c",
+    "semantic_hash": "b01f5ec1a792ec983d7f12c8317b587c"
+  },
+  "docs/09_Personalita_Compatibile.md": {
+    "mtime": 1781168789.572913,
+    "ast_hash": "14cddc557c981948852d109b842a00d8",
+    "semantic_hash": "14cddc557c981948852d109b842a00d8"
+  },
+  "docs/12_ImplementationPlan.md": {
+    "mtime": 1781308839.7343998,
+    "ast_hash": "56ad997f4e8ce0c3e587d1ae37d45d66",
+    "semantic_hash": "56ad997f4e8ce0c3e587d1ae37d45d66"
+  },
+  "docs/14_Memory_Consolidation_Plan.md": {
+    "mtime": 1781308581.6215725,
+    "ast_hash": "ef42b38ea762b7730bd783d2ba7b7478",
+    "semantic_hash": "ef42b38ea762b7730bd783d2ba7b7478"
+  },
+  "docs/15_Cognitive_User_Knowledge_Plan.md": {
+    "mtime": 1781308581.7370455,
+    "ast_hash": "7a04239a6fa9543848a15ad41e62a7a2",
+    "semantic_hash": "7a04239a6fa9543848a15ad41e62a7a2"
+  },
+  "docs/16_Agentic_Daemon_Plan.md": {
+    "mtime": 1781308839.876677,
+    "ast_hash": "938aa11ce57378155c2e1af5d3f02c65",
+    "semantic_hash": "938aa11ce57378155c2e1af5d3f02c65"
+  },
+  "jarvis/official/JARVIS_v6_IMPLEMENTATION.md": {
+    "mtime": 1778795418.4932542,
+    "ast_hash": "da128656a8ed105637ec2343aaf36a39",
+    "semantic_hash": "da128656a8ed105637ec2343aaf36a39"
+  },
+  "jarvis/official/JARVIS_v6_STACK.md": {
+    "mtime": 1778795414.6967642,
+    "ast_hash": "a4a0c2db9bd15616181b4eb6a0143225",
+    "semantic_hash": "a4a0c2db9bd15616181b4eb6a0143225"
+  },
+  "jarvis/official/OVERVIEW.md": {
+    "mtime": 1778795409.4269006,
+    "ast_hash": "abdb017bbaa11639c8abec9669212e96",
+    "semantic_hash": "abdb017bbaa11639c8abec9669212e96"
+  },
+  "jarvis/official/VISION.md": {
+    "mtime": 1777651722.8062851,
+    "ast_hash": "8353c159365fa5ea9a9c6f82647e5092",
+    "semantic_hash": "8353c159365fa5ea9a9c6f82647e5092"
+  },
+  "jarvis/wiki/AgentMemory.md": {
+    "mtime": 1779204643.9629493,
+    "ast_hash": "d518f240d5675f1a3c962aea15f1d0f8",
+    "semantic_hash": "d518f240d5675f1a3c962aea15f1d0f8"
+  },
+  "jarvis/wiki/Agentic_Runtime_Options_2026_05.md": {
+    "mtime": 1779743032.9795148,
+    "ast_hash": "62107f8eaa19dfc6a438741b2c2dc9b7",
+    "semantic_hash": "62107f8eaa19dfc6a438741b2c2dc9b7"
+  },
+  "jarvis/wiki/Jarvis_Cognitive_User_Model_Execution_Harness.md": {
+    "mtime": 1780560478.0345385,
+    "ast_hash": "2b44ffcc610b8c24d880b08ade37dc49",
+    "semantic_hash": "2b44ffcc610b8c24d880b08ade37dc49"
+  },
+  "jarvis/wiki/Jarvis_Memory_Architecture.md": {
+    "mtime": 1777966237.3581586,
+    "ast_hash": "321768c5dd1bc5cd4740bc44b87924c9",
+    "semantic_hash": "321768c5dd1bc5cd4740bc44b87924c9"
+  },
+  "jarvis/wiki/OpenHarness.md": {
+    "mtime": 1779742884.4753766,
+    "ast_hash": "a7d641b9c4054a6fff704a74ba2d20e5",
+    "semantic_hash": "a7d641b9c4054a6fff704a74ba2d20e5"
+  },
+  "jarvis/wiki/Personal_OS_Thesis_Direction.md": {
+    "mtime": 1781100511.5861733,
+    "ast_hash": "d8362c6d9700806e0fbb2e5888e0bb0b",
+    "semantic_hash": "d8362c6d9700806e0fbb2e5888e0bb0b"
+  },
+  "00_CORPUS_BRIDGES.md": {
+    "mtime": 1781309522.8042326,
+    "ast_hash": "94030ea8508506a0d918bf5fbeb5a3ea",
+    "semantic_hash": "94030ea8508506a0d918bf5fbeb5a3ea"
+  },
+  "jarvis/official/MISSION.md": {
+    "mtime": 1777651722.847651,
+    "ast_hash": "ad5ab28ace77845457e1613cf5477f7f",
+    "semantic_hash": "ad5ab28ace77845457e1613cf5477f7f"
+  },
+  "seed/docs/07_Struttura_Repo.md": {
+    "mtime": 1781256901.921058,
+    "ast_hash": "c3d887ddce33237cfb2650a7d0cf4f39",
+    "semantic_hash": "c3d887ddce33237cfb2650a7d0cf4f39"
+  },
+  "seed/docs/13_ModelRoles_Voice_Plan.md": {
+    "mtime": 1781308581.5085495,
+    "ast_hash": "d09d99f42644b9e4ebfa8bcf41069955",
+    "semantic_hash": "d09d99f42644b9e4ebfa8bcf41069955"
+  },
+  "seed/docs/10_Fonti_Ricerca.md": {
+    "mtime": 1781256902.04154,
+    "ast_hash": "888518681c0e24704459368113b89020",
+    "semantic_hash": "888518681c0e24704459368113b89020"
+  },
+  "seed/docs/08_TestWindows_Domani.md": {
+    "mtime": 1781248405.0635457,
+    "ast_hash": "c99d02c7bb672f129323c8b2c54a5b73",
+    "semantic_hash": "c99d02c7bb672f129323c8b2c54a5b73"
+  }
+}

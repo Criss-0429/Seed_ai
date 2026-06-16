@@ -193,6 +193,12 @@ CREATE TABLE IF NOT EXISTS daemon_state (
     last_emit_at REAL,
     updated_at REAL NOT NULL
 );
+CREATE TABLE IF NOT EXISTS daemon_heartbeat (
+    -- ultimo battito persistito: aggregato e privacy-safe (mai topic_ref/testo).
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    beat TEXT NOT NULL,                    -- JSON: tick, conteggi decisione, flag confini
+    at REAL NOT NULL
+);
 CREATE TABLE IF NOT EXISTS observation_consent (
     obs_class TEXT PRIMARY KEY,            -- foreground_app|browser_tab|process
     enabled INTEGER NOT NULL DEFAULT 0,    -- D-OBS: default OFF per-classe
@@ -675,6 +681,20 @@ class Memory:
              None if last_emit_at is None else float(last_emit_at),
              time.time()))
         self._conn.commit()
+
+    def save_heartbeat(self, beat: dict) -> None:
+        """Persiste l'ultimo battito (aggregato, mai dato personale) cosi che
+        review/UI mostrino conteggi e flag dell'ultimo tick anche dopo riavvio."""
+        self._conn.execute(
+            "INSERT INTO daemon_heartbeat (id, beat, at) VALUES (1, ?, ?) "
+            "ON CONFLICT(id) DO UPDATE SET beat = excluded.beat, at = excluded.at",
+            (json.dumps(beat, ensure_ascii=True), float(beat.get("at", time.time()))))
+        self._conn.commit()
+
+    def last_heartbeat(self) -> dict | None:
+        row = self._conn.execute(
+            "SELECT beat FROM daemon_heartbeat WHERE id = 1").fetchone()
+        return None if row is None else json.loads(row[0])
 
     # --- D-OBS: observation consent + purge -----------------------------
     def set_observation_consent(self, obs_class: str, enabled: bool) -> None:

@@ -10,10 +10,8 @@ Contratto di esecuzione del tool:
 from __future__ import annotations
 
 import ast
-import json
 import logging
 import os
-import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path

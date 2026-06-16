@@ -2,7 +2,8 @@
 
 Il daemon vive esclusivamente nel processo SEED supervisionato (avviato da
 `SeedApp.start_background`, fermato da `SeedApp.shutdown`). Non e' un servizio
-OS, non ha auto-start ne always-on: a SEED chiuso non gira nulla.
+OS. L'app puo essere avviata al login solo con consenso per-utente; a processo
+SEED terminato non gira nulla.
 
 Cosa fa in D1 e cosa NON fa (scope owner-gated, doc 16):
 
@@ -28,7 +29,7 @@ import re
 import threading
 import time
 import uuid
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 log = logging.getLogger("seed.daemon")
 
@@ -39,6 +40,10 @@ SCHEMA_VERSION = "seed.daemon.v1"
 DEFAULT_HEARTBEAT_SECONDS = 60.0
 DEFAULT_COOLDOWN_SECONDS = 1800.0   # >=30 min tra due emit: niente raffica
 DEFAULT_MIN_NET_VALUE = 0.0         # silenzio di default: deve SUPERARE il costo
+
+# Un battito e' considerato STALE se l'ultimo e' piu' vecchio di
+# heartbeat_seconds * STALE_FACTOR: tollera un tick perso prima di allarmare.
+STALE_FACTOR = 2.5
 
 # Categorie ammesse: etichette generiche e non personali. Una candidate non puo'
 # trasportare testo libero: solo categoria + riferimento opaco.
@@ -216,6 +221,31 @@ def build_heartbeat(*, tick: int, now: float, stats: HeartbeatStats,
     }
 
 
+def heartbeat_health(
+    *,
+    running: bool,
+    last_heartbeat_at: float | None,
+    now: float,
+    heartbeat_seconds: float,
+) -> dict:
+    """Salute del battito, derivata e spiegabile (per indicatore di stato UI/owner).
+
+    - `stopped`: il loop non gira (atteso quando il daemon e' fermo/disabilitato);
+    - `stale`: gira ma l'ultimo battito manca o e' piu' vecchio della soglia
+      (`heartbeat_seconds * STALE_FACTOR`) — segnale di loop bloccato;
+    - `healthy`: gira e l'ultimo battito e' recente.
+
+    Nessun dato personale: solo flag e secondi trascorsi."""
+    since = None if last_heartbeat_at is None else round(now - float(last_heartbeat_at), 3)
+    if not running:
+        return {"health": "stopped", "seconds_since_heartbeat": since,
+                "heartbeat_stale": False}
+    threshold = max(1.0, float(heartbeat_seconds)) * STALE_FACTOR
+    stale = since is None or since > threshold
+    return {"health": "stale" if stale else "healthy",
+            "seconds_since_heartbeat": since, "heartbeat_stale": stale}
+
+
 class BackgroundDaemon:
     """Loop di background supervisionato, in-process. Mirroring di `Scheduler`:
     thread daemon, `threading.Event` per lo stop, nessun servizio OS.
@@ -306,6 +336,12 @@ class BackgroundDaemon:
         """Snapshot aggregato e rivedibile: stato daemon, conteggi coda e flag
         che dimostrano i confini D1. Nessun dato personale."""
         state = self._memory.daemon_state()
+        health = heartbeat_health(
+            running=self.running,
+            last_heartbeat_at=state.get("last_heartbeat_at"),
+            now=self._clock(),
+            heartbeat_seconds=self._heartbeat_seconds,
+        )
         return {
             "schema_version": SCHEMA_VERSION,
             "enabled": self._enabled,
@@ -324,6 +360,11 @@ class BackgroundDaemon:
             "tick_count": state.get("tick_count", 0),
             "last_heartbeat_at": state.get("last_heartbeat_at"),
             "last_emit_at": state.get("last_emit_at"),
+            # Salute derivata (indicatore di stato) + ultimo battito persistito.
+            "health": health["health"],
+            "seconds_since_heartbeat": health["seconds_since_heartbeat"],
+            "heartbeat_stale": health["heartbeat_stale"],
+            "last_heartbeat": self._memory.last_heartbeat(),
             "queue_status_counts": self._memory.proactivity_status_counts(),
         }
 
@@ -372,6 +413,8 @@ class BackgroundDaemon:
             last_heartbeat_at=now,
             last_emit_at=last_emit_at if can_run else state.get("last_emit_at"),
         )
+        # Persiste l'ultimo battito (aggregato) per review/UI dopo riavvio.
+        self._memory.save_heartbeat(heartbeat)
         # Audit ESCLUSIVAMENTE aggregato: solo conteggi e flag, mai topic_ref.
         self._audit("daemon_heartbeat", heartbeat)
 

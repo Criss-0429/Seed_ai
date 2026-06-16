@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import builtins
 import io
-import json
 import os
+import _socket
+import socket
 import sys
 from pathlib import Path
 
@@ -24,13 +25,31 @@ def _under(path: object, root: Path) -> Path:
     return resolved
 
 
+def _install_network_guard() -> None:
+    if os.environ.get("SEED_NETWORK_ALLOWED") == "1":
+        return
+
+    def blocked(*args, **kwargs):
+        raise PermissionError("network disabled in isolated process")
+
+    socket.socket = blocked
+    socket.SocketType = blocked
+    _socket.socket = blocked
+    socket.create_connection = blocked
+    socket.create_server = blocked
+    socket.getaddrinfo = blocked
+    socket.gethostbyname = blocked
+    socket.gethostbyname_ex = blocked
+    socket.gethostbyaddr = blocked
+
+
 def main() -> int:
     if len(sys.argv) != 2:
         raise SystemExit("tool path required")
     source_path = Path(sys.argv[1]).resolve()
     source = source_path.read_text(encoding="utf-8")
     root = Path.cwd().resolve()
-    real_open, real_io_open, real_os_open = builtins.open, io.open, os.open
+    real_open, real_os_open = builtins.open, os.open
     real_scandir, real_stat, real_lstat = os.scandir, os.stat, os.lstat
 
     def guarded_open(file, *args, **kwargs):
@@ -63,6 +82,7 @@ def main() -> int:
     os.symlink = lambda *a, **k: (_ for _ in ()).throw(PermissionError("symlink blocked"))
     os.remove = lambda path, *a, **k: (_ for _ in ()).throw(PermissionError("remove blocked"))
     os.unlink = os.remove
+    _install_network_guard()
     namespace = {"__name__": "__main__", "__file__": str(source_path),
                  "__builtins__": builtins.__dict__}
     exec(compile(source, str(source_path), "exec"), namespace, namespace)

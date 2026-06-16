@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import hashlib
-import json
 import sys
 from pathlib import Path
 
@@ -55,6 +54,48 @@ def test_restricted_process_blocks_reads_outside_workspace(tmp_path):
     assert "outside workspace" in result.stderr
 
 
+def test_restricted_process_blocks_network_by_default(tmp_path):
+    script = tmp_path / "tool.py"
+    script.write_text(
+        "import socket\n"
+        "sock=socket.socket()\n"
+        "sock.close()\n"
+        "print('{}')\n",
+        encoding="utf-8")
+    result = run_python(script, {}, workspace=tmp_path / "work",
+                        policy=IsolationPolicy())
+    assert not result.ok
+    assert "network disabled in isolated process" in result.stderr
+
+
+def test_restricted_process_blocks_low_level_socket_bypass(tmp_path):
+    script = tmp_path / "tool.py"
+    script.write_text(
+        "import _socket\n"
+        "sock=_socket.socket()\n"
+        "sock.close()\n"
+        "print('{}')\n",
+        encoding="utf-8")
+    result = run_python(script, {}, workspace=tmp_path / "work",
+                        policy=IsolationPolicy())
+    assert not result.ok
+    assert "network disabled in isolated process" in result.stderr
+
+
+def test_restricted_process_allows_network_only_when_explicit(tmp_path):
+    script = tmp_path / "tool.py"
+    script.write_text(
+        "import json,socket\n"
+        "sock=socket.socket()\n"
+        "sock.close()\n"
+        "print(json.dumps({'socket_created':True}))\n",
+        encoding="utf-8")
+    result = run_python(script, {}, workspace=tmp_path / "work",
+                        policy=IsolationPolicy(network_allowed=True))
+    assert result.ok
+    assert result.output == {"socket_created": True}
+
+
 class _Registry:
     def __init__(self):
         self.installed = []
@@ -86,7 +127,10 @@ class _Memory:
 
 def test_brand_hue_is_stable_and_maturity_comes_from_events():
     state = {"version": 0, "theme": {}}
-    writer = lambda value: state.update(value)
+
+    def writer(value):
+        state.update(value)
+
     brand = BrandEvolution(_Memory(), lambda: state, writer)
     first = brand.refresh("utente")
     second = brand.refresh("utente")

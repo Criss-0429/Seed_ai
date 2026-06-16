@@ -75,11 +75,12 @@ def run_python(
     return _run_process(script, payload, workspace, policy)
 
 
-def _minimal_env() -> dict[str, str]:
+def _minimal_env(*, network_allowed: bool = False) -> dict[str, str]:
     keep = {"SYSTEMROOT", "WINDIR", "COMSPEC", "PATHEXT", "TEMP", "TMP", "PATH"}
     env = {key: value for key, value in os.environ.items() if key.upper() in keep}
     env.update({"PYTHONIOENCODING": "utf-8", "PYTHONDONTWRITEBYTECODE": "1",
-                "SEED_ISOLATED": "1"})
+                "SEED_ISOLATED": "1",
+                "SEED_NETWORK_ALLOWED": "1" if network_allowed else "0"})
     return env
 
 
@@ -95,7 +96,8 @@ def _run_process(
         proc = subprocess.run(
             command, input=json.dumps(payload, ensure_ascii=False),
             capture_output=True, text=True, encoding="utf-8", cwd=workspace,
-            env=_minimal_env(), timeout=policy.timeout_seconds,
+            env=_minimal_env(network_allowed=policy.network_allowed),
+            timeout=policy.timeout_seconds,
             creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
         )
     except subprocess.TimeoutExpired:
