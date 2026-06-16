@@ -24,6 +24,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Validate workflow YAML
         run: |
@@ -92,4 +94,13 @@ jobs:
           echo "ok: no heavy artifacts tracked"
 
       - name: git diff --check (whitespace / conflict markers)
-        run: git diff --check HEAD~1 HEAD || git diff --check $(git hash-object -t tree /dev/null) HEAD
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git diff --check "${{ github.event.pull_request.base.sha }}" HEAD
+          elif git rev-parse --verify "${{ github.event.before }}^{commit}" >/dev/null 2>&1; then
+            git diff --check "${{ github.event.before }}" HEAD
+          else
+            git diff --check HEAD~1 HEAD
+          fi
