@@ -340,7 +340,10 @@ personalita. Mostrera una presenza minimale che:
 3. consenso informato prima di watcher, voce o integrazioni;
 4. avviso chiaro sul download iniziale del privacy filter;
 5. accesso sempre visibile a pausa, permessi, spiegazioni e rollback;
-6. l'esperimento dura 14 giorni, con onboarding al giorno 0 e debrief al giorno 15.
+6. l'esperimento dura 14 giorni, con onboarding al giorno 0 e debrief al giorno 15;
+7. voce ElevenLabs BYOK e FACOLTATIVA: nessuna key inclusa nell'installer, si puo
+   saltare; la key dell'utente e validata e cifrata DPAPI (`voice_credentials.json`
+   in `core_config`). Senza key SEED resta pienamente usabile in modalita testuale.
 
 ## Runtime Completion locale
 

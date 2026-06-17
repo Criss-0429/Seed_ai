@@ -57,6 +57,7 @@ from .startup import WindowsStartup
 from .scheduler import Scheduler
 from .telemetry import Telemetry
 from .voice import VoiceEngine
+from .voice_credentials import VoiceCredentials
 from .watcher import ActivityWatcher
 
 log = logging.getLogger("seed.app")
@@ -172,6 +173,13 @@ class SeedApp:
             if self.cfg.models.embedding_enabled and self.cfg.models.embedding_model
             else None)
         self.telemetry = Telemetry(self.memory, self.evolution)
+        # BYOK ElevenLabs FACOLTATIVO: la key inserita dall'utente (cifrata DPAPI)
+        # ha precedenza; in sua assenza si usa quella eventuale in config.json.
+        # Nessuna key = voce spenta, SEED resta testuale.
+        self.voice_credentials = VoiceCredentials(
+            audit=lambda ev, payload: self.memory.add_event(ev, payload))
+        self.cfg.voice.elevenlabs_api_key = (
+            self.voice_credentials.api_key() or self.cfg.voice.elevenlabs_api_key)
         self.voice = VoiceEngine(
             self.cfg.voice,
             audit=lambda ev, payload: self.memory.add_event(ev, payload))
@@ -930,6 +938,33 @@ class SeedApp:
         self.provider_hub.revoke(provider)
         self._reload_provider_models()
         return {"ok": True, "status": self.provider_hub.status()}
+
+    # --- BYOK ElevenLabs (voce, FACOLTATIVO) -----------------------------
+    def ui_voice_credentials_status(self) -> dict:
+        return self.voice_credentials.status()
+
+    def ui_voice_set_key(self, api_key: str) -> dict:
+        try:
+            status = self.voice_credentials.validate_and_save(api_key)
+            self._reload_voice_engine()
+            return {"ok": True, "status": status}
+        except Exception as exc:
+            return {"ok": False, "error": str(exc)}
+
+    def ui_voice_skip(self) -> dict:
+        return {"ok": True, "status": self.voice_credentials.skip()}
+
+    def ui_voice_revoke(self) -> dict:
+        status = self.voice_credentials.revoke()
+        self._reload_voice_engine()
+        return {"ok": True, "status": status}
+
+    def _reload_voice_engine(self) -> None:
+        """Ricostruisce il motore voce dopo set/revoke della key, senza riavvio."""
+        self.cfg.voice.elevenlabs_api_key = self.voice_credentials.api_key()
+        self.voice = VoiceEngine(
+            self.cfg.voice,
+            audit=lambda ev, payload: self.memory.add_event(ev, payload))
 
     def _reload_provider_models(self) -> None:
         """Ricollega i consumer LLM dopo cambio profilo, senza riavvio."""

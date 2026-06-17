@@ -341,6 +341,24 @@
   #perm .btns button { flex: 1; padding: 9px; border-radius: 8px; border: 1px solid var(--line);
     background: var(--app); color: var(--ink); cursor: pointer; }
 
+  /* modale stilizzata in-app: sostituisce prompt()/confirm() nativi di Windows */
+  #ask { position: absolute; inset: 0; background: oklch(40% 0.02 85 / .35);
+    display: none; place-items: center; z-index: 11; animation: sd-fade .2s ease-out; }
+  #ask.open { display: grid; }
+  #ask .box { width: 420px; max-width: 90vw; background: oklch(97.5% 0.005 85);
+    border: 1px solid var(--line); border-radius: 14px; padding: 22px;
+    box-shadow: 0 24px 60px -24px oklch(40% 0.02 85 / .5); animation: sd-rise .3s ease-out; }
+  #ask h3 { margin: 0 0 8px; font-size: 16px; font-weight: 500; }
+  #ask p { font-size: 14px; color: oklch(45% 0.01 85); margin: 4px 0 12px; line-height: 1.5; }
+  #ask input { width: 100%; font-family: var(--mono); font-size: 14px; padding: 10px 12px;
+    border: 1px solid var(--line); border-radius: 10px; background: var(--app); color: var(--ink); }
+  #ask input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  #ask .btns { margin-top: 16px; display: flex; gap: 8px; }
+  #ask .btns button { flex: 1; padding: 9px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--app); color: var(--ink); cursor: pointer; min-height: 42px; }
+  #ask .btns button.primary { background: var(--ink); color: var(--app); border-color: var(--ink); }
+  #ask .btns button.ghost { color: var(--mut); }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; }
   }
@@ -535,6 +553,16 @@
       <button data-d="once">Solo stavolta</button>
       <button data-d="remember">Consenti e ricorda</button>
       <button data-d="deny">Nega</button>
+    </div>
+  </div></div>
+
+  <div id="ask" role="dialog" aria-modal="true" aria-labelledby="ask-title"><div class="box">
+    <h3 id="ask-title"></h3>
+    <p id="ask-msg"></p>
+    <input id="ask-input" type="text" autocomplete="off" spellcheck="false" style="display:none">
+    <div class="btns">
+      <button id="ask-secondary" class="ghost"></button>
+      <button id="ask-primary" class="primary"></button>
     </div>
   </div></div>
 </div>
@@ -746,8 +774,24 @@ let recorder = null, audioChunks = [], audioStream = null;
 async function startMic() {
   setOrb('listening'); $('#hold-btn').classList.add('active'); $('#voice-trans').textContent = '';
   try {
+    // Voce FACOLTATIVA: senza key ElevenLabs blocca e chiede la key (o salta).
+    if (!(await api.voice_available())) {
+      const key = await askInput({title: 'Voce: serve la key ElevenLabs',
+        message: 'La voce è facoltativa. Inserisci la tua API key ElevenLabs per attivarla, '
+               + 'oppure salta e continua a usare SEED in modalità testuale.',
+        placeholder: 'API key ElevenLabs', password: true,
+        primary: 'Attiva voce', secondary: 'Salta'});
+      if (key === null) { await api.voice_skip(); throw new Error('voce saltata'); }
+      if (!key) throw new Error('voce non attivata');
+      flash('Validazione key ElevenLabs…');
+      const out = await api.voice_set_key(key);
+      if (!out || !out.ok) throw new Error('key ElevenLabs non valida: ' + ((out && out.error) || ''));
+      flash('Voce attivata');
+    }
     if (!(await api.voice_ready())) {
-      const granted = confirm('Attivare la voce? L’audio viene inviato al provider configurato e non viene salvato.');
+      const granted = await askConfirm({title: 'Attivare la voce?',
+        message: 'L’audio viene inviato a ElevenLabs e non viene salvato.',
+        primary: 'Attiva', secondary: 'Annulla'});
       if (!granted || !(await api.grant_voice_consent(true))) throw new Error('consenso voce non concesso');
     }
     audioStream = await navigator.mediaDevices.getUserMedia({audio:true});
@@ -932,6 +976,37 @@ async function openForge() {
   acts.appendChild(inp); acts.appendChild(btn); body.appendChild(acts);
 }
 
+// Modale stilizzata in-app (no prompt()/confirm() nativi → niente dialog Windows).
+function askModal({title, message='', input=false, value='', placeholder='',
+                   password=false, primary='OK', secondary='Annulla'}) {
+  return new Promise(resolve => {
+    const scrim = $('#ask'), inp = $('#ask-input');
+    $('#ask-title').textContent = title || '';
+    const msg = $('#ask-msg');
+    msg.textContent = message; msg.style.display = message ? 'block' : 'none';
+    inp.style.display = input ? 'block' : 'none';
+    inp.type = password ? 'password' : 'text';
+    inp.value = value || ''; inp.placeholder = placeholder || '';
+    const pb = $('#ask-primary'), sb = $('#ask-secondary');
+    pb.textContent = primary; sb.textContent = secondary;
+    scrim.classList.add('open');
+    if (input) setTimeout(() => inp.focus(), 30);
+    const done = (val) => {
+      scrim.classList.remove('open');
+      pb.onclick = sb.onclick = inp.onkeydown = null;
+      resolve(val);
+    };
+    pb.onclick = () => done(input ? (inp.value || '') : true);
+    sb.onclick = () => done(input ? null : false);
+    inp.onkeydown = (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); done(inp.value || ''); }
+      else if (e.key === 'Escape') { e.preventDefault(); done(input ? null : false); }
+    };
+  });
+}
+const askInput = (opts) => askModal({...opts, input: true});
+const askConfirm = (opts) => askModal({...opts, input: false});
+
 async function openProviders() {
   const box = $('#pr-rows'); box.innerHTML = '';
   let status;
@@ -953,7 +1028,9 @@ async function openProviders() {
     const acts = row.querySelector('.acts');
     const configure = document.createElement('button'); configure.textContent = profile ? 'sostituisci key' : 'configura';
     configure.onclick = async () => {
-      const key = prompt(`Inserisci API key ${spec.label}. Verrà validata realmente e cifrata con DPAPI.`);
+      const key = await askInput({title: `API key ${spec.label}`,
+        message: 'Verrà validata realmente sul provider e cifrata con DPAPI.',
+        placeholder: 'incolla la tua API key', password: true, primary: 'Valida', secondary: 'Annulla'});
       if (!key) return;
       flash('Validazione provider in corso…');
       setOperationalState('loading', `validazione ${spec.label} in corso`);
@@ -975,7 +1052,9 @@ async function openProviders() {
         const out = await api.provider_restore_preset(spec.provider); flash(out.ok ? 'Preset ripristinato' : out.error);
       }; acts.appendChild(preset);
       const roles = document.createElement('button'); roles.textContent = 'ruoli'; roles.onclick = async () => {
-        const raw = prompt('Modelli per ruolo in JSON', JSON.stringify(profile.roles || {}, null, 2));
+        const raw = await askInput({title: 'Modelli per ruolo',
+          message: 'JSON ruolo → modello.', value: JSON.stringify(profile.roles || {}, null, 2),
+          primary: 'Salva', secondary: 'Annulla'});
         if (!raw) return;
         try {
           const out = await api.provider_set_roles(spec.provider, JSON.parse(raw));
@@ -988,13 +1067,60 @@ async function openProviders() {
         }; acts.appendChild(active);
       }
       const revoke = document.createElement('button'); revoke.textContent = 'revoca'; revoke.onclick = async () => {
-        if (!confirm(`Revocare ${spec.label}?`)) return;
+        if (!(await askConfirm({title: `Revocare ${spec.label}?`,
+          message: 'La key verrà rimossa dal dispositivo.', primary: 'Revoca', secondary: 'Annulla'}))) return;
         await api.provider_revoke(spec.provider); flash('Provider revocato'); openProviders();
       }; acts.appendChild(revoke);
     }
     box.appendChild(row);
   }
+  await renderVoiceProviderRow(box);
   closeSurfaces(); $('#pr-scrim').classList.add('open');
+}
+
+// ElevenLabs (voce) — BYOK FACOLTATIVO e skippabile: gestione separata dai
+// provider LLM perché serve solo ad abilitare la voce.
+async function renderVoiceProviderRow(box) {
+  let vs;
+  try { vs = await api.voice_credentials_status(); } catch (e) { return; }
+  const row = document.createElement('div'); row.className = 'urow';
+  const state = vs.configured ? 'attivo' : (vs.skipped ? 'saltato' : 'facoltativo · non configurato');
+  row.innerHTML = `<div class="claimrow"><div class="claim"></div><span class="chip"></span></div>
+    <div class="meta"></div><div class="acts"></div>`;
+  row.querySelector('.claim').textContent = 'ElevenLabs (voce)';
+  row.querySelector('.chip').textContent = state;
+  row.querySelector('.meta').textContent = `facoltativo · solo per la voce · ${vs.dashboard_url}`;
+  const acts = row.querySelector('.acts');
+  const configure = document.createElement('button');
+  configure.textContent = vs.configured ? 'sostituisci key' : 'configura';
+  configure.onclick = async () => {
+    const key = await askInput({title: 'API key ElevenLabs (voce)',
+      message: 'Facoltativa: serve solo per la voce. Validata sul provider e cifrata con DPAPI.',
+      placeholder: 'API key ElevenLabs', password: true, primary: 'Valida', secondary: 'Annulla'});
+    if (!key) return;
+    flash('Validazione key ElevenLabs…');
+    const out = await api.voice_set_key(key);
+    flash(out.ok ? 'Voce attivata' : `Validazione fallita: ${out.error}`);
+    if (out.ok) openProviders();
+  };
+  acts.appendChild(configure);
+  const dash = document.createElement('button'); dash.textContent = 'dashboard';
+  dash.onclick = () => window.open(vs.dashboard_url, '_blank'); acts.appendChild(dash);
+  if (!vs.configured && !vs.skipped) {
+    const skip = document.createElement('button'); skip.textContent = 'salta';
+    skip.onclick = async () => { await api.voice_skip(); flash('Voce saltata'); openProviders(); };
+    acts.appendChild(skip);
+  }
+  if (vs.configured) {
+    const revoke = document.createElement('button'); revoke.textContent = 'revoca';
+    revoke.onclick = async () => {
+      if (!(await askConfirm({title: 'Revocare la key ElevenLabs?',
+        message: 'La voce verrà disattivata e la key rimossa.', primary: 'Revoca', secondary: 'Annulla'}))) return;
+      await api.voice_revoke_key(); flash('Voce disattivata'); openProviders();
+    };
+    acts.appendChild(revoke);
+  }
+  box.appendChild(row);
 }
 function renderSelector() {
   const box = $('#sel-rows'); box.innerHTML = '';

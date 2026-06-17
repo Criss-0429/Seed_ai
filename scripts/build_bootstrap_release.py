@@ -33,6 +33,12 @@ MODEL_SOURCES = {
     / "snapshots",
 }
 
+PRESERVED_MODEL_ASSET_KEYS = {
+    "privacy-filter": "privacy_model",
+    "emotion-wav2vec2": "emotion_model",
+    "embedding-mpnet": "embedding_model",
+}
+
 
 def digest(path: Path) -> str:
     h = hashlib.sha256()
@@ -122,11 +128,31 @@ def build_bootstrap(version: str, target_dir: Path, python_exe: Path) -> Path:
     return exe
 
 
+def preserved_model_assets(manifest_path: Path) -> dict[str, dict[str, object]]:
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    release_assets = manifest.get("release_assets")
+    if not isinstance(release_assets, dict):
+        raise RuntimeError(f"release_assets missing from preserve manifest: {manifest_path}")
+
+    preserved: dict[str, dict[str, object]] = {}
+    for model_name, asset_key in PRESERVED_MODEL_ASSET_KEYS.items():
+        asset = release_assets.get(asset_key)
+        if not isinstance(asset, dict):
+            raise RuntimeError(f"{asset_key} missing from preserve manifest: {manifest_path}")
+        preserved[model_name] = dict(asset)
+    return preserved
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--version", default="0.3.0-pilot-p2")
     parser.add_argument("--python", default=sys.executable)
     parser.add_argument("--skip-bootstrap", action="store_true")
+    parser.add_argument(
+        "--preserve-model-assets-from",
+        type=Path,
+        help="Reuse model release asset metadata from an existing manifest instead of rebuilding model zips.",
+    )
     args = parser.parse_args(argv)
 
     version = args.version
@@ -147,8 +173,10 @@ def main(argv: list[str] | None = None) -> int:
     supervisor_zip = target / f"SEED-{version}-supervisor.zip"
     zip_tree(supervisor_dir, supervisor_zip)
 
-    model_assets = {}
+    model_assets = preserved_model_assets(args.preserve_model_assets_from) if args.preserve_model_assets_from else {}
     for model_name, source in MODEL_SOURCES.items():
+        if model_name in model_assets:
+            continue
         if not source.is_dir():
             raise RuntimeError(f"model source missing: {source}")
         actual = latest_snapshot(source) if source.name == "snapshots" else source
