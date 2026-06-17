@@ -261,6 +261,24 @@ La guida SmartScreen/hash per i tester e in `installer/TESTER_GUIDE.md`.
 Ogni shortcut installato avvia `SEEDSupervisor.exe`, mai direttamente
 `SEED.exe`.
 
+## Build release bootstrap per GitHub Releases
+
+GitHub Release non deve ricevere l'installer monolitico multi-GB. Per la
+distribuzione tester pubblica usare invece bootstrap + asset split:
+
+```powershell
+python -m venv .release-venv
+.\.release-venv\Scripts\python.exe -m pip install pyinstaller
+.\.release-venv\Scripts\python.exe scripts\build_bootstrap_release.py `
+  --version 0.3.0-pilot-p2 `
+  --python .\.release-venv\Scripts\python.exe
+```
+
+Il comando produce `SEED-Bootstrap-Setup-Unsigned.exe`, zip runtime/supervisor,
+zip modelli, parti split per il privacy-filter oltre 2 GiB, manifest e
+`SHA256SUMS.txt`. Caricare questi asset nella GitHub Release; non caricare
+`SEED-<version>-Setup-Unsigned.exe`.
+
 ## Quality gate P2
 
 ```powershell

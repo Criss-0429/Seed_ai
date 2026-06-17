@@ -37,17 +37,21 @@ Required release assets for the bootstrap strategy:
 
 ```text
 SEED-Bootstrap-Setup-Unsigned.exe
-SEED-runtime-<version>.zip
-SEED-models-privacy-filter-<version>.zip
-SEED-models-embedding-<version>.zip
-SEED-models-emotion-<version>.zip
+SEED-<version>-runtime-update.zip
+SEED-<version>-supervisor.zip
+SEED-models-privacy-filter-<version>.zip.part01
+SEED-models-privacy-filter-<version>.zip.part02
+SEED-models-embedding-mpnet-<version>.zip
+SEED-models-emotion-wav2vec2-<version>.zip
 release-manifest.json
 SHA256SUMS.txt
 TESTER_GUIDE.md
 ```
 
 GitHub Release assets must stay below 2 GiB each. Do not publish a single
-monolithic installer if it exceeds that limit.
+monolithic installer if it exceeds that limit. The privacy-filter checkpoint is
+larger than 2 GiB, so it is published as ordered `.partNN` files and reassembled
+by `SEED-Bootstrap-Setup-Unsigned.exe`.
 
 ## Site Scope For Claude
 
