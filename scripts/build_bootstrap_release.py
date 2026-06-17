@@ -100,6 +100,8 @@ def build_bootstrap(version: str, target_dir: Path, python_exe: Path) -> Path:
             "--clean",
             "--noconfirm",
             "--onefile",
+            "--icon",
+            str(ROOT / "assets" / "seed.ico"),
             "--name",
             "SEED-Bootstrap-Setup-Unsigned",
             "--distpath",
