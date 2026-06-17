@@ -238,6 +238,19 @@ class JsApi:
     def voice_available(self) -> bool:
         return self._app.voice.available
 
+    # BYOK ElevenLabs: opzionale, skippabile. Solo per abilitare la voce.
+    def voice_credentials_status(self) -> dict:
+        return self._app.ui_voice_credentials_status()
+
+    def voice_set_key(self, api_key: str) -> dict:
+        return self._app.ui_voice_set_key(api_key)
+
+    def voice_skip(self) -> dict:
+        return self._app.ui_voice_skip()
+
+    def voice_revoke_key(self) -> dict:
+        return self._app.ui_voice_revoke()
+
     def grant_voice_consent(self, granted: bool = True) -> bool:
         return self._app.grant_voice_consent(granted)
 

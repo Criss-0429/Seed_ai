@@ -17,3 +17,14 @@ or remove it.
 
 All shortcuts launch `SEEDSupervisor.exe`, which verifies health and recovery
 before accepting runtime as known-good.
+
+## Optional voice (ElevenLabs BYOK)
+
+Voice (speech-to-text and text-to-speech) is **optional**. SEED is fully usable
+in text-only mode without it. No ElevenLabs key is bundled in the installer.
+
+To enable voice, bring your own ElevenLabs API key in the app settings: the key
+is validated, encrypted with DPAPI, and stored only under `%LOCALAPPDATA%\SEED`.
+You can **skip** this at any time and SEED will not block on it. Revoking the key
+turns voice off again. Voice also requires explicit voice consent, separate from
+memory consent.

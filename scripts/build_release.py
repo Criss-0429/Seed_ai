@@ -187,6 +187,15 @@ def main(argv: list[str] | None = None) -> int:
         "data_schema_version": args.schema_version,
         "created_at": time.time(),
         "unsigned": True,
+        "features": {
+            "voice": {
+                "provider": "elevenlabs",
+                "byok": True,
+                "optional": True,
+                "skippable": True,
+                "bundled_key": False,
+            },
+        },
         "layout": {
             "runtime": "app/runtime",
             "supervisor": "app/supervisor",
