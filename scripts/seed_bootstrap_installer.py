@@ -71,6 +71,77 @@ def extract_zip(archive: Path, destination: Path) -> None:
         zf.extractall(destination)
 
 
+def write_json(path: Path, value: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def initialize_boot_state(seed_root: Path) -> None:
+    version_id = "installed-baseline"
+    state = seed_root / "state"
+    capabilities = seed_root / "capabilities"
+    versions = seed_root / "versions"
+    active = seed_root / "active"
+    lineage = seed_root / "lineage" / "events"
+
+    write_json(state / "policy.json", {"rules": [], "suppressions": []})
+    write_json(
+        state / "user_model.json",
+        {
+            "version": 0,
+            "regenerated_at": None,
+            "interaction": {
+                "verbosity": 0.5,
+                "formality": 0.5,
+                "humor": 0.0,
+                "language": "it",
+                "preferred_input": "text",
+            },
+            "ui": {"density": 0.3, "font_scale": 1.0, "palette": "mono", "motion": 0.1},
+            "proactivity": {"level": 0.0, "channels": ["in_app"], "quiet_hours": ["22:00-08:00"]},
+            "domains": {"observed": [], "ignored": []},
+            "evidence_refs": [],
+        },
+    )
+    write_json(
+        state / "ui_manifest.json",
+        {
+            "version": 0,
+            "theme": {
+                "palette": "mono",
+                "font_scale": 1.0,
+                "density": 0.3,
+                "background": "#111111",
+                "foreground": "#e8e8e8",
+                "accent": "#888888",
+            },
+            "persona": {
+                "tone": "neutro, essenziale, nessuna personalita' imposta",
+                "greeting": "Ciao. Scrivimi pure.",
+            },
+            "widgets": ["chat"],
+        },
+    )
+    capabilities.mkdir(parents=True, exist_ok=True)
+    lineage.mkdir(parents=True, exist_ok=True)
+
+    version = versions / version_id
+    if not version.exists():
+        (version / "state").mkdir(parents=True, exist_ok=True)
+        (version / "capabilities").mkdir(parents=True, exist_ok=True)
+        for file_name in ("policy.json", "user_model.json", "ui_manifest.json"):
+            shutil.copy2(state / file_name, version / "state" / file_name)
+
+    write_json(
+        active / "current_version.json",
+        {
+            "schema_version": "seed.active-version.v1",
+            "version_id": version_id,
+            "rollback_version": version_id,
+        },
+    )
+
+
 def verify(path: Path, expected: str) -> None:
     actual = sha256(path)
     if actual.lower() != expected.lower():
@@ -169,6 +240,7 @@ def main() -> int:
             extract_zip(joined, destination)
 
         (install_root / "release-manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+        initialize_boot_state(data_root)
 
     supervisor = install_root / "supervisor" / "SEEDSupervisor.exe"
     runtime = install_root / "runtime" / "SEED.exe"
