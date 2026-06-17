@@ -2,24 +2,18 @@
 
 ## Fonte unica
 
-`FrameworkUtenti/seed` e' la singola fonte di verita' del progetto SEED.
-Documentazione, fasi, sorgenti UI, knowledge graph, codice, test e ricette di
-build devono restare dentro questo repository.
-
-Non creare o mantenere copie operative in cartelle sorelle di `seed`.
+Questo repository e' la singola fonte di verita' del progetto SEED.
+Documentazione, fasi, sorgenti UI, codice, test e ricette di build devono
+restare dentro questo repository.
 
 ## Prima di lavorare
 
 Leggere, nell'ordine:
 
-1. `seed-knowledge-graph/graphify-out/GRAPH_REPORT.md`
-2. `PROJECT_OVERVIEW.md`
-3. `ProductionPlan.md`
-4. `docs/12_ImplementationPlan.md`
-5. i documenti canonici pertinenti alla fase attiva
-
-Non aggiornare Graphify o il knowledge graph senza una richiesta esplicita di
-Cristian.
+1. `PROJECT_OVERVIEW.md`
+2. `ProductionPlan.md`
+3. `docs/12_ImplementationPlan.md`
+4. i documenti canonici pertinenti alla fase attiva
 
 ## Regole di avanzamento
 

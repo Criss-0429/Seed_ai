@@ -1,233 +1,71 @@
-# SEED v0.2 - runtime corrente
+<div align="center">
 
-Questa cartella contiene la base eseguibile attuale di SEED. Implementa un
-harness locale con command router deterministico, privacy gate, permessi,
-sandbox capability, memoria, watcher, reflection e rollback.
+# SEED
 
-## Repository autocontenuto
+**A local-first AI companion for Windows that grows with you.**
 
-Questa cartella Git e' la singola fonte di verita' del progetto SEED. Contiene
-runtime, test, script, configurazioni di build, documentazione, piani di
-produzione, sorgenti UI e knowledge graph:
+![platform](https://img.shields.io/badge/platform-Windows%2010%2F11-1f1f1f)
+![status](https://img.shields.io/badge/status-pilot-orange)
+![license](https://img.shields.io/badge/license-AGPL--3.0-blue)
+![python](https://img.shields.io/badge/python-3.11%2B-3776ab)
 
-- `PROJECT_OVERVIEW.md`: indice generale del progetto;
-- `ProductionPlan.md` e `docs/12_ImplementationPlan.md`: fasi e piano operativo;
-- `docs/`: documentazione di prodotto e architettura;
-- `TESI_SEED_Scaletta.md`: materiale tesi;
-- `SEED_UI/`: sorgenti di design autorevoli;
-- `seed-knowledge-graph/`: knowledge graph e corpus documentale preservati;
-- `packaging/pyinstaller/`: contratti di build riproducibili.
+[English](README.md) · [Italiano](README-ita.md)
 
-`build/`, `dist/` e `release/` sono output locali rigenerabili e non vengono
-versionati. Installer e pacchetti update pubblicabili appartengono alle GitHub
-Releases, non alla cronologia Git.
+</div>
 
-P0 distribuzione aggiunge il Provider Hub BYOK: nelle installazioni tester
-(`provider_hub.required=true`) onboarding personale e chat restano bloccati
-finche almeno un profilo Ollama Cloud, OpenRouter o Vercel AI Gateway non viene
-validato realmente. Le key sono cifrate con DPAPI; il fallback automatico
-cross-provider puo andare solo verso Ollama Cloud, mai verso provider PAYG.
-La superficie **Provider e modelli** permette configurazione, test, revoca,
-preset e mapping per ruolo.
+---
 
-P1 distribuzione aggiunge build Windows `onedir`, installer Inno Setup unsigned,
-bundle ML offline e pacchetto update verificabile. Runtime, supervisor e modelli
-restano separati sotto la directory applicativa; i dati utente restano sotto
-`%LOCALAPPDATA%\SEED` e non vengono inclusi nel payload release.
+## Project status
 
-La visione e l'architettura obiettivo sono in `docs/`. In particolare:
+SEED is an **early, evolving open-source project** in private pilot. The
+foundations are solid — local privacy gate, boot supervisor, reversible
+mutations — while higher-level capabilities are still moving. Expect rough
+edges and treat it as a technical base, not a finished product.
 
-- `00_Visione_Prodotto.md` definisce l'esperienza iniziale e i principi;
-- `02_EvolutionEngine.md` descrive il modello evolutivo target;
-- `09_Personalita_Compatibile.md` sostituisce l'idea di persona costruita per
-  semplice imitazione dell'utente;
-- `11_Contratto_Mutazione.md` definisce quando una mutazione puo essere promossa.
+## What SEED is
 
-Il codice v0.2 non implementa ancora integralmente queste decisioni. Mantiene un
-core compilato non mutabile, mutazioni periferiche e un cap fisso di selezione.
-La prima fondazione target e presente in `seed/core/lineage.py`: candidate typed,
-transizioni, record evaluator, promotion blockers e lineage append-only.
-Il reflection pass e ora proposal-only: registra candidate e validazione legacy
-nel lineage, ma non applica cambiamenti al runtime attivo. Le candidate valide
-vengono materializzate come descendant isolati e non eseguibili sotto
-`%LOCALAPPDATA%\SEED\lab\descendants\`.
-Il replay/evaluator S4 verifica integrita, scope, permission contract, pattern
-di segreti e assertion state-based. I report canonici vivono sotto
-`%LOCALAPPDATA%\SEED\lab\evaluator_runs\`. Nessun descendant o codice capability
-generato viene eseguito; candidate runtime-only restano `inconclusive`.
-Il promotion core S5 separa autorita e candidate: reflection puo aprire solo
-shadow senza effetti; canary usa lease per context id; promotion state-based
-richiede prove shadow/canary, parent non stale e rollback. UI/personality,
-capability generate e descendant completi non sono promossi in questa fase.
-S6 aggiunge `SEEDSupervisor.exe`, un processo esterno al core attivo che valida
-pointer, snapshot e lineage, avvia il runtime, attende un health signal
-tokenizzato e mantiene una known-good legata all'hash completo della versione.
-Su boot unhealthy ripristina la known-good e ritenta una sola volta.
-S7 aggiunge un onboarding conversazionale persistente core-only: consenso prima
-di qualsiasi raccolta, racconto redatto, preferenze esplicite, ipotesi
-correggibili a bassa confidenza, sintesi, pausa, revoca e reset. Durante
-onboarding watcher e reflection sono bloccati; gli episodi onboarding non
-alimentano mutazioni. S8 aggiunge una identita conversazionale stabile e
-distinta dall'utente, modalita temporanee, counterpoint, correzioni stilistiche
-esplicite, explainability e telemetria aggregata. Le ipotesi onboarding non
-diventano istruzioni di personalita e `persona_change` resta proposal-only.
-La UI Her-like resta una fase separata.
-S9 (completa, 2026-06-12) aggiunge la Online Research Lane: ricerca online
-provider-neutral (Exa/Tavily) con query redatta dal privacy gate, key solo in
-core_config, cap giornaliero di chiamate, fallback esplicito tra provider,
-risultati con provenance, risposta con citazioni verificate e distinzione
-fonte/inferenza. Le pagine analizzate scalano con la profondita (quick 3,
-basic 5, deep 10) e con la preferenza esplicita dell'utente: floor fisso a 3
-fonti per evitare fiducia cieca, nessun massimo sul deep. La builtin
-`web_search` e' dormant: la lane e' l'unico percorso web governato.
+SEED is a desktop runtime for Windows: a conversational companion that starts
+minimal and adapts to how you work over time. It runs locally, asks before it
+acts, and changes only in reversible, auditable steps.
 
-D0 (pronta per review, 2026-06-13) aggiunge un benchmark architetturale locale
-e deterministico per OpenClaw, Hermes e OpenHarness. Usa solo fixture sintetiche
-privacy-safe, non installa o avvia runtime esterni e non concede accesso reale.
-La decisione proposta mantiene SEED Core governatore: OpenHarness come backend
-isolamento/esecuzione, Hermes come pattern registry/skills/delega, OpenClaw come
-pattern daemon/sessione. Il comando `:runtimebench` esporta evidenza hashata
-sotto `%LOCALAPPDATA%\SEED\lab\runtime_bench\`. Il gate D0 e' stato approvato
-manualmente dall'owner il 2026-06-13 (documentato in `docs/12_ImplementationPlan.md`).
+- **Local-first** — memory, history and configuration live under
+  `%LOCALAPPDATA%\SEED`. Your content is not uploaded automatically.
+- **Consent-driven** — watcher, voice, online search and permissions are off by
+  default; you turn them on, and pause/revoke/rollback are always available.
+- **Reversible** — every proposed change goes through validation (shadow,
+  canary, evidence). Final promotion is always an explicit owner decision, never
+  automatic.
+- **Bring your own keys (BYOK)** — you connect your own LLM provider; one
+  encrypted key per user, with a spending cap.
 
-D1 (pronta per review, 2026-06-13) aggiunge un daemon di background SOLO
-in-process: vive dentro il processo SEED supervisionato, parte con SEED e muore
-alla chiusura. Nessun servizio OS, nessun auto-start, nessun always-on. Emette un
-heartbeat reviewable e mantiene una coda di proattivita' locale e persistente con
-cooldown, suppression e silenzio di default (parla solo se il valore atteso supera
-il costo di interruzione + privacy + trust). Il daemon NON esegue azioni
-agentiche di scrittura, non ha accesso a shell/file reali/worker esterni e non
-riceve registry/broker: per costruzione produce solo decisioni rivedibili. La coda
-e l'audit non contengono dati personali, segreti o testo grezzo (solo categoria,
-riferimento opaco e conteggi aggregati). Comando locale `:daemon` per lo snapshot
-review; telemetria nella sezione `daemon` del report.
+## Features
 
-D2 (pronta per review, 2026-06-13) aggiunge il worker adapter READ-only: la prima
-capability worker `worker.runtime_status` dietro permission broker + audit
-aggregato. Ogni azione worker ha un `ActionContract` tipizzato (input/output
-schema, risk_class, side_effect_type, requires_approval, supports_dry_run,
-supports_rollback, observability_signal); in D2 sono ammesse SOLO azioni
-READ-only (`side_effect_type == "read"`, risk class `safe`/`read_safe`), e il
-registry rifiuta in registrazione qualunque azione non-read. Il worker riceve solo
-un provider di stato aggregato (mai config/key/memoria grezza), supporta dry-run
-e dichiara l'observation attesa. Nessuna scrittura, shell, file reale o worker
-esterno (l'isolamento container/ristretto e' D3, la capability WRITE_SAFE e' D4).
-Allowlist azioni in config. Comando locale `:worker`; telemetria sezione `worker`.
+- Conversational assistant with a stable, distinct personality (not a clone of
+  the user) and explainable answers.
+- BYOK LLM providers: **Ollama Cloud** (recommended, free tier), **OpenRouter**,
+  **Vercel AI Gateway**. Keys are encrypted with Windows DPAPI.
+- **Optional voice** (speech-to-text and text-to-speech) via ElevenLabs BYOK —
+  fully optional and skippable; SEED is complete in text-only mode.
+- Local privacy gate that redacts queries before they reach any provider.
+- Boot supervisor with health checks, known-good snapshots and crash recovery.
+- Proposal-only evolution engine: mutations are evaluated in isolation and
+  remain owner-gated.
 
-D-OBS / D3 / D4 / D5 + UI U0-U7 (pronti per review, 2026-06-13) — tutti
-**default OFF / gated**, nulla attivato:
+## Download
 
-- **D-OBS** observation lane READ-only (`observation.py`): consenso per-classe
-  (default OFF), sensibile escluso, salienza deterministica, candidate-ipotesi a
-  bassa confidenza (mai fatti), revoca = purge. `:observation`.
-- **D3** sandbox hardening (`worker_sandbox.py`): tier isolamento, trust gate
-  (`destructive` vietata, write -> approval owner, observability gate), dry-run,
-  rollback. `:sandbox`.
-- **D4** WRITE_SAFE (`write_safe.py`): write reversibili allowlistate solo nel
-  workspace, approval owner + dry-run + rollback + auto-rollback su observation
-  fallita. Default OFF. `:writesafe`.
-- **D5** skills + delega (`skills.py`): registry review-gated (no self-install),
-  task graph IR aciclico, delega a sub-agenti isolati gated. Default OFF.
-  `:skills`.
-- **D6 ritirata dall'owner**: nessun gateway esterno; tutto resta in `SEED.exe`.
-- **UI U0-U7** (`ui/surface/index.html`, `ui_governance.py`): riproduzione fedele
-  del design `SEED_UI/SEED Prototype.dc.html` (palette oklch, DM Sans/DM Mono, orb
-  seme+anelli, conversazione, superfici Modello Utente/Permessi via Ctrl+., voice
-  overlay = S11.3, toast), **reimplementata in JS vanilla** (niente React/CDN) per
-  restare app Python/pywebview offline con build EXE; chat via `JsApi`. Governance
-  P0-P5 (`ui_directives` nel DesignDirectivePack).
+The Windows installer is published via **GitHub Releases**:
 
-Attivazione delle lane, smoke reali e apertura dei gate restano owner.
+➡️ **[Download the latest release](https://github.com/Criss-0429/Seed_ai/releases/latest)**
 
-Comandi ricerca: `cerca online <tema>`, `cerca <tema> sul web`,
-`approfondisci <tema>`. Ampiezza: `analizza piu fonti`, `analizza meno fonti`,
-`fonti standard`. Telemetria aggregata nella sezione `research` del report.
+The installer is **unsigned**, so Windows SmartScreen will warn you ("Windows
+protected your PC"). This is expected — verify the SHA-256 against
+`SHA256SUMS.txt` in the release, then choose **More info → Run anyway**. SEED
+never installs a certificate into your Trusted Root. See
+[`installer/TESTER_GUIDE.md`](installer/TESTER_GUIDE.md) for the full procedure.
 
-## Compatible Personality Runtime S8
+## Quick start (development)
 
-Il runtime di personalita:
-
-- adatta forma e modalita, ma non copia opinioni o identita dell'utente;
-- usa modalita informative, creative, supportive, critiche e operative;
-- permette override per turno, per esempio `modalità critica: valuta...`;
-- tratta correzioni esplicite supportate come preferenze persistenti;
-- attiva counterpoint per richieste di opinione, critica o rischio senza
-  inventare disaccordo sulle richieste fattuali;
-- registra decisioni e report solo in forma aggregata, senza testo del turno;
-- tenta al massimo un repair privacy-gated su risposte evidentemente servili o
-  compiacenti.
-
-Controlli locali disponibili:
-
-- `Quali principi segui?`
-- `Perché hai risposto così?`
-
-## Stable Boot Supervisor S6
-
-Prima del primo boot supervisionato, registrare esplicitamente lo stato attivo:
-
-```powershell
-dist\SEEDSupervisor.exe --register-current baseline-v1
-```
-
-Avvio supervisionato:
-
-```powershell
-dist\SEEDSupervisor.exe --boot --runtime dist\SEED.exe
-```
-
-Recovery manuale esplicito:
-
-```powershell
-dist\SEEDSupervisor.exe --recover baseline-v1 --reason "owner recovery"
-```
-
-Il supervisor:
-
-- fallisce chiuso su pointer, versione, lineage o known-good invalidi;
-- considera healthy il runtime solo dopo inizializzazione e token health valido;
-- marca known-good solo dopo health riuscito;
-- rileva modifiche successive allo snapshot known-good tramite SHA-256;
-- registra tentativi, fallback e recovery in log append-only;
-- usa `SEED_DATA_ROOT` per garantire che child e supervisor condividano la
-  stessa root anche nei test isolati.
-
-S6 protegge snapshot state-based e l'avvio iniziale. Non prova stabilita
-continua dopo il health signal, non sceglie binari diversi per versione e non
-sostituisce un filesystem transazionale o firme contro un attaccante con pieno
-accesso disco.
-
-## Acceptance pratica isolata S1-S5
-
-Il runner seguente crea dati sintetici sotto una root temporanea e attraversa
-memoria, lineage, descendant, evaluator, shadow, canary, promotion, riapertura,
-rollback e tamper detection:
-
-```powershell
-cd C:\path\to\seed
-python scripts\core_acceptance.py
-```
-
-Output atteso:
-
-```json
-{"status":"passed","checks":12,"report":"...core_acceptance_report.json"}
-```
-
-Il runner non usa `%LOCALAPPDATA%\SEED`, rete, provider, OPF, UI o dati reali.
-Le observation shadow/canary sono sintetiche e verificano i gate, non la
-qualita dell'adattamento reale.
-
-Il follow-up pratico con Ollama Cloud ha inoltre verificato:
-
-- OpenAI Privacy Filter reale;
-- persistenza e recall locale di preferenze dichiarate esplicitamente;
-- parsing di JSON strutturato anche quando il provider aggiunge fence Markdown;
-- reflection reale con candidate valida in shadow e candidate invalida
-  bloccata dal builder;
-- nessuna promotion automatica.
-
-## Setup dev
+Requires Python 3.11+ on Windows.
 
 ```powershell
 python -m venv .venv
@@ -235,11 +73,17 @@ python -m venv .venv
 pip install -r requirements.txt
 pip install git+https://github.com/openai/privacy-filter
 copy config\config.example.json config\config.json
-python run_dev.py
-python run_dev.py --repl
+python run_dev.py            # GUI
+python run_dev.py --repl     # REPL
 ```
 
-## Build release tester P1
+On first run SEED asks for consent, then for an LLM provider key (BYOK). The
+chat unlocks once at least one provider key is validated.
+
+## Build from source
+
+Build a Windows tester release (PyInstaller `onedir` + Inno Setup). ML
+checkpoints must be present locally; they are not committed to Git.
 
 ```powershell
 python scripts\build_release.py --version 0.3.0-pilot --schema-version 1
@@ -252,117 +96,54 @@ python scripts\build_release.py --version 0.3.0-pilot --schema-version 1
 python scripts\build_release.py --version 0.3.0-pilot --finalize-installer
 ```
 
-Il primo comando genera build PyInstaller `onedir`, copia i checkpoint ML
-locali richiesti, crea update ZIP, manifest e hash. Inno Setup genera
-l'installer completo unsigned. Il comando finale aggiunge installer e relativo
-SHA-256 al manifest e a `SHA256SUMS.txt`.
-
-La guida SmartScreen/hash per i tester e in `installer/TESTER_GUIDE.md`.
-Ogni shortcut installato avvia `SEEDSupervisor.exe`, mai direttamente
-`SEED.exe`.
-
-## Build release bootstrap per GitHub Releases
-
-GitHub Release non deve ricevere l'installer monolitico multi-GB. Per la
-distribuzione tester pubblica usare invece bootstrap + asset split:
-
-```powershell
-python -m venv .release-venv
-.\.release-venv\Scripts\python.exe -m pip install pyinstaller
-.\.release-venv\Scripts\python.exe scripts\build_bootstrap_release.py `
-  --version 0.3.0-pilot-p2 `
-  --python .\.release-venv\Scripts\python.exe
-```
-
-Il comando produce `SEED-Bootstrap-Setup-Unsigned.exe`, zip runtime/supervisor,
-zip modelli, parti split per il privacy-filter oltre 2 GiB, manifest e
-`SHA256SUMS.txt`. Caricare questi asset nella GitHub Release; non caricare
-`SEED-<version>-Setup-Unsigned.exe`.
-
-## Quality gate P2
+Run the quality gate (lint, types, tests, acceptance) before building:
 
 ```powershell
 python scripts\quality_gate.py --full
-.\scripts\create_release_env.ps1
-.\.release-venv\Scripts\python.exe scripts\build_release.py `
-  --version 0.3.0-pilot-p2 --schema-version 1
 ```
 
-Il gate include Ruff, format progressivo sui boundary P2, mypy progressivo,
-dependency audit, secret scan, import-cycle scan, compileall, test completi e
-core acceptance. La build release usa una venv pulita senza tooling dev e
-rimuove test/cache/audio stack inutilizzato dal payload. `SEED.exe --smoke`
-offre smoke non interattivo per misurare primo avvio e RAM.
+## Tech stack
 
-## Dati del runtime corrente
+- **Runtime:** Python 3.11+, packaged with PyInstaller (`onedir`).
+- **UI:** `pywebview` desktop shell rendering a vanilla-JS surface (no
+  React/CDN), fully offline.
+- **ML (local):** Torch CPU, Transformers, Sentence-Transformers; emotion
+  recognition (wav2vec2), embeddings, privacy filter.
+- **Providers (BYOK):** OpenAI-compatible LLM APIs; ElevenLabs for optional voice.
+- **Installer:** Inno Setup (unsigned), distributed via GitHub Releases.
 
-```text
-%LOCALAPPDATA%\SEED\
-  core_config\config.json
-  data\seed.db
-  data\traces\*.jsonl
-  state\
-  capabilities\
-  versions\YYYY-MM-DD\
-  lineage\events\
-  active\current_version.json
-  lab\descendants\
-  lab\replay_fixtures\
-  lab\evaluator_runs\
-  lab\canary_leases\
-  recovery\known_good.json
-  recovery\health\
-  recovery\supervisor_logs\
-  workspace\
-  logs\seed.log
+## Repository layout
+
+```
+seed/            Application package (core runtime, UI, builtin capabilities)
+config/          Example configuration (config.example.json)
+packaging/       PyInstaller specs (reproducible build recipes)
+installer/       Inno Setup script + tester guide
+scripts/         Build, release and quality-gate scripts
+site/            Static distribution website (GitHub Pages)
+tests/           Test suite
+docs/            Architecture and product documentation
+assets/          Brand assets (icon, mark)
+benchmarks/      Local benchmarks
 ```
 
-Il target aggiunge ancora descendant completi, evaluator comportamentali e
-canary con effetti controllati. La struttura prevista e documentata in
-`docs/07_Struttura_Repo.md`.
+## Privacy & security
 
-## Primo avvio target
+- User data stays under `%LOCALAPPDATA%\SEED`; uninstall asks whether to keep or
+  delete it.
+- Provider keys are encrypted with DPAPI and never written in plaintext.
+- No automatic upload of memory, traces or lineage.
+- Online search is a separate, off-by-default module with privacy-gated queries.
 
-Il primo avvio non sara una chat vuota e non sara un questionario di
-personalita. Mostrera una presenza minimale che:
+Found a security issue? Please report it privately to the maintainer rather than
+opening a public issue.
 
-1. completa avvio e download necessari con stato leggibile;
-2. presenta consenso, privacy, mutabilita e rollback;
-3. chiede all'utente di parlare di se;
-4. raccoglie preferenze tramite conversazione e confronti concreti;
-5. mostra cio che pensa di aver compreso per consentire correzioni;
-6. entra nel periodo sperimentale di 14 giorni.
+## Contributing
 
-## Promemoria distribuzione
+Contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). This is a
+pilot project, so open an issue to discuss substantial changes first.
 
-1. una API key per utente con hard cap di spesa;
-2. nessun upload automatico di memoria, trace o lineage;
-3. consenso informato prima di watcher, voce o integrazioni;
-4. avviso chiaro sul download iniziale del privacy filter;
-5. accesso sempre visibile a pausa, permessi, spiegazioni e rollback;
-6. l'esperimento dura 14 giorni, con onboarding al giorno 0 e debrief al giorno 15;
-7. voce ElevenLabs BYOK e FACOLTATIVA: nessuna key inclusa nell'installer, si puo
-   saltare; la key dell'utente e validata e cifrata DPAPI (`voice_credentials.json`
-   in `core_config`). Senza key SEED resta pienamente usabile in modalita testuale.
+## License
 
-## Runtime Completion locale
-
-Il runtime desktop include ora:
-
-- isolamento reale con container Docker fail-closed oppure processo ristretto
-  con ambiente senza segreti e filesystem limitato al workspace;
-- observation collector locale consent-first per foreground app e categorie di
-  processo, senza titoli, URL, screenshot o contenuti;
-- sub-agent locale che esegue task graph di sole capability allowlistate, un
-  nodo isolato alla volta;
-- tool builder governato: stage, audit AST, test isolato, reviewer e owner gate
-  prima dell'installazione;
-- lifecycle automatico per evidenze shadow/canary e proposta di promozione;
-  la promotion finale non e' automatica;
-- brand evolutivo deterministico da eventi locali reali;
-- backup/restore, update staging, migrazioni versionate, crash recovery e
-  uninstall plan confermato.
-
-Nessun gateway Telegram/mobile/device viene avviato o collegato. Tutto resta
-nell'app `SEED.exe`. Comandi locali utili: `:backup`, `:brand`, `:lifecycle`,
-`:sandbox`.
+[GNU AGPL-3.0](LICENSE). If you run a modified version of SEED as a network
+service, you must make the source of your version available to its users.
