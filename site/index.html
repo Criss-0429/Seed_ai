@@ -54,12 +54,13 @@ body {
 a { color: var(--ink); text-decoration-color: var(--accent-soft); text-underline-offset: 3px; }
 a:hover { text-decoration-color: var(--accent); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
-h1, h2, h3 { font-weight: 450; line-height: 1.2; margin: 0; letter-spacing: -0.01em; }
-h1 { font-size: clamp(34px, 5vw, 52px); }
-h2 { font-size: clamp(24px, 3vw, 32px); }
-h3 { font-size: 18px; }
-p { margin: 0; }
-.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--s5); }
+h1, h2, h3 { font-weight: 450; line-height: 1.15; margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+h1 { font-size: clamp(32px, 5.5vw, 48px); }
+h2 { font-size: clamp(23px, 4vw, 32px); }
+h3 { font-size: clamp(17px, 2.4vw, 18px); }
+p { margin: 0; text-wrap: pretty; }
+img, svg { max-width: 100%; height: auto; }
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 clamp(20px, 5vw, 28px); }
 .kicker { font-family: var(--mono); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--mut); }
 .mono { font-family: var(--mono); }
 .muted { color: var(--mut); }
@@ -95,8 +96,8 @@ header.site .wrap { display: flex; align-items: center; justify-content: space-b
 .orb .seed { width: calc(var(--orb, 150px) * 0.085); height: calc(var(--orb, 150px) * 0.085); min-width: 6px; min-height: 6px; background: var(--ink); border-radius: 50%; }
 @keyframes sd-breathe { 0%,100%{ transform: scale(1); } 50%{ transform: scale(1.045); } }
 @media (prefers-reduced-motion: no-preference) { .orb.breathe { animation: sd-breathe 3.6s ease-in-out infinite; } }
-.hero { padding: var(--s9) 0 var(--s8); }
-.hero .wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: var(--s7); align-items: center; }
+.hero { padding: clamp(48px, 9vw, 96px) 0 clamp(40px, 7vw, 64px); }
+.hero .wrap { display: grid; grid-template-columns: 1.35fr .65fr; gap: var(--s6); align-items: center; }
 @media (max-width: 820px) { .hero .wrap { grid-template-columns: 1fr; gap: var(--s6); text-align: left; } .hero .orbcol { order: -1; justify-self: start; } }
 .hero h1 { margin: var(--s4) 0 var(--s4); }
 .hero .lede { font-size: 19px; color: var(--ink-2); max-width: 46ch; }
@@ -104,7 +105,7 @@ header.site .wrap { display: flex; align-items: center; justify-content: space-b
 .hero .underbtn { margin-top: var(--s3); font-size: 13px; color: var(--mut); }
 .orbcol { display: grid; place-items: center; }
 .orbcol .stato { margin-top: var(--s4); font-family: var(--mono); font-size: 10px; letter-spacing: .26em; color: oklch(66% 0.04 var(--sd-hue)); }
-section { padding: var(--s8) 0; border-top: 1px solid var(--line-soft); }
+section { padding: clamp(48px, 8vw, 64px) 0; border-top: 1px solid var(--line-soft); }
 /* keep section headings clear of the 60px sticky header when jumped to */
 :target, section[id], #top { scroll-margin-top: 76px; }
 section > .wrap > .kicker { display: block; margin-bottom: var(--s3); }
@@ -113,7 +114,10 @@ section > .wrap > .kicker { display: block; margin-bottom: var(--s3); }
 .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
 .grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
 @media (max-width: 760px) { .grid.cols-3, .grid.cols-2 { grid-template-columns: 1fr; } }
-.card { border: 1px solid var(--line); border-radius: var(--radius); padding: var(--s5); background: oklch(96% 0.006 85); }
+.card { border: 1px solid var(--line); border-radius: var(--radius); padding: var(--s5); background: oklch(96% 0.006 85); transition: border-color .15s ease, transform .15s ease; }
+@media (prefers-reduced-motion: no-preference) and (hover: hover) {
+  .card:hover { border-color: var(--accent-soft); transform: translateY(-2px); }
+}
 .card h3 { margin-bottom: var(--s2); }
 .card p { color: var(--mut); font-size: 15px; }
 .card .num { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; color: var(--accent); display: block; margin-bottom: var(--s3); }
@@ -171,6 +175,15 @@ footer.site .col h4 { font-family: var(--mono); font-size: 10px; letter-spacing:
 footer.site .col a { display: block; font-size: 14px; color: var(--mut); text-decoration: none; margin: var(--s2) 0; }
 footer.site .col a:hover { color: var(--ink); }
 footer.site .fineprint { font-size: 12px; max-width: 38ch; line-height: 1.5; }
+@media (max-width: 560px) {
+  body { font-size: 16px; }
+  .hero .lede { font-size: 17px; }
+  .dlcard { padding: var(--s5); }
+  .dlhead { gap: var(--s3); }
+  footer.site .wrap { flex-direction: column; gap: var(--s6); }
+  footer.site .cols { gap: var(--s6); width: 100%; }
+  footer.site .col { min-width: 40%; }
+}
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 </style>
 <meta property="og:title" content="SEED — un'intelligenza che cresce con te">
