@@ -22,9 +22,8 @@ from pathlib import Path
 
 OWNER = "Criss-0429"
 REPO = "Seed_ai"
-TAG = "v0.3.0-pilot-p2"
 VERSION = "0.3.0-pilot-p2"
-API = f"https://api.github.com/repos/{OWNER}/{REPO}/releases/tags/{TAG}"
+API = f"https://api.github.com/repos/{OWNER}/{REPO}/releases/latest"
 
 
 def log(message: str) -> None:
