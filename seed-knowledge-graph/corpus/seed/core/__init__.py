@@ -1,1 +1,0 @@
-"""Core immutabile di SEED."""

@@ -211,3 +211,15 @@ cython_debug/
 /seed/.gitignore
 /seed/.github/
 /seed/docs/release/
+
+# --- Local-only author tooling (kept on disk, excluded from the public repo) ---
+# graphify knowledge-graph: useful to the maintainer, noise for external users.
+/graphify-out/
+/seed-knowledge-graph/
+/scripts/inject_graph.py
+# internal thesis material, not part of the product
+/TESI_SEED_Scaletta.md
+# local virtualenvs / tool caches
+/.release-venv/
+/.uv-cache/
+/pytest-cache-files-*/

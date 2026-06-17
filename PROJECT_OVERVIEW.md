@@ -3,17 +3,6 @@
 > Framework desktop personale auto-evolutivo per l'esperimento di tesi.
 > Ultimo aggiornamento: 2026-06-15.
 
-## Knowledge graph specifico
-
-Il grafo SEED specifico, collegato ai documenti ufficiali JARVIS e alla LLM
-Wiki pertinente, vive in
-[`seed-knowledge-graph/`](seed-knowledge-graph/README.md).
-
-- report navigabile: [`GRAPH_REPORT.md`](seed-knowledge-graph/graphify-out/GRAPH_REPORT.md)
-- grafo interattivo: `seed-knowledge-graph/graphify-out/graph.html`
-- grafo SEED + JARVIS merged:
-  `seed-knowledge-graph/graphify-out/jarvis-seed-merged.json`
-
 ## Cos'e
 
 SEED e un'applicazione Windows locale che parte da una base comune e costruisce,
