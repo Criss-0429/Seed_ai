@@ -31,6 +31,21 @@ class FakeEngine:
         return text  # mai chiamato nei test di unload
 
 
+class FakeGliner:
+    """Imita GLiNER.predict_entities: trova un'email e un nome fissi."""
+    def predict_entities(self, text, labels, threshold=0.5):
+        out = []
+        i = text.find("mario.rossi@example.com")
+        if i >= 0:
+            out.append({"start": i, "end": i + len("mario.rossi@example.com"),
+                        "text": "mario.rossi@example.com", "label": "email"})
+        j = text.find("Mario Rossi")
+        if j >= 0:
+            out.append({"start": j, "end": j + len("Mario Rossi"),
+                        "text": "Mario Rossi", "label": "person"})
+        return out
+
+
 def _gate(**kw):
     return PrivacyGate(FakeMemory(), **kw)
 
@@ -77,3 +92,29 @@ def test_idle_unload_disabled_when_zero():
     g._opf_last_use = time.monotonic() - 9999
     assert g._maybe_unload() is False
     assert g._opf_engine is not None
+
+
+def test_gliner_backend_detects_and_pseudonymizes():
+    g = _gate(backend="gliner")
+    g._opf_engine = FakeGliner()   # inietta il modello (gliner non installato in test)
+    g._opf_tried = True
+    out = g.redact("scrivi a Mario Rossi su mario.rossi@example.com", purpose="llm")
+    assert "Mario Rossi" not in out.text
+    assert "mario.rossi@example.com" not in out.text
+    assert "[PERSON_1]" in out.text and "[EMAIL_1]" in out.text
+    assert "gliner" in out.layers
+
+
+def test_gliner_unavailable_degrades_to_regex():
+    # gliner non installato -> load fallisce -> engine None -> solo regex
+    g = _gate(backend="gliner")
+    assert g.init_opf() is False
+    out = g.redact("mail mario.rossi@example.com", purpose="llm")
+    assert "mario.rossi@example.com" not in out.text   # regex copre comunque l'email
+    assert "gliner" not in out.layers and "regex" in out.layers
+
+
+def test_regex_backend_never_loads_model():
+    g = _gate(backend="regex")
+    assert g.init_opf() is False
+    assert g._lite_mode is True

@@ -47,6 +47,10 @@ acts, and changes only in reversible, auditable steps.
 - **Optional voice** (speech-to-text and text-to-speech) via ElevenLabs BYOK —
   fully optional and skippable; SEED is complete in text-only mode.
 - Local privacy gate that redacts queries before they reach any provider.
+  Selectable Layer-1 backend (`privacy.backend`): `opf` (OpenAI Privacy Filter,
+  ~2.7GB, highest accuracy, unloaded when idle), `gliner` (~300MB multilingual,
+  always-on, good for low-RAM machines), or `regex` only. A deterministic regex
+  layer always runs underneath.
 - Boot supervisor with health checks, known-good snapshots and crash recovery.
 - Proposal-only evolution engine: mutations are evaluated in isolation and
   remain owner-gated.

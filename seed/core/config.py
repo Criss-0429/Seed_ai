@@ -55,6 +55,7 @@ class PrivacyConfig:
     opf_checkpoint: str = ""       # vuoto = default ~/.opf/privacy_filter
     recall_bias: bool = True       # preset recall-oriented
     fail_closed: bool = True       # se il gate non e' pronto, NIENTE esce verso l'API
+    backend: str = "opf"           # opf (2.7GB, max) | gliner (~300MB) | regex
     lite_mode: bool = False        # True = solo regex, niente modello ML (~2.7GB)
     opf_idle_unload_s: int = 120   # scarica il filtro ML dopo N s idle (0 = mai)
 

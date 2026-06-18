@@ -3,9 +3,12 @@ requests>=2.31
 psutil>=5.9
 pywebview>=5.0
 
-# Privacy gate locale (OpenAI Privacy Filter)
-# installare dal repo ufficiale:  pip install git+https://github.com/openai/privacy-filter
-# (il checkpoint si scarica al primo avvio in ~/.opf/privacy_filter)
+# Privacy gate locale, Layer-1 selezionabile (privacy.backend):
+#   opf    (default, ~2.7GB, max accuracy): pip install git+https://github.com/openai/privacy-filter
+#          (checkpoint scaricato al primo avvio in ~/.opf/privacy_filter)
+#   gliner (~300MB, multilingue/italiano, sempre-attivo): pip install gliner
+#          (modello urchade/gliner_multi_pii-v1 al primo uso)
+# Assente il backend scelto -> degrada a sole regex (Layer-2), senza rompersi.
 
 # Media session Windows uses the existing heuristic fallback. `winsdk` has no
 # Python 3.14 wheel and is intentionally excluded from the tester release.

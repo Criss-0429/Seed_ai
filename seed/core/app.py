@@ -107,7 +107,8 @@ class SeedApp:
                                 recall_bias=self.cfg.privacy.recall_bias,
                                 fail_closed=self.cfg.privacy.fail_closed,
                                 lite_mode=self.cfg.privacy.lite_mode,
-                                idle_unload_s=self.cfg.privacy.opf_idle_unload_s)
+                                idle_unload_s=self.cfg.privacy.opf_idle_unload_s,
+                                backend=self.cfg.privacy.backend)
         self.broker = PermissionBroker(self.memory)
         self.registry = CapabilityRegistry(self.memory, self.broker)
         # S10: un solo client OpenAI-compatible; i ruoli cambiano solo il modello
