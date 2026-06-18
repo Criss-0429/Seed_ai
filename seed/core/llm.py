@@ -9,12 +9,16 @@ from __future__ import annotations
 
 import json
 import logging
+import time
 from dataclasses import dataclass, field
 from typing import Any
 
 import requests
 
 log = logging.getLogger("seed.llm")
+
+# Transient HTTP statuses worth retrying (rate limit + gateway/server errors).
+_RETRY_STATUS = {429, 500, 502, 503, 504}
 
 
 @dataclass
@@ -51,7 +55,8 @@ def parse_json_object(text: str) -> dict[str, Any]:
 
 class LLMClient:
     def __init__(self, base_url: str, api_key: str, default_model: str,
-                 max_tokens: int = 2048, timeout: int = 120):
+                 max_tokens: int = 2048, timeout: int = 120,
+                 retries: int = 2, backoff: float = 0.6):
         if not base_url:
             raise ValueError("llm.base_url non configurato (config.json)")
         self.base_url = base_url.rstrip("/")
@@ -59,6 +64,19 @@ class LLMClient:
         self.default_model = default_model
         self.max_tokens = max_tokens
         self.timeout = timeout
+        self.retries = max(0, int(retries))      # tentativi extra oltre il primo
+        self.backoff = max(0.0, float(backoff))  # base backoff esponenziale (s)
+
+    @staticmethod
+    def _retry_after(resp: "requests.Response") -> float | None:
+        """Rispetta l'header Retry-After (secondi) quando presente."""
+        raw = resp.headers.get("Retry-After")
+        if not raw:
+            return None
+        try:
+            return max(0.0, float(raw))
+        except (TypeError, ValueError):
+            return None
 
     @property
     def configured(self) -> bool:
@@ -92,12 +110,32 @@ class LLMClient:
         if response_json:
             body["response_format"] = {"type": "json_object"}
 
-        resp = requests.post(
-            f"{self.base_url}/chat/completions",
-            headers={"Authorization": f"Bearer {self._api_key}",
-                     "Content-Type": "application/json"},
-            json=body, timeout=self.timeout)
-        resp.raise_for_status()
+        url = f"{self.base_url}/chat/completions"
+        headers = {"Authorization": f"Bearer {self._api_key}",
+                   "Content-Type": "application/json"}
+        attempt = 0
+        while True:
+            try:
+                resp = requests.post(url, headers=headers, json=body,
+                                     timeout=self.timeout)
+            except (requests.Timeout, requests.ConnectionError) as exc:
+                if attempt >= self.retries:
+                    raise
+                wait = self.backoff * (2 ** attempt)
+                log.warning("LLM transient %s, retry %d/%d in %.1fs",
+                            type(exc).__name__, attempt + 1, self.retries, wait)
+                time.sleep(wait)
+                attempt += 1
+                continue
+            if resp.status_code in _RETRY_STATUS and attempt < self.retries:
+                wait = self._retry_after(resp) or self.backoff * (2 ** attempt)
+                log.warning("LLM HTTP %s, retry %d/%d in %.1fs",
+                            resp.status_code, attempt + 1, self.retries, wait)
+                time.sleep(wait)
+                attempt += 1
+                continue
+            resp.raise_for_status()
+            break
         data = resp.json()
 
         choice = (data.get("choices") or [{}])[0]

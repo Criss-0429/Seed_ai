@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import logging
 import sys
+import threading
 import time
 
 from . import config as config_mod
@@ -63,6 +64,26 @@ from .watcher import ActivityWatcher
 log = logging.getLogger("seed.app")
 
 _MAX_TOOL_ROUNDS = 4
+_torch_tuned = False
+
+
+def _tune_torch_threads() -> None:
+    """Limita i thread di Torch su CPU: meno arene di memoria e meno thrash,
+    causa dei picchi RAM/CPU altalenanti. Idempotente, no-op se Torch assente."""
+    global _torch_tuned
+    if _torch_tuned:
+        return
+    _torch_tuned = True
+    try:
+        import os
+
+        import torch
+
+        cap = max(1, min(4, (os.cpu_count() or 4)))
+        torch.set_num_threads(cap)
+        log.info("torch threads limitati a %d", cap)
+    except Exception:
+        pass
 
 
 def normalize_repl_command(text: str) -> str:
@@ -383,7 +404,12 @@ class SeedApp:
 
     # ------------------------------------------------------------------
     def start_background(self) -> None:
-        self.gate.init_opf()
+        _tune_torch_threads()
+        # Privacy Filter caricato in un thread daemon: il boot non si blocca sul
+        # load/download del modello e la prima chat lo trova gia' caldo. Se non
+        # ancora pronto, `redact()` lo carica comunque lazy (fail-safe).
+        threading.Thread(target=self.gate.init_opf, name="opf-warmup",
+                         daemon=True).start()
         self.brand.refresh(self.cfg.user_alias)
         self.observation_collector.start()
         self.scheduler.start()

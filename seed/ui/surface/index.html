@@ -91,6 +91,12 @@
   .windowmodes .wsep { width: 1px; height: 18px; background: var(--line); margin: 0 4px; }
   /* i bottoni non sono area di drag */
   .ctrlbtn, .wbtn { -webkit-app-region: no-drag; }
+  /* durante il drag finestra (pywebview muove via JS per ogni mousemove):
+     pausa animazioni e blur per non ripaginare a ogni frame -> drag fluido */
+  body.dragging *, body.dragging *::before, body.dragging *::after {
+    animation-play-state: paused !important; transition: none !important; }
+  body.dragging .scrim, body.dragging #operational-status,
+  body.dragging .titlebar { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
   .wbtn { width: 30px; height: 26px; display: grid; place-items: center; border: none;
     background: transparent; color: var(--mut); border-radius: 6px; cursor: pointer; font-size: 13px; line-height: 1; }
   .wbtn:hover { background: oklch(92% 0.005 85); color: var(--ink); }
@@ -1006,6 +1012,22 @@ function askModal({title, message='', input=false, value='', placeholder='',
 }
 const askInput = (opts) => askModal({...opts, input: true});
 const askConfirm = (opts) => askModal({...opts, input: false});
+
+// Drag finestra fluido: marca body.dragging mentre si trascina una drag-region,
+// cosi' il CSS sospende animazioni/blur e pywebview non ripagina a ogni frame.
+(function () {
+  let dragging = false;
+  const on = (e) => {
+    if (e.button !== undefined && e.button !== 0) return;
+    if (!(e.target.closest && e.target.closest('.pywebview-drag-region'))) return;
+    dragging = true; document.body.classList.add('dragging');
+  };
+  const off = () => { if (dragging) { dragging = false; document.body.classList.remove('dragging'); } };
+  document.addEventListener('pointerdown', on, true);
+  document.addEventListener('pointerup', off, true);
+  document.addEventListener('pointercancel', off, true);
+  window.addEventListener('blur', off);
+})();
 
 async function openProviders() {
   const box = $('#pr-rows'); box.innerHTML = '';

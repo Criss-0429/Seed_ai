@@ -51,6 +51,11 @@ def _runtime_identifiers() -> list[tuple[str, str]]:
     return [(s, t) for s, t in out if s and len(s) > 2]
 
 
+class PrivacyGateBlocked(RuntimeError):
+    """fail_closed: il filtro locale ha fallito a meta' su un payload diretto
+    all'API. Si BLOCCA l'uscita invece di proseguire con le sole regex."""
+
+
 @dataclass
 class GateResult:
     text: str
@@ -64,12 +69,20 @@ class PrivacyGate:
         self._memory = memory          # per pii_map persistente
         self._fail_closed = fail_closed
         self._opf_engine = None
+        self._opf_tried = False        # load lazy: niente RAM finche' non si redige
         self._opf_checkpoint = opf_checkpoint
         self._recall_bias = recall_bias
 
     # ------------------------------------------------------------------
     def init_opf(self) -> bool:
-        """Carica il Privacy Filter (API reale OPF). Auto-download al primo uso."""
+        """Carica il Privacy Filter (API reale OPF). Auto-download al primo uso.
+
+        Lazy: idempotente, eseguito al primo `redact` se non gia' chiamato. Cosi'
+        il boot non carica il modello in RAM e una sessione di sola configurazione
+        non paga il costo del filtro."""
+        if self._opf_tried:
+            return self._opf_engine is not None
+        self._opf_tried = True
         try:
             from opf import OPF  # type: ignore
             from .model_bundle import resolve
@@ -105,7 +118,9 @@ class PrivacyGate:
         """Da chiamare PRIMA di qualunque uscita verso l'API o i log."""
         result = GateResult(text=text)
 
-        # Layer 1 — modello locale
+        # Layer 1 — modello locale (load lazy al primo uso reale)
+        if not self._opf_tried and purpose in {"llm", "research"}:
+            self.init_opf()
         if self._opf_engine is not None:
             try:
                 spans = self._detect_opf(result.text)
@@ -117,7 +132,10 @@ class PrivacyGate:
             except Exception as exc:
                 log.error("OPF failure: %s", exc)
                 if self._fail_closed and purpose == "llm":
-                    log.warning("fail_closed: continuo con solo layer regex")
+                    # fail-closed reale: NON proseguire verso l'API con sole regex.
+                    raise PrivacyGateBlocked(
+                        "privacy filter fallito su payload llm (fail_closed)"
+                    ) from exc
 
         # Layer 2 — sempre, in serie
         for ident, placeholder in _runtime_identifiers():
