@@ -16,10 +16,13 @@ si usa comunque il layer 2 ma l'evento viene loggato.
 
 from __future__ import annotations
 
+import gc
 import getpass
 import logging
 import re
 import socket
+import threading
+import time
 from dataclasses import dataclass, field
 
 log = logging.getLogger("seed.privacy")
@@ -65,13 +68,22 @@ class GateResult:
 
 class PrivacyGate:
     def __init__(self, memory, opf_checkpoint: str = "", recall_bias: bool = True,
-                 fail_closed: bool = True):
+                 fail_closed: bool = True, *, lite_mode: bool = False,
+                 idle_unload_s: int = 120):
         self._memory = memory          # per pii_map persistente
         self._fail_closed = fail_closed
         self._opf_engine = None
         self._opf_tried = False        # load lazy: niente RAM finche' non si redige
         self._opf_checkpoint = opf_checkpoint
         self._recall_bias = recall_bias
+        # Lite mode: solo regex, il modello ML (~2.7GB) non viene mai caricato.
+        self._lite_mode = lite_mode
+        # Unload-on-idle: il modello viene scaricato dopo N s di inattivita',
+        # cosi' SEED aperto ma fermo torna a RAM bassa. 0 = mai scaricare.
+        self._idle_unload_s = max(0, int(idle_unload_s))
+        self._opf_lock = threading.Lock()
+        self._opf_last_use = 0.0
+        self._opf_watch_started = False
 
     # ------------------------------------------------------------------
     def init_opf(self) -> bool:
@@ -79,10 +91,17 @@ class PrivacyGate:
 
         Lazy: idempotente, eseguito al primo `redact` se non gia' chiamato. Cosi'
         il boot non carica il modello in RAM e una sessione di sola configurazione
-        non paga il costo del filtro."""
-        if self._opf_tried:
-            return self._opf_engine is not None
-        self._opf_tried = True
+        non paga il costo del filtro. In lite_mode non carica nulla (solo regex)."""
+        if self._lite_mode:
+            self._opf_tried = True
+            return False
+        with self._opf_lock:
+            if self._opf_tried:
+                return self._opf_engine is not None
+            self._opf_tried = True
+            return self._load_opf_locked()
+
+    def _load_opf_locked(self) -> bool:
         try:
             from opf import OPF  # type: ignore
             from .model_bundle import resolve
@@ -96,12 +115,41 @@ class PrivacyGate:
             self._opf_engine = OPF(**kwargs)
             # warm-up: forza load del checkpoint (e l'eventuale download)
             self._opf_engine.redact("warm up test")
+            self._opf_last_use = time.monotonic()
+            self._start_idle_watch()
             log.info("OpenAI Privacy Filter caricato (cpu)")
             return True
         except Exception as exc:  # modello non installato / download fallito
             log.warning("Privacy Filter non disponibile (%s): attivo solo layer regex", exc)
             self._opf_engine = None
             return False
+
+    def _start_idle_watch(self) -> None:
+        if self._idle_unload_s <= 0 or self._opf_watch_started:
+            return
+        self._opf_watch_started = True
+        threading.Thread(target=self._idle_watch, name="opf-idle",
+                         daemon=True).start()
+
+    def _maybe_unload(self) -> bool:
+        """Scarica il modello se idle oltre la soglia. Ritorna True se liberato."""
+        with self._opf_lock:
+            if (self._opf_engine is None or self._idle_unload_s <= 0
+                    or time.monotonic() - self._opf_last_use < self._idle_unload_s):
+                return False
+            self._opf_engine = None
+            self._opf_tried = False   # consenti reload lazy al prossimo uso
+        gc.collect()
+        log.info("Privacy Filter scaricato per inattivita' (RAM liberata)")
+        return True
+
+    def _idle_watch(self) -> None:
+        """Scarica il modello dopo inattivita': RAM torna bassa a SEED fermo.
+        Il prossimo `redact` lo ricarica lazy."""
+        interval = max(5, min(30, self._idle_unload_s // 2))
+        while True:
+            time.sleep(interval)
+            self._maybe_unload()
 
     @property
     def opf_ready(self) -> bool:
@@ -121,9 +169,13 @@ class PrivacyGate:
         # Layer 1 — modello locale (load lazy al primo uso reale)
         if not self._opf_tried and purpose in {"llm", "research"}:
             self.init_opf()
-        if self._opf_engine is not None:
+        # Ref locale: il watchdog idle puo' azzerare self._opf_engine in parallelo,
+        # ma il modello resta vivo per questa chiamata finche' `engine` lo tiene.
+        engine = self._opf_engine
+        if engine is not None:
+            self._opf_last_use = time.monotonic()
             try:
-                spans = self._detect_opf(result.text)
+                spans = self._detect_opf(engine, result.text)
                 result.text = self._pseudonymize_spans(
                     result.text, spans, persist_mapping=persist_mapping
                 )
@@ -161,10 +213,10 @@ class PrivacyGate:
         return text
 
     # ------------------------------------------------------------------
-    def _detect_opf(self, text: str) -> list[dict]:
+    def _detect_opf(self, engine, text: str) -> list[dict]:
         """Invoca OPF.redact e converte RedactionResult.detected_spans
         nel formato interno [{start, end, label, value}]."""
-        result = self._opf_engine.redact(text)  # type: ignore[union-attr]
+        result = engine.redact(text)
         if isinstance(result, str):             # output_text_only mode
             return []
         spans = []

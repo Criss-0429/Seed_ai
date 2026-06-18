@@ -25,8 +25,24 @@ def _setup_logging() -> None:
                   logging.StreamHandler()])
 
 
+def _cap_native_threads() -> None:
+    """Limita i thread nativi PRIMA di importare numpy/torch.
+
+    BLAS/OMP/MKL allocano arene di memoria per-thread: su CPU con molti core la
+    RAM (e quindi il pagefile su SSD) cresce in modo imprevedibile. Cap a 4
+    rende il footprint piccolo e stabile. Rispetta eventuali override utente."""
+    import os
+
+    cap = str(max(1, min(4, (os.cpu_count() or 4))))
+    for var in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
+                "NUMEXPR_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"):
+        os.environ.setdefault(var, cap)
+    os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+
+
 def main() -> int:
     argv = sys.argv[1:]
+    _cap_native_threads()
     from .core.model_bundle import enforce_offline_if_bundled
     enforce_offline_if_bundled()
 

@@ -45,7 +45,9 @@
   "privacy": {
     "opf_checkpoint": "",
     "recall_bias": true,
-    "fail_closed": true
+    "fail_closed": true,
+    "lite_mode": false,
+    "opf_idle_unload_s": 120
   },
   "watcher": {
     "enabled": true,
