@@ -12,6 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from seed.supervisor import BootSupervisor  # noqa: E402
+from seed.supervisor_cli import _wait_for_process_exit  # noqa: E402
 
 
 def _stage(root: Path, runtime_bytes: bytes, pkg_bytes: bytes, sha: str | None = None):
@@ -125,3 +126,17 @@ def test_onedir_zip_path_traversal_is_blocked(tmp_path):
     assert result["applied"] is False
     assert runtime.read_bytes() == b"OLD"
     assert not (tmp_path / "escape.exe").exists()
+
+
+def test_wait_for_runtime_exit_returns_when_process_disappears(monkeypatch):
+    calls = {"count": 0}
+
+    def fake_kill(_pid, _signal):
+        calls["count"] += 1
+        if calls["count"] > 1:
+            raise ProcessLookupError
+
+    monkeypatch.setattr("seed.supervisor_cli.os.kill", fake_kill)
+    monkeypatch.setattr("seed.supervisor_cli.time.sleep", lambda _seconds: None)
+    _wait_for_process_exit(1234, timeout_seconds=1)
+    assert calls["count"] == 2

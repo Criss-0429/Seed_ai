@@ -10,7 +10,9 @@ from __future__ import annotations
 import base64
 import json
 import logging
+import os
 from pathlib import Path
+import subprocess
 import sys
 import threading
 
@@ -176,6 +178,41 @@ class JsApi:
 
     def create_backup(self) -> str:
         return self._app.ui_create_backup()
+
+    def update_check(self) -> dict:
+        return self._app.ui_update_check()
+
+    def update_status(self) -> dict:
+        return self._app.ui_update_status()
+
+    def update_start(self, owner_confirmed: bool) -> dict:
+        return self._app.ui_update_start(bool(owner_confirmed))
+
+    def restart_for_update(self) -> dict:
+        if self._window is None or not getattr(sys, "frozen", False):
+            return {"ok": False, "error": "riavvio update disponibile solo nell'app installata"}
+        marker = self._app.operations.updates / "pending_update.json"
+        runtime = Path(sys.executable).resolve()
+        supervisor = runtime.parent.parent / "supervisor" / "SEEDSupervisor.exe"
+        if not marker.is_file() or not supervisor.is_file():
+            return {"ok": False, "error": "update pronto o supervisor non disponibile"}
+        flags = 0
+        for name in ("DETACHED_PROCESS", "CREATE_NEW_PROCESS_GROUP"):
+            flags |= int(getattr(subprocess, name, 0))
+        try:
+            subprocess.Popen(
+                [str(supervisor), "--boot", "--runtime", str(runtime),
+                 "--wait-pid", str(os.getpid())],
+                cwd=str(supervisor.parent),
+                creationflags=flags,
+                close_fds=True,
+            )
+            self._allow_terminate = True
+            self._window.destroy()
+            return {"ok": True}
+        except OSError as exc:
+            log.warning("riavvio per update fallito: %s", exc)
+            return {"ok": False, "error": str(exc)}
 
     def delegation_status(self) -> dict:
         return self._app.ui_delegation_status()

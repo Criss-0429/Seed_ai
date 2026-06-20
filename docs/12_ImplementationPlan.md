@@ -203,6 +203,67 @@ esplicitamente dall'owner il 2026-06-14 dopo esecuzione P0.
 - Pubblicazione GitHub Release, note definitive e hash ufficiale richiedono
   approvazione owner dopo review dell'artefatto locale.
 
+### Follow-up P1 - GitHub Release Update Manager (2026-06-20)
+
+**Autorizzazione owner:** completare il percorso gia previsto da P1 dalla
+GitHub Release fino allo staging locale, senza avanzare lo scope della feature
+attiva D0 e senza modificare i gate manuali.
+
+Decisioni operative:
+
+- la fonte remota e solo `releases/latest` del repository ufficiale SEED;
+- il confronto usa la versione del manifest installato, non il nome del tag;
+- il controllo e read-only e puo avvenire all'apertura delle impostazioni;
+- download e applicazione richiedono consenso esplicito dell'utente;
+- viene scaricato solo `runtime-update.zip`; modelli invariati e dati utente
+  non vengono riscaricati o modificati;
+- il pacchetto viene scritto prima come `.part`, supporta ripresa tramite HTTP
+  Range, poi viene verificato SHA-256 e spostato nello staging Operations;
+- errori rete, manifest malformato, downgrade, asset mancante o hash errato
+  falliscono chiusi e non creano `pending_update.json`;
+- dopo lo staging, il riavvio passa dal supervisor esistente, che applica il
+  pacchetto, esegue health check e rollback automatico su errore;
+- l'aggiornamento separato del supervisor resta fuori da questo follow-up:
+  sostituire in sicurezza il processo che sta eseguendo richiede un bootstrap
+  dedicato. Le release che cambiano il supervisor devono richiedere il nuovo
+  bootstrap invece di dichiarare un update runtime-only.
+
+Test richiesti:
+
+- nessun update quando le versioni coincidono o la remota e precedente;
+- manifest/asset GitHub valido produce proposta con versione, byte e note;
+- consenso assente non scarica e non crea marker;
+- download completo e ripreso verifica hash e crea marker supervisor;
+- hash errato, risposta Range incoerente e rete fallita lasciano il runtime
+  corrente intatto;
+- UI espone controllo, conferma, progresso, update pronto e riavvio.
+
+Evidenza implementativa del follow-up:
+
+- `seed/core/release_updater.py` implementa discovery della release ufficiale,
+  confronto versione manifest, validazione asset, download riprendibile,
+  progresso, SHA-256 e staging tramite `OperationsManager`;
+- `OperationsManager` calcola gli hash in streaming e conserva il marker
+  esistente consumato dal supervisor;
+- `supervisor_cli --wait-pid` impedisce la sostituzione del runtime mentre il
+  processo corrente e ancora aperto;
+- il pannello Sistema espone controllo, consenso, percentuale, stato pronto e
+  riavvio supervisionato;
+- versione baseline impostata a `0.3.2-pilot-p2`; installazioni precedenti
+  richiedono un ultimo bootstrap per acquisire updater e supervisor coordinato;
+- verifica locale: `660` test passati in quattro processi isolati, `ruff` verde,
+  `compileall` verde, check live read-only della release `0.3.1` riuscito.
+
+Rischi residui:
+
+- il primo aggiornamento automatico end-to-end richiede una futura release
+  successiva a `0.3.2`; fino ad allora il percorso e coperto con transport
+  simulato, staging reale locale e discovery live read-only;
+- aggiornamenti del supervisor continuano a richiedere il bootstrap; l'Update
+  Manager applica intenzionalmente solo il runtime directory package;
+- interruzioni ripetute conservano il `.part` per la ripresa e possono occupare
+  temporaneamente fino alla dimensione del pacchetto runtime.
+
 ## Feature Context Pack - P2 Lint E Riduzione Dimensioni
 
 **Feature esatta:** `P2 - Lint E Riduzione Dimensioni`, terza fase del programma

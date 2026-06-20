@@ -84,6 +84,13 @@ python run_dev.py --repl     # REPL
 On first run SEED asks for consent, then for an LLM provider key (BYOK). The
 chat unlocks once at least one provider key is validated.
 
+Starting with `0.3.2-pilot-p2`, the System panel checks the official GitHub
+Release and downloads the incremental runtime package only after confirmation.
+The supervisor verifies SHA-256, creates a backup, applies the update on
+restart, and restores the previous version if the new runtime fails its health
+check. Unchanged models and user data are not downloaded again. Older installs
+must run the `0.3.2` bootstrap once to acquire the Update Manager.
+
 ## Build from source
 
 Build a Windows tester release (PyInstaller `onedir` + Inno Setup). ML

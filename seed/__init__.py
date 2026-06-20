@@ -1,2 +1,2 @@
 """SEED — framework desktop auto-evolutivo. Core package."""
-__version__ = "0.2.0"
+__version__ = "0.3.2-pilot-p2"

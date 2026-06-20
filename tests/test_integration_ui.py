@@ -91,6 +91,8 @@ def test_jsapi_exposes_system_methods(tmp_path, monkeypatch):
     assert isinstance(js.tool_candidates(), list)
     assert isinstance(js.mutation_status(), dict)
     assert isinstance(js.operations_status(), dict)
+    assert isinstance(js.update_status(), dict)
+    assert js.update_start(False)["ok"] is False
     assert isinstance(js.delegation_status(), dict)
     assert "errors" in js.tool_install("nope", False) or js.tool_install("nope", False)["ok"] is False
     app.shutdown()

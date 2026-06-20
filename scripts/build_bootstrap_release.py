@@ -145,7 +145,7 @@ def preserved_model_assets(manifest_path: Path) -> dict[str, dict[str, object]]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--version", default="0.3.1-pilot-p2")
+    parser.add_argument("--version", default="0.3.2-pilot-p2")
     parser.add_argument("--python", default=sys.executable)
     parser.add_argument("--skip-bootstrap", action="store_true")
     parser.add_argument(
