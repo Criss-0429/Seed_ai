@@ -60,6 +60,7 @@ class JsApi:
         self._app = app
         self._window = None
         self._allow_terminate = False
+        self._tray_active = False   # se True, la chiusura va in background (tray)
 
     def attach(self, window) -> None:
         self._window = window
@@ -308,6 +309,15 @@ class JsApi:
         """Cancel native close when the owner chooses background heartbeat."""
         if self._allow_terminate or self._window is None:
             return True
+        # Con la tray attiva: chiudere = ridursi in background (niente prompt),
+        # come Wispr. Si esce davvero dal menu "Esci" della tray.
+        if self._tray_active:
+            try:
+                self._window.hide()
+                self._app.memory.add_event("window_hidden_to_tray", {})
+            except Exception as exc:
+                log.warning("hide su chiusura fallito: %s", exc)
+            return False
         try:
             keep = bool(self._window.evaluate_js(
                 "confirm('Lasciare SEED attivo in background per mantenere heartbeat?\\n\\n"
@@ -387,9 +397,31 @@ def run_window(app, *, start_hidden: bool = False) -> None:
     api.attach(window)
     window.events.closing += api.handle_native_closing
 
+    def _summon(overlay: bool) -> None:
+        try:
+            window.show()
+            window.restore()
+            fn = "seedToggleOverlayFromHost" if overlay else "seedShowFull"
+            window.evaluate_js(f"window.{fn} && window.{fn}()")
+        except Exception as exc:
+            log.warning("summon da tray fallito: %s", exc)
+
+    def _quit_from_tray() -> None:
+        api._allow_terminate = True
+        try:
+            window.destroy()
+        except Exception as exc:
+            log.warning("uscita da tray fallita: %s", exc)
+
     def _on_start():
         app.start_background()
         _start_overlay_hotkey(window)
+        # Icona background (Wispr-like): apri pieno, cattura rapida, esci.
+        from .tray import start_tray
+        if start_tray(on_open=lambda: _summon(False),
+                      on_quick=lambda: _summon(True),
+                      on_quit=_quit_from_tray) is not None:
+            api._tray_active = True
         if start_hidden:
             window.hide()
             app.memory.add_event("window_started_hidden_for_heartbeat", {})

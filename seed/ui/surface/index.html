@@ -1188,6 +1188,7 @@ async function setWindowMode(mode) {
 }
 $('#mode-exit').onclick = () => setWindowMode('full');
 window.seedToggleOverlayFromHost = () => setWindowMode(windowMode === 'overlay' ? 'full' : 'overlay');
+window.seedShowFull = () => setWindowMode('full');   // "Apri SEED" dalla tray
 $('#presence-btn').onclick = () => setWindowMode(windowMode === 'presence' ? 'full' : 'presence');
 $('#overlay-btn').onclick = () => setWindowMode(windowMode === 'overlay' ? 'full' : 'overlay');
 

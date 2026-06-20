@@ -3,6 +3,11 @@ requests>=2.31
 psutil>=5.9
 pywebview>=5.0
 
+# Modalita' background (icona tray, Wispr-like) — OPZIONALE.
+# Assente = niente icona tray, ma la shortcut globale Ctrl+Spazio resta attiva.
+pystray>=0.19
+pillow>=10.0
+
 # Privacy gate locale, Layer-1 selezionabile (privacy.backend):
 #   opf    (default, ~2.7GB, max accuracy): pip install git+https://github.com/openai/privacy-filter
 #          (checkpoint scaricato al primo avvio in ~/.opf/privacy_filter)
