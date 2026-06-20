@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import logging
 import sys
+import threading
 import time
 
 from . import config as config_mod
@@ -63,6 +64,26 @@ from .watcher import ActivityWatcher
 log = logging.getLogger("seed.app")
 
 _MAX_TOOL_ROUNDS = 4
+_torch_tuned = False
+
+
+def _tune_torch_threads() -> None:
+    """Limita i thread di Torch su CPU: meno arene di memoria e meno thrash,
+    causa dei picchi RAM/CPU altalenanti. Idempotente, no-op se Torch assente."""
+    global _torch_tuned
+    if _torch_tuned:
+        return
+    _torch_tuned = True
+    try:
+        import os
+
+        import torch
+
+        cap = max(1, min(4, (os.cpu_count() or 4)))
+        torch.set_num_threads(cap)
+        log.info("torch threads limitati a %d", cap)
+    except Exception:
+        pass
 
 
 def normalize_repl_command(text: str) -> str:
@@ -84,7 +105,10 @@ class SeedApp:
         self.gate = PrivacyGate(self.memory,
                                 opf_checkpoint=self.cfg.privacy.opf_checkpoint,
                                 recall_bias=self.cfg.privacy.recall_bias,
-                                fail_closed=self.cfg.privacy.fail_closed)
+                                fail_closed=self.cfg.privacy.fail_closed,
+                                lite_mode=self.cfg.privacy.lite_mode,
+                                idle_unload_s=self.cfg.privacy.opf_idle_unload_s,
+                                backend=self.cfg.privacy.backend)
         self.broker = PermissionBroker(self.memory)
         self.registry = CapabilityRegistry(self.memory, self.broker)
         # S10: un solo client OpenAI-compatible; i ruoli cambiano solo il modello
@@ -383,7 +407,12 @@ class SeedApp:
 
     # ------------------------------------------------------------------
     def start_background(self) -> None:
-        self.gate.init_opf()
+        _tune_torch_threads()
+        # Privacy Filter caricato in un thread daemon: il boot non si blocca sul
+        # load/download del modello e la prima chat lo trova gia' caldo. Se non
+        # ancora pronto, `redact()` lo carica comunque lazy (fail-safe).
+        threading.Thread(target=self.gate.init_opf, name="opf-warmup",
+                         daemon=True).start()
         self.brand.refresh(self.cfg.user_alias)
         self.observation_collector.start()
         self.scheduler.start()

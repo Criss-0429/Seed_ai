@@ -8,6 +8,7 @@ from pathlib import Path
 
 MODEL_DIRS = {
     "privacy_filter": "privacy-filter",
+    "gliner_pii": "gliner-pii",            # backend privacy leggero (~300MB)
     "superb/wav2vec2-base-superb-er": "emotion-wav2vec2",
     "paraphrase-multilingual-mpnet-base-v2": "embedding-mpnet",
 }

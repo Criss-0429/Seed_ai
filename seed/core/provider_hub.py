@@ -10,7 +10,9 @@ import base64
 import ctypes
 import ctypes.wintypes as wt
 import json
+import logging
 import os
+import re
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -20,7 +22,17 @@ import requests
 
 from . import forbidden
 
+log = logging.getLogger("seed.provider_hub")
+
 SCHEMA_VERSION = "seed.provider-hub.v1"
+
+# Model ids che NON sono modelli di chat: non devono mai finire sul ruolo
+# conversation (era il bug del fallback su models[0] in ordine alfabetico).
+_NON_CHAT_ID = re.compile(
+    r"(embed|embedding|rerank|reranker|whisper|tts|speech|audio|moderation|"
+    r"guard|vision|image|clip|bge|nomic|minilm)",
+    re.IGNORECASE,
+)
 ROLE_NAMES = (
     "conversation",
     "reflection",
@@ -55,11 +67,11 @@ PROVIDERS = {
 
 _PRESET_CANDIDATES = {
     "ollama_cloud": {
-        "conversation": ("gemma4:31b", "gpt-oss:20b"),
-        "reflection": ("gpt-oss:120b", "gemma4:31b"),
-        "tool_builder": ("qwen3-coder-next", "devstral-2:123b"),
+        "conversation": ("gpt-oss:120b", "gpt-oss:20b", "glm-4.6"),
+        "reflection": ("gpt-oss:120b", "deepseek-v3.1:671b"),
+        "tool_builder": ("qwen3-coder:480b", "gpt-oss:120b"),
         "design_reviewer": ("gpt-oss:120b",),
-        "design_reviewer_fallback": ("nemotron-3-super",),
+        "design_reviewer_fallback": ("deepseek-v3.1:671b",),
     },
     "openrouter": {
         "conversation": ("openai/gpt-4.1-mini", "google/gemini-2.5-flash"),
@@ -310,9 +322,18 @@ class ProviderHub:
             if selected:
                 roles[role] = selected
         if "conversation" not in roles:
-            if not models:
-                raise ProviderHubError("provider returned no models")
-            roles["conversation"] = models[0]
+            # Nessun preset combacia: scegli un modello di CHAT, non il primo in
+            # ordine alfabetico (poteva essere embedding/whisper/ecc → router rotto).
+            chat_models = [m for m in models if not _NON_CHAT_ID.search(m)]
+            if not chat_models:
+                raise ProviderHubError("provider returned no chat-capable models")
+            roles["conversation"] = chat_models[0]
+            log.warning(
+                "provider %s: nessun preset noto, conversation su '%s' "
+                "(scelto tra %d modelli chat). Verifica il modello in Impostazioni.",
+                provider, roles["conversation"], len(chat_models),
+            )
+            self._record("provider_preset_fallback", provider, True)
         roles.setdefault("reflection", roles["conversation"])
         roles.setdefault("tool_builder", roles["reflection"])
         return roles

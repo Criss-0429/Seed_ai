@@ -16,10 +16,13 @@ si usa comunque il layer 2 ma l'evento viene loggato.
 
 from __future__ import annotations
 
+import gc
 import getpass
 import logging
 import re
 import socket
+import threading
+import time
 from dataclasses import dataclass, field
 
 log = logging.getLogger("seed.privacy")
@@ -51,6 +54,18 @@ def _runtime_identifiers() -> list[tuple[str, str]]:
     return [(s, t) for s, t in out if s and len(s) > 2]
 
 
+# Entita' PII chieste a GLiNER (zero-shot). Mappate in _LABEL_MAP ai placeholder.
+_GLINER_LABELS = [
+    "person", "email", "phone number", "address", "organization", "url",
+    "date", "credit card number", "iban", "api key", "password",
+]
+
+
+class PrivacyGateBlocked(RuntimeError):
+    """fail_closed: il filtro locale ha fallito a meta' su un payload diretto
+    all'API. Si BLOCCA l'uscita invece di proseguire con le sole regex."""
+
+
 @dataclass
 class GateResult:
     text: str
@@ -60,35 +75,112 @@ class GateResult:
 
 class PrivacyGate:
     def __init__(self, memory, opf_checkpoint: str = "", recall_bias: bool = True,
-                 fail_closed: bool = True):
+                 fail_closed: bool = True, *, lite_mode: bool = False,
+                 idle_unload_s: int = 120, backend: str = "opf"):
         self._memory = memory          # per pii_map persistente
         self._fail_closed = fail_closed
         self._opf_engine = None
+        self._opf_tried = False        # load lazy: niente RAM finche' non si redige
         self._opf_checkpoint = opf_checkpoint
         self._recall_bias = recall_bias
+        # Backend Layer-1 selezionabile da config:
+        #   opf    : OpenAI Privacy Filter (~2.7GB, max accuracy) — default
+        #   gliner : GLiNER multilingue PII (~300MB, sempre-attivo, italiano)
+        #   regex  : nessun modello (solo Layer-2) — equivale a lite_mode
+        self._backend = (backend or "opf").strip().lower()
+        # Lite mode: solo regex, nessun modello ML caricato.
+        self._lite_mode = lite_mode or self._backend == "regex"
+        # Unload-on-idle: il modello viene scaricato dopo N s di inattivita',
+        # cosi' SEED aperto ma fermo torna a RAM bassa. 0 = mai scaricare.
+        self._idle_unload_s = max(0, int(idle_unload_s))
+        self._opf_lock = threading.Lock()
+        self._opf_last_use = 0.0
+        self._opf_watch_started = False
 
     # ------------------------------------------------------------------
     def init_opf(self) -> bool:
-        """Carica il Privacy Filter (API reale OPF). Auto-download al primo uso."""
+        """Carica il Privacy Filter (API reale OPF). Auto-download al primo uso.
+
+        Lazy: idempotente, eseguito al primo `redact` se non gia' chiamato. Cosi'
+        il boot non carica il modello in RAM e una sessione di sola configurazione
+        non paga il costo del filtro. In lite_mode non carica nulla (solo regex)."""
+        if self._lite_mode:
+            self._opf_tried = True
+            return False
+        with self._opf_lock:
+            if self._opf_tried:
+                return self._opf_engine is not None
+            self._opf_tried = True
+            return self._load_model_locked()
+
+    def _load_model_locked(self) -> bool:
+        loader = {"gliner": self._load_gliner, "opf": self._load_opf}.get(
+            self._backend, self._load_opf)
         try:
-            from opf import OPF  # type: ignore
-            from .model_bundle import resolve
-            kwargs = {"device": "cpu", "output_mode": "typed"}
-            if self._opf_checkpoint:
-                kwargs["model"] = resolve(self._opf_checkpoint)
-            else:
-                bundled = resolve("privacy_filter")
-                if bundled != "privacy_filter":
-                    kwargs["model"] = bundled
-            self._opf_engine = OPF(**kwargs)
-            # warm-up: forza load del checkpoint (e l'eventuale download)
-            self._opf_engine.redact("warm up test")
-            log.info("OpenAI Privacy Filter caricato (cpu)")
+            engine = loader()
+            self._opf_engine = engine
+            self._opf_last_use = time.monotonic()
+            self._start_idle_watch()
+            log.info("privacy backend '%s' caricato (cpu)", self._backend)
             return True
         except Exception as exc:  # modello non installato / download fallito
-            log.warning("Privacy Filter non disponibile (%s): attivo solo layer regex", exc)
+            log.warning("privacy backend '%s' non disponibile (%s): solo layer regex",
+                        self._backend, exc)
             self._opf_engine = None
             return False
+
+    def _load_opf(self):
+        from opf import OPF  # type: ignore
+
+        from .model_bundle import resolve
+        kwargs = {"device": "cpu", "output_mode": "typed"}
+        if self._opf_checkpoint:
+            kwargs["model"] = resolve(self._opf_checkpoint)
+        else:
+            bundled = resolve("privacy_filter")
+            if bundled != "privacy_filter":
+                kwargs["model"] = bundled
+        engine = OPF(**kwargs)
+        engine.redact("warm up test")   # forza il load del checkpoint
+        return engine
+
+    def _load_gliner(self):
+        from gliner import GLiNER  # type: ignore
+
+        from .model_bundle import resolve
+        name = resolve("gliner_pii")
+        if name == "gliner_pii":
+            name = "urchade/gliner_multi_pii-v1"   # PII-tuned, multilingue
+        engine = GLiNER.from_pretrained(name)
+        engine.predict_entities("warm up", _GLINER_LABELS, threshold=0.5)
+        return engine
+
+    def _start_idle_watch(self) -> None:
+        if self._idle_unload_s <= 0 or self._opf_watch_started:
+            return
+        self._opf_watch_started = True
+        threading.Thread(target=self._idle_watch, name="opf-idle",
+                         daemon=True).start()
+
+    def _maybe_unload(self) -> bool:
+        """Scarica il modello se idle oltre la soglia. Ritorna True se liberato."""
+        with self._opf_lock:
+            if (self._opf_engine is None or self._idle_unload_s <= 0
+                    or time.monotonic() - self._opf_last_use < self._idle_unload_s):
+                return False
+            self._opf_engine = None
+            self._opf_tried = False   # consenti reload lazy al prossimo uso
+        gc.collect()
+        log.info("Privacy Filter scaricato per inattivita' (RAM liberata)")
+        return True
+
+    def _idle_watch(self) -> None:
+        """Scarica il modello dopo inattivita': RAM torna bassa a SEED fermo.
+        Il prossimo `redact` lo ricarica lazy."""
+        interval = max(5, min(30, self._idle_unload_s // 2))
+        while True:
+            time.sleep(interval)
+            self._maybe_unload()
 
     @property
     def opf_ready(self) -> bool:
@@ -105,19 +197,28 @@ class PrivacyGate:
         """Da chiamare PRIMA di qualunque uscita verso l'API o i log."""
         result = GateResult(text=text)
 
-        # Layer 1 — modello locale
-        if self._opf_engine is not None:
+        # Layer 1 — modello locale (load lazy al primo uso reale)
+        if not self._opf_tried and purpose in {"llm", "research"}:
+            self.init_opf()
+        # Ref locale: il watchdog idle puo' azzerare self._opf_engine in parallelo,
+        # ma il modello resta vivo per questa chiamata finche' `engine` lo tiene.
+        engine = self._opf_engine
+        if engine is not None:
+            self._opf_last_use = time.monotonic()
             try:
-                spans = self._detect_opf(result.text)
+                spans = self._detect_model(engine, result.text)
                 result.text = self._pseudonymize_spans(
                     result.text, spans, persist_mapping=persist_mapping
                 )
                 result.replacements += len(spans)
-                result.layers.append("opf")
+                result.layers.append(self._backend)
             except Exception as exc:
-                log.error("OPF failure: %s", exc)
+                log.error("privacy backend '%s' failure: %s", self._backend, exc)
                 if self._fail_closed and purpose == "llm":
-                    log.warning("fail_closed: continuo con solo layer regex")
+                    # fail-closed reale: NON proseguire verso l'API con sole regex.
+                    raise PrivacyGateBlocked(
+                        "privacy filter fallito su payload llm (fail_closed)"
+                    ) from exc
 
         # Layer 2 — sempre, in serie
         for ident, placeholder in _runtime_identifiers():
@@ -143,10 +244,15 @@ class PrivacyGate:
         return text
 
     # ------------------------------------------------------------------
-    def _detect_opf(self, text: str) -> list[dict]:
+    def _detect_model(self, engine, text: str) -> list[dict]:
+        if self._backend == "gliner":
+            return self._detect_gliner(engine, text)
+        return self._detect_opf(engine, text)
+
+    def _detect_opf(self, engine, text: str) -> list[dict]:
         """Invoca OPF.redact e converte RedactionResult.detected_spans
         nel formato interno [{start, end, label, value}]."""
-        result = self._opf_engine.redact(text)  # type: ignore[union-attr]
+        result = engine.redact(text)
         if isinstance(result, str):             # output_text_only mode
             return []
         spans = []
@@ -159,11 +265,30 @@ class PrivacyGate:
             })
         return spans
 
+    def _detect_gliner(self, engine, text: str) -> list[dict]:
+        """GLiNER.predict_entities → formato interno. Soglia conservativa."""
+        ents = engine.predict_entities(text, _GLINER_LABELS, threshold=0.5)
+        spans = []
+        for e in ents:
+            spans.append({
+                "start": int(e["start"]),
+                "end": int(e["end"]),
+                "label": str(e["label"]),
+                "value": str(e.get("text") or text[e["start"]:e["end"]]),
+            })
+        return spans
+
     _LABEL_MAP = {
+        # OPF labels
         "private_person": "PERSON", "private_email": "EMAIL",
         "private_phone": "PHONE", "private_address": "ADDR",
         "private_url": "URL", "private_date": "DATE",
         "account_number": "ACCT", "secret": "SECRET",
+        # GLiNER labels (vedi _GLINER_LABELS)
+        "person": "PERSON", "email": "EMAIL", "phone number": "PHONE",
+        "address": "ADDR", "organization": "ORG", "url": "URL", "date": "DATE",
+        "credit card number": "CARD", "iban": "IBAN", "api key": "SECRET",
+        "password": "SECRET",
     }
 
     def _pseudonymize_spans(

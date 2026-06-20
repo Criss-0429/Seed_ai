@@ -81,6 +81,20 @@ def test_roles_must_exist_in_discovered_catalog(tmp_path):
             roles={"conversation": "missing-model"})
 
 
+def test_preset_fallback_skips_non_chat_models(tmp_path):
+    # nessun preset noto: deve scegliere un modello di chat, MAI un embedding
+    # (era il bug: models[0] alfabetico = "a-embed" finiva su conversation).
+    hub = ProviderHub(tmp_path / "providers.json")
+    roles = hub.preset("ollama_cloud", ["a-embeddings", "whisper-1", "zephyr-7b"])
+    assert roles["conversation"] == "zephyr-7b"
+
+
+def test_preset_raises_when_only_non_chat_models(tmp_path):
+    hub = ProviderHub(tmp_path / "providers.json")
+    with pytest.raises(ProviderHubError, match="no chat-capable"):
+        hub.preset("ollama_cloud", ["text-embedding-3", "bge-large"])
+
+
 def test_revoke_active_provider_closes_gate(tmp_path):
     hub = ProviderHub(tmp_path / "providers.json", request=FakeHTTP())
     hub.validate_and_save("ollama_cloud", "key")
