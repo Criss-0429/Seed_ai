@@ -22,7 +22,7 @@ from pathlib import Path
 
 OWNER = "Criss-0429"
 REPO = "Seed_ai"
-VERSION = "0.3.0-pilot-p2"
+VERSION = "0.3.1-pilot-p2"
 API = f"https://api.github.com/repos/{OWNER}/{REPO}/releases/latest"
 
 
