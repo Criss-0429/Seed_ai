@@ -186,6 +186,21 @@ footer.site .fineprint { font-size: 12px; max-width: 38ch; line-height: 1.5; }
   footer.site .cols { gap: var(--s6); width: 100%; }
   footer.site .col { min-width: 40%; }
 }
+/* quick / background mode (Wispr-inspired) */
+kbd { font-family: var(--mono); font-size: 12px; line-height: 1; color: var(--ink-2);
+  background: var(--app); border: 1px solid var(--line); border-bottom-width: 2px;
+  border-radius: 6px; padding: 4px 7px; }
+.kbd-plus { margin: 0 4px; color: var(--mut); font-family: var(--mono); font-size: 12px; }
+.quickbar { display: flex; align-items: center; gap: var(--s3); margin-top: var(--s6);
+  max-width: 520px; width: 100%; padding: 12px 14px; border: 1.5px solid var(--line);
+  border-radius: 100px; background: var(--app); box-shadow: 0 16px 40px -28px oklch(40% 0.02 85 / .55); }
+.quickbar .qb-orb { position: relative; flex: 0 0 auto; width: 26px; height: 26px; display: grid; place-items: center; }
+.quickbar .qb-orb .ring-out { position: absolute; inset: 0; border: 1.6px solid var(--accent); border-radius: 50%; opacity: .55; }
+.quickbar .qb-orb .ring-in { position: absolute; inset: 6px; border: 1.6px solid var(--ink); border-radius: 50%; opacity: .6; }
+.quickbar .qb-orb .seed { width: 4px; height: 4px; background: var(--ink); border-radius: 50%; }
+.quickbar .qb-text { flex: 1; color: var(--mut-2); font-size: 15px; }
+.quickbar .qb-keys { flex: 0 0 auto; }
+@media (max-width: 480px) { .quickbar .qb-keys { display: none; } }
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 </style>
 <meta property="og:title" content="SEED — un'intelligenza che cresce con te">
@@ -202,6 +217,7 @@ footer.site .fineprint { font-size: 12px; max-width: 38ch; line-height: 1.5; }
     </a>
     <nav class="navlinks" aria-label="Principale">
       <a class="hide-sm" href="#cose">Cos'è</a>
+      <a class="hide-sm" href="#rapido">Modalità rapida</a>
       <a class="hide-sm" href="#rapporto">Personalizzazione</a>
       <a class="hide-sm" href="#come">Come funziona</a>
       <a href="#scarica">Scarica</a>
@@ -238,6 +254,44 @@ footer.site .fineprint { font-size: 12px; max-width: 38ch; line-height: 1.5; }
           <span class="seed"></span>
         </div>
         <span class="stato">PRESENZA</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUICK / BACKGROUND MODE -->
+  <section id="rapido" class="quick" aria-labelledby="q-h">
+    <div class="wrap">
+      <span class="kicker">Sempre a portata</span>
+      <h2 id="q-h">Richiamalo ovunque. Parla o scrivi.</h2>
+      <p class="section-lead">
+        SEED vive in una piccola icona in background. Premi
+        <kbd>Ctrl</kbd><span class="kbd-plus">+</span><kbd>Spazio</kbd> da qualsiasi
+        app e appare una barra rapida: detta una richiesta o scrivila al volo.
+        Finito, torna in background.
+      </p>
+      <div class="quickbar" role="img" aria-label="Barra di cattura rapida di SEED">
+        <span class="qb-orb" aria-hidden="true">
+          <span class="ring-out"></span><span class="ring-in"></span><span class="seed"></span>
+        </span>
+        <span class="qb-text">chiedi a SEED…</span>
+        <span class="qb-keys"><kbd>Ctrl</kbd><span class="kbd-plus">+</span><kbd>Spazio</kbd></span>
+      </div>
+      <div class="grid cols-3">
+        <article class="card">
+          <span class="num">Background</span>
+          <h3>Sempre lì, mai d'intralcio</h3>
+          <p>Chiudi la finestra e SEED si riduce a un'icona nella barra di sistema. Niente taskbar ingombra, niente processi sempre-accesi imposti.</p>
+        </article>
+        <article class="card">
+          <span class="num">Scorciatoia</span>
+          <h3>Una pressione, ovunque</h3>
+          <p>La stessa scorciatoia globale apre la barra rapida sopra qualunque applicazione. Nessun cambio di finestra, nessun clic.</p>
+        </article>
+        <article class="card">
+          <span class="num">Voce o testo</span>
+          <h3>Come preferisci</h3>
+          <p>Scrivi, o tieni premuto per parlare (voce ElevenLabs opzionale). La risposta appare nella barra, poi tutto sparisce.</p>
+        </article>
       </div>
     </div>
   </section>
