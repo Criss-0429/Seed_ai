@@ -1353,6 +1353,7 @@ async function openSystem() {
   const bk = document.createElement('button'); bk.className = 'close'; bk.textContent = 'crea backup ora';
   bk.onclick = async () => { const path = await api.create_backup(); flash('Backup creato.'); openSystem(); };
   box.appendChild(bk);
+  await renderUpdateControls(box);
   box.appendChild(_note(`delega sub-agent: ${del.enabled ? 'attiva' : 'disattivata'} · owner-gated`));
 
   // --- HEARTBEAT / STARTUP ---
@@ -1369,6 +1370,67 @@ async function openSystem() {
     openSystem();
   };
   box.appendChild(sr);
+}
+async function renderUpdateControls(box) {
+  let st = {};
+  try { st = await api.update_status(); } catch (e) { return; }
+  const row = document.createElement('div'); row.className = 'prow';
+  const lbl = document.createElement('div'); lbl.className = 'lbl';
+  const title = document.createElement('span'); title.className = 't';
+  const detail = document.createElement('span'); detail.className = 's';
+  const total = Number(st.total_bytes || (st.offer && st.offer.bytes) || 0);
+  const done = Number(st.downloaded_bytes || 0);
+  const pct = total ? Math.min(100, Math.round(done * 100 / total)) : 0;
+  const labels = {
+    unavailable: 'aggiornamenti disponibili nell’app installata', idle: 'nessun controllo eseguito',
+    checking: 'controllo release in corso', current: 'SEED è aggiornato',
+    available: `versione ${st.offer ? st.offer.version : ''} disponibile`,
+    downloading: `download verificato in corso · ${pct}%`,
+    ready: 'aggiornamento verificato e pronto al riavvio', error: 'controllo aggiornamenti non riuscito'
+  };
+  title.textContent = 'Aggiornamenti';
+  detail.textContent = labels[st.state] || st.state || 'stato non disponibile';
+  if (st.error) detail.textContent += ` · ${st.error}`;
+  lbl.append(title, detail); row.appendChild(lbl);
+  let button = null;
+  if (st.state === 'ready' || st.pending) {
+    button = document.createElement('button'); button.className = 'chip'; button.textContent = 'riavvia e aggiorna';
+    button.onclick = async () => {
+      if (!(await askConfirm({title: 'Riavviare SEED?',
+        message: 'Il supervisor applicherà l’aggiornamento, controllerà l’avvio e ripristinerà la versione precedente in caso di errore.', primary: 'Riavvia'}))) return;
+      const out = await api.restart_for_update();
+      if (!out.ok) flash('Riavvio bloccato: ' + out.error);
+    };
+  } else if (st.state === 'idle' || st.state === 'current' || st.state === 'error') {
+    button = document.createElement('button'); button.className = 'chip'; button.textContent = 'controlla';
+    button.onclick = async () => { button.disabled = true; detail.textContent = 'controllo release in corso'; await api.update_check(); openSystem(); };
+  } else if (st.state === 'available') {
+    button = document.createElement('button'); button.className = 'chip'; button.textContent = 'scarica';
+    button.onclick = async () => {
+      const mb = total ? Math.ceil(total / 1048576) : 0;
+      if (!(await askConfirm({title: 'Scaricare l’aggiornamento?',
+        message: `SEED scaricherà circa ${mb} MB. Dati personali e modelli invariati resteranno sul PC.`, primary: 'Scarica'}))) return;
+      const out = await api.update_start(true);
+      if (!out.ok) { flash('Aggiornamento bloccato: ' + out.error); return; }
+      pollUpdateProgress();
+    };
+  }
+  if (button) row.appendChild(button);
+  box.appendChild(row);
+}
+let updatePoll = null;
+function pollUpdateProgress() {
+  if (updatePoll) clearInterval(updatePoll);
+  updatePoll = setInterval(async () => {
+    let st; try { st = await api.update_status(); } catch (e) { return; }
+    if (!['downloading', 'checking'].includes(st.state)) {
+      clearInterval(updatePoll); updatePoll = null; openSystem(); return;
+    }
+    const total = Number(st.total_bytes || 0), done = Number(st.downloaded_bytes || 0);
+    const pct = total ? Math.min(100, Math.round(done * 100 / total)) : 0;
+    const visible = $('#sys-rows .prow:last-of-type .s');
+    if (visible) visible.textContent = `download verificato in corso · ${pct}%`;
+  }, 500);
 }
 function _note(text) { const d = document.createElement('div'); d.className = 'selnote'; d.textContent = text; return d; }
 

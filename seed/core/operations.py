@@ -68,7 +68,7 @@ class OperationsManager:
 
     def stage_update(self, package: Path, expected_sha256: str) -> Path:
         package = Path(package).resolve()
-        digest = hashlib.sha256(package.read_bytes()).hexdigest()
+        digest = _digest(package)
         if digest != expected_sha256:
             raise OperationsError("update digest mismatch")
         target = self.updates / f"{digest}{package.suffix}"
@@ -85,7 +85,7 @@ class OperationsManager:
         marker.write_text(json.dumps({
             "schema_version": "seed.pending-update.v1",
             "package": staged.name,
-            "sha256": hashlib.sha256(staged.read_bytes()).hexdigest(),
+            "sha256": _digest(staged),
             "scheduled_at": time.time(),
             "apply_on_next_supervised_boot": True,
         }, indent=2), encoding="utf-8")
@@ -146,6 +146,14 @@ def _safe(value: str) -> str:
     if not out:
         raise OperationsError("invalid label")
     return out
+
+
+def _digest(path: Path) -> str:
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _hashes(root: Path, exclude: set[str] | None = None) -> dict[str, str]:

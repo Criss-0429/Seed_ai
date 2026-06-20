@@ -136,6 +136,13 @@ def test_operations_surface_exposes_install_update_and_recovery_state(tmp_path, 
     assert status["recovery_available"] is False
     app.shutdown()
 
+
+def test_surface_exposes_github_release_update_controls():
+    html = _SURFACE.read_text(encoding="utf-8")
+    for method in ("update_check", "update_status", "update_start", "restart_for_update"):
+        assert method in html
+    assert "riavvia e aggiorna" in html
+
 def test_jsapi_voice_bridge_and_window_modes(tmp_path, monkeypatch):
     app = _app(tmp_path, monkeypatch)
     monkeypatch.setattr(app, "voice_message",

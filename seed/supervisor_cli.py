@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
+import time
 
 from .supervisor import (
     BootSupervisor,
@@ -25,6 +27,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--runtime", type=Path, help="runtime executable used by --boot")
     parser.add_argument("--background", action="store_true",
                         help="launch runtime hidden with heartbeat active")
+    parser.add_argument("--wait-pid", type=int, default=0,
+                        help="wait for the current runtime process before updating")
     args = parser.parse_args(argv)
     try:
         supervisor = BootSupervisor(args.root)
@@ -38,6 +42,8 @@ def main(argv: list[str] | None = None) -> int:
         else:
             if args.runtime is None:
                 raise SupervisorError("--runtime is required with --boot")
+            if args.wait_pid:
+                _wait_for_process_exit(args.wait_pid)
             # Updater reale: applica un eventuale update staged prima del boot.
             update = supervisor.apply_pending_update(args.runtime)
             result = supervisor.boot(
@@ -65,6 +71,19 @@ def main(argv: list[str] | None = None) -> int:
     except (OSError, SupervisorError) as exc:
         print(json.dumps({"status": "failed", "error": str(exc)}, ensure_ascii=False))
         return 2
+
+
+def _wait_for_process_exit(pid: int, timeout_seconds: float = 60.0) -> None:
+    if pid <= 0 or pid == os.getpid():
+        raise SupervisorError("invalid --wait-pid")
+    deadline = time.monotonic() + timeout_seconds
+    while time.monotonic() < deadline:
+        try:
+            os.kill(pid, 0)
+        except OSError:
+            return
+        time.sleep(0.1)
+    raise SupervisorError("runtime did not exit before update timeout")
 
 
 if __name__ == "__main__":

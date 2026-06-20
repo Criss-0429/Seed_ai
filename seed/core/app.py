@@ -52,6 +52,7 @@ from .observation import ObservationCollector, ObservationLane
 from .brand import BrandEvolution
 from .mutation_lifecycle import MutationLifecycle
 from .operations import OperationsManager
+from .release_updater import ReleaseUpdater, installed_version
 from .tool_builder import GovernedToolBuilder, ToolCandidate
 from .connections import CoreConnections
 from .startup import WindowsStartup
@@ -310,6 +311,12 @@ class SeedApp:
             lambda manifest: self.evolution._save_json("ui_manifest.json", manifest),
             audit=lambda ev, payload: self.memory.add_event(ev, payload))
         self.operations = OperationsManager(forbidden.seed_data_dir())
+        from seed import __version__
+        self.release_updater = ReleaseUpdater(
+            self.operations,
+            installed_version(__version__),
+            enabled=bool(getattr(sys, "frozen", False)),
+        )
         self.scheduler = Scheduler(
             self.watcher,
             self.evolution,
@@ -413,6 +420,12 @@ class SeedApp:
         # ancora pronto, `redact()` lo carica comunque lazy (fail-safe).
         threading.Thread(target=self.gate.init_opf, name="opf-warmup",
                          daemon=True).start()
+        if self.release_updater.enabled:
+            threading.Thread(
+                target=self.release_updater.check,
+                name="release-update-check",
+                daemon=True,
+            ).start()
         self.brand.refresh(self.cfg.user_alias)
         self.observation_collector.start()
         self.scheduler.start()
@@ -865,14 +878,12 @@ class SeedApp:
 
     def ui_operations(self) -> dict:
         """Gestione operativa: backup disponibili, update pending, piano uninstall."""
-        from seed import __version__
-
         ops = self.operations
         backups = sorted(p.name for p in ops.backups.iterdir()
                          if p.is_dir()) if ops.backups.exists() else []
         pending = (ops.updates / "pending_update.json")
         return {
-            "app_version": __version__,
+            "app_version": self.release_updater.current_version,
             "install_mode": "installed" if getattr(sys, "frozen", False) else "development",
             "backups": backups,
             "pending_update": pending.is_file(),
@@ -884,6 +895,27 @@ class SeedApp:
 
     def ui_create_backup(self) -> str:
         return str(self.operations.create_backup("ui"))
+
+    def ui_update_check(self) -> dict:
+        result = self.release_updater.check()
+        self.memory.add_event("release_update_checked", {
+            "available": bool(result.get("available")),
+            "version": result.get("version") or result.get("latest_version"),
+        })
+        return result
+
+    def ui_update_status(self) -> dict:
+        return self.release_updater.status()
+
+    def ui_update_start(self, owner_confirmed: bool) -> dict:
+        try:
+            result = self.release_updater.start(owner_confirmed=owner_confirmed)
+            self.memory.add_event("release_update_download_started", {
+                "owner_confirmed": bool(owner_confirmed),
+            })
+            return {"ok": True, **result}
+        except Exception as exc:
+            return {"ok": False, "error": str(exc)}
 
     def ui_delegation_status(self) -> dict:
         """Sub-agent: stato della delega isolata collegata alla chat."""

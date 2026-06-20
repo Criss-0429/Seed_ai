@@ -84,6 +84,13 @@ python run_dev.py --repl     # REPL
 Al primo avvio SEED chiede il consenso, poi una chiave provider LLM (BYOK). La
 chat si sblocca quando almeno una chiave provider è validata.
 
+Dalla release `0.3.2-pilot-p2`, il pannello Sistema controlla la GitHub Release
+ufficiale e, solo dopo conferma, scarica il pacchetto runtime incrementale. Il
+supervisor verifica SHA-256, crea un backup, applica al riavvio e ripristina la
+versione precedente se il nuovo runtime non supera l'health check. Modelli e
+dati utente invariati non vengono riscaricati. Le installazioni precedenti
+devono usare il bootstrap `0.3.2` una volta per acquisire l'Update Manager.
+
 ## Build da sorgente
 
 Build di una release tester Windows (PyInstaller `onedir` + Inno Setup). I
