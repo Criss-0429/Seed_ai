@@ -18,6 +18,26 @@ or remove it.
 All shortcuts launch `SEEDSupervisor.exe`, which verifies health and recovery
 before accepting runtime as known-good.
 
+## One-time clean reinstall while keeping memory
+
+Use `Reset-SEED-Keep-Memory.ps1` only when the maintainer asks you to remove a
+duplicate/old SEED installation before installing the latest complete release.
+The script preserves only the local SQLite memory. It removes runtime, models,
+configuration, provider keys, lineage, generated tools, workspace files and
+local backups. Provider keys must be entered again after reinstalling.
+
+1. Download `Reset-SEED-Keep-Memory.ps1` from the same GitHub Release.
+2. Verify its SHA-256 against `SHA256SUMS.txt`.
+3. Preview without changing the PC:
+   `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Reset-SEED-Keep-Memory.ps1 -WhatIf`
+4. Run it and type `RESET-SEED` when requested:
+   `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Reset-SEED-Keep-Memory.ps1`
+5. Install the latest complete SEED release.
+
+The script leaves a second verified memory copy under
+`%LOCALAPPDATA%\SEED-memory-backups` and never scans or deletes project folders
+under Documents.
+
 ## Optional voice (ElevenLabs BYOK)
 
 Voice (speech-to-text and text-to-speech) is **optional**. SEED is fully usable

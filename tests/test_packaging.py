@@ -5,6 +5,8 @@ from __future__ import annotations
 import ast
 import importlib.util
 from pathlib import Path
+import shutil
+import subprocess
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -95,6 +97,44 @@ def test_release_builder_requires_all_three_ml_bundles():
     assert "finalize_installer" in script
     assert '"installer"' in script
     assert "prune_runtime" in script
+    assert "Reset-SEED-Keep-Memory.ps1" in script
+
+
+def test_tester_reset_script_is_guarded_and_release_hashed():
+    reset = ROOT / "installer" / "Reset-SEED-Keep-Memory.ps1"
+    source = reset.read_text(encoding="utf-8")
+    bootstrap = (ROOT / "scripts" / "build_bootstrap_release.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert reset.is_file()
+    assert "SupportsShouldProcess" in source and "$WhatIfPreference" in source
+    assert 'Read-Host "Scrivi RESET-SEED per continuare"' in source
+    assert "Assert-SafeLocalPath" in source and "Test-IsUnder" in source
+    assert '@("seed.db", "seed.db-wal", "seed.db-shm")' in source
+    assert "Get-FileHash" in source and "Assert-SqliteHeader" in source
+    assert "CurrentVersion\\Run" in source and "SEED.lnk" in source
+    assert 'release_assets["tester_reset"]' in bootstrap
+    assert 'target / "Reset-SEED-Keep-Memory.ps1"' in bootstrap
+
+
+def test_tester_reset_powershell_parses_when_available():
+    powershell = shutil.which("powershell") or shutil.which("pwsh")
+    if powershell is None:
+        return
+    reset = ROOT / "installer" / "Reset-SEED-Keep-Memory.ps1"
+    command = (
+        "$tokens=$null; $errors=$null; "
+        f"[void][System.Management.Automation.Language.Parser]::ParseFile('{reset}',"
+        "[ref]$tokens,[ref]$errors); "
+        "if($errors.Count){$errors | ForEach-Object { Write-Error $_ }; exit 1}"
+    )
+    subprocess.run(
+        [powershell, "-NoProfile", "-Command", command],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
 
 
 def test_runtime_pruning_removes_tests_caches_and_unused_audio_stack(tmp_path):

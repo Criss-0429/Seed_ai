@@ -177,6 +177,10 @@ def main(argv: list[str] | None = None) -> int:
     pruned["bytes"] += supervisor_pruned["bytes"]
     model_sizes = copy_models(target / "app" / "models")
     shutil.copy2(ROOT / "installer" / "TESTER_GUIDE.md", target / "TESTER_GUIDE.md")
+    shutil.copy2(
+        ROOT / "installer" / "Reset-SEED-Keep-Memory.ps1",
+        target / "Reset-SEED-Keep-Memory.ps1",
+    )
 
     update_zip = target / f"SEED-{args.version}-runtime-update.zip"
     zip_tree(target / "app" / "runtime", update_zip)

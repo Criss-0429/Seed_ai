@@ -77,7 +77,7 @@ class FakeResp:
 @pytest.fixture()
 def env(tmp_path):
     mem = Memory(tmp_path / "research.db")
-    gate = PrivacyGate(mem)  # solo layer regex: OPF non inizializzato
+    gate = PrivacyGate(mem, backend="regex")
     cfg = ResearchConfig(exa_api_key="sk-exa-test-0000000000000000",
                          tavily_api_key="tvly-test-key")
     return mem, gate, cfg

@@ -6,7 +6,6 @@ import argparse
 import hashlib
 import json
 import os
-import shutil
 import subprocess
 import sys
 import zipfile
@@ -166,6 +165,9 @@ def main(argv: list[str] | None = None) -> int:
     runtime_zip = target / f"SEED-{version}-runtime-update.zip"
     if not runtime_zip.is_file():
         raise RuntimeError(f"runtime update zip missing: {runtime_zip}")
+    tester_reset = target / "Reset-SEED-Keep-Memory.ps1"
+    if not tester_reset.is_file():
+        raise RuntimeError(f"tester reset script missing: {tester_reset}")
 
     supervisor_dir = DIST / "SEEDSupervisor"
     if not (supervisor_dir / "SEEDSupervisor.exe").is_file():
@@ -237,6 +239,13 @@ def main(argv: list[str] | None = None) -> int:
             "kind": "bootstrap-exe",
             "unsigned": True,
         }
+    release_assets["tester_reset"] = {
+        "file": tester_reset.name,
+        "sha256": digest(tester_reset),
+        "bytes": tester_reset.stat().st_size,
+        "kind": "powershell-support-script",
+        "preserves": ["data/seed.db", "data/seed.db-wal", "data/seed.db-shm"],
+    }
 
     manifest.pop("installer", None)
     manifest["release_assets"] = release_assets

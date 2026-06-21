@@ -203,6 +203,18 @@ class CapabilityForgeConfig:
 
 
 @dataclass
+class MaintenanceConfig:
+    """Retention conservativa di artefatti locali recuperabili."""
+    enabled: bool = True
+    keep_versions: int = 10        # active/rollback/known-good sempre protette
+    keep_backups: int = 5          # solo automatici; manuali sempre protetti
+    keep_runtime_backups: int = 2  # backup directory creati dagli update
+    keep_update_history: int = 20  # marker applied/failed per directory
+    keep_lab_runs: int = 20        # solo candidate terminali
+    trace_days: int = 30
+
+
+@dataclass
 class SeedConfig:
     user_alias: str = "utente"     # alias scelto dall'utente, NON il nome reale
     llm: LLMConfig = field(default_factory=LLMConfig)
@@ -219,6 +231,7 @@ class SeedConfig:
     skills: SkillsConfig = field(default_factory=SkillsConfig)
     web_render: WebRenderConfig = field(default_factory=WebRenderConfig)
     capability_forge: CapabilityForgeConfig = field(default_factory=CapabilityForgeConfig)
+    maintenance: MaintenanceConfig = field(default_factory=MaintenanceConfig)
 
     def redacted_summary(self) -> dict:
         """Versione loggabile: key sostituite da presenza/assenza."""
@@ -274,6 +287,7 @@ def _from_dict(d: dict) -> SeedConfig:
                                ("skills", cfg.skills),
                                ("web_render", cfg.web_render),
                                ("capability_forge", cfg.capability_forge),
+                               ("maintenance", cfg.maintenance),
                                ("provider_hub", cfg.provider_hub)):
         for k, v in d.get(section, {}).items():
             if hasattr(cls_field, k):
