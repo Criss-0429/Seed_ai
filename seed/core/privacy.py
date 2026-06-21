@@ -23,6 +23,7 @@ import re
 import socket
 import threading
 import time
+import weakref
 from dataclasses import dataclass, field
 
 log = logging.getLogger("seed.privacy")
@@ -96,6 +97,9 @@ class PrivacyGate:
         self._opf_lock = threading.Lock()
         self._opf_last_use = 0.0
         self._opf_watch_started = False
+        self._opf_watch_stop = threading.Event()
+        self._opf_watch_thread: threading.Thread | None = None
+        self._closed = False
 
     # ------------------------------------------------------------------
     def init_opf(self) -> bool:
@@ -108,6 +112,8 @@ class PrivacyGate:
             self._opf_tried = True
             return False
         with self._opf_lock:
+            if self._closed:
+                return False
             if self._opf_tried:
                 return self._opf_engine is not None
             self._opf_tried = True
@@ -118,6 +124,10 @@ class PrivacyGate:
             self._backend, self._load_opf)
         try:
             engine = loader()
+            if self._closed:
+                del engine
+                gc.collect()
+                return False
             self._opf_engine = engine
             self._opf_last_use = time.monotonic()
             self._start_idle_watch()
@@ -156,11 +166,18 @@ class PrivacyGate:
         return engine
 
     def _start_idle_watch(self) -> None:
-        if self._idle_unload_s <= 0 or self._opf_watch_started:
+        if (self._idle_unload_s <= 0 or self._opf_watch_started
+                or self._closed):
             return
         self._opf_watch_started = True
-        threading.Thread(target=self._idle_watch, name="opf-idle",
-                         daemon=True).start()
+        interval = max(5, min(30, self._idle_unload_s // 2))
+        self._opf_watch_thread = threading.Thread(
+            target=self._idle_watch,
+            args=(weakref.ref(self), self._opf_watch_stop, interval),
+            name="opf-idle",
+            daemon=True,
+        )
+        self._opf_watch_thread.start()
 
     def _maybe_unload(self) -> bool:
         """Scarica il modello se idle oltre la soglia. Ritorna True se liberato."""
@@ -174,13 +191,36 @@ class PrivacyGate:
         log.info("Privacy Filter scaricato per inattivita' (RAM liberata)")
         return True
 
-    def _idle_watch(self) -> None:
+    @staticmethod
+    def _idle_watch(gate_ref, stop_event: threading.Event, interval: int) -> None:
         """Scarica il modello dopo inattivita': RAM torna bassa a SEED fermo.
-        Il prossimo `redact` lo ricarica lazy."""
-        interval = max(5, min(30, self._idle_unload_s // 2))
-        while True:
-            time.sleep(interval)
-            self._maybe_unload()
+        Il prossimo `redact` lo ricarica lazy. Il weakref evita che il watcher
+        mantenga vivo un gate gia' abbandonato da test o runtime."""
+        while not stop_event.wait(interval):
+            gate = gate_ref()
+            if gate is None:
+                return
+            gate._maybe_unload()
+            del gate
+
+    def close(self) -> None:
+        """Ferma il watcher e libera il modello locale in modo deterministico."""
+        self._closed = True
+        self._opf_watch_stop.set()
+        had_engine = False
+        acquired = self._opf_lock.acquire(timeout=1.0)
+        if acquired:
+            try:
+                had_engine = self._opf_engine is not None
+                self._opf_engine = None
+                self._opf_tried = True
+            finally:
+                self._opf_lock.release()
+        thread = self._opf_watch_thread
+        if thread is not None and thread is not threading.current_thread():
+            thread.join(timeout=1.0)
+        if had_engine:
+            gc.collect()
 
     @property
     def opf_ready(self) -> bool:

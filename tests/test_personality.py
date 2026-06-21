@@ -205,7 +205,7 @@ def test_repair_payload_is_redacted_before_second_provider_call(tmp_path):
     from seed.core.privacy import PrivacyGate
 
     runtime, memory = _runtime(tmp_path)
-    gate = PrivacyGate(memory)
+    gate = PrivacyGate(memory, backend="regex")
     llm = MockLLM(["Valuto il piano in modo indipendente."])
     decision = runtime.plan("Sei d'accordo?")
 

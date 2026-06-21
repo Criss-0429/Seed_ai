@@ -204,14 +204,14 @@ class CapabilityForgeConfig:
 
 @dataclass
 class MaintenanceConfig:
-    """Retention dei dati locali rigenerabili: evita che %LOCALAPPDATA%\\SEED
-    cresca senza limite (snapshot versioni, backup, lab, trace) riempiendo l'SSD.
-    Eseguita all'avvio. 0 = nessun limite per quella voce."""
+    """Retention conservativa di artefatti locali recuperabili."""
     enabled: bool = True
-    keep_versions: int = 10        # snapshot in versions/
-    keep_backups: int = 5          # operations/backups/
-    keep_lab_runs: int = 20        # lab/descendants e lab/evaluator_runs (ciascuna)
-    trace_days: int = 30           # data/traces/*.jsonl piu' vecchi di N giorni
+    keep_versions: int = 10        # active/rollback/known-good sempre protette
+    keep_backups: int = 5          # solo automatici; manuali sempre protetti
+    keep_runtime_backups: int = 2  # backup directory creati dagli update
+    keep_update_history: int = 20  # marker applied/failed per directory
+    keep_lab_runs: int = 20        # solo candidate terminali
+    trace_days: int = 30
 
 
 @dataclass

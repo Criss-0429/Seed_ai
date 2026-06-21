@@ -4,6 +4,7 @@ Offline: nessun modello reale; si inietta un fake engine per l'unload."""
 from __future__ import annotations
 
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -61,7 +62,7 @@ def test_lite_mode_never_loads_model():
 
 
 def test_regex_still_redacts_without_model():
-    g = _gate()  # opf non installato in test -> engine None
+    g = _gate(backend="regex")
     out = g.redact("IBAN IT60X0542811101000000123456 e +39 333 1234567",
                    purpose="llm")
     assert "IT60X0542811101000000123456" not in out.text
@@ -92,6 +93,25 @@ def test_idle_unload_disabled_when_zero():
     g._opf_last_use = time.monotonic() - 9999
     assert g._maybe_unload() is False
     assert g._opf_engine is not None
+
+
+def test_close_stops_idle_watcher_and_releases_engine():
+    g = _gate(idle_unload_s=1)
+    g._opf_engine = FakeEngine()
+    g._opf_tried = True
+    g._start_idle_watch()
+    watcher = g._opf_watch_thread
+
+    assert watcher is not None and watcher.is_alive()
+    g.close()
+
+    assert not watcher.is_alive()
+    assert g.opf_ready is False
+    assert g.init_opf() is False
+    assert not any(
+        thread is watcher and thread.is_alive()
+        for thread in threading.enumerate()
+    )
 
 
 def test_gliner_backend_detects_and_pseudonymizes():
