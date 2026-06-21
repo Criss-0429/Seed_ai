@@ -28,7 +28,6 @@ import logging
 import re
 import threading
 import time
-import uuid
 from dataclasses import dataclass
 
 log = logging.getLogger("seed.daemon")
@@ -447,7 +446,3 @@ class BackgroundDaemon:
             created_at=row["created_at"],
             expiry=row["expiry"],
         )
-
-
-def new_candidate_id() -> str:
-    return uuid.uuid4().hex
