@@ -10,11 +10,14 @@ import subprocess
 import sys
 import zipfile
 from pathlib import Path
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / "dist"
 RELEASE = ROOT / "release"
 MAX_PART_BYTES = 1_600_000_000
+OWNER = "Criss-0429"
+REPO = "Seed_ai"
 
 MODEL_SOURCES = {
     "privacy-filter": Path.home() / ".opf" / "privacy_filter",
@@ -129,6 +132,15 @@ def build_bootstrap(version: str, target_dir: Path, python_exe: Path) -> Path:
 
 def preserved_model_assets(manifest_path: Path) -> dict[str, dict[str, object]]:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    source_version = manifest.get("version")
+    if not isinstance(source_version, str) or not re.fullmatch(
+        r"[0-9A-Za-z][0-9A-Za-z._-]*", source_version
+    ):
+        raise RuntimeError(f"invalid preserve manifest version: {manifest_path}")
+    base_url = (
+        f"https://github.com/{OWNER}/{REPO}/releases/download/"
+        f"v{source_version}/"
+    )
     release_assets = manifest.get("release_assets")
     if not isinstance(release_assets, dict):
         raise RuntimeError(f"release_assets missing from preserve manifest: {manifest_path}")
@@ -138,7 +150,23 @@ def preserved_model_assets(manifest_path: Path) -> dict[str, dict[str, object]]:
         asset = release_assets.get(asset_key)
         if not isinstance(asset, dict):
             raise RuntimeError(f"{asset_key} missing from preserve manifest: {manifest_path}")
-        preserved[model_name] = dict(asset)
+        reused = dict(asset)
+        parts = reused.get("parts")
+        if isinstance(parts, list):
+            reused["parts"] = [
+                {**part, "download_url": base_url + str(part["file"])}
+                for part in parts
+                if isinstance(part, dict) and part.get("file")
+            ]
+            if len(reused["parts"]) != len(parts):
+                raise RuntimeError(f"invalid parts in {asset_key}: {manifest_path}")
+        else:
+            file_name = reused.get("file")
+            if not isinstance(file_name, str) or not file_name:
+                raise RuntimeError(f"invalid file in {asset_key}: {manifest_path}")
+            reused["download_url"] = base_url + file_name
+        reused["reused_from_release"] = f"v{source_version}"
+        preserved[model_name] = reused
     return preserved
 
 

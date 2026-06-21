@@ -412,6 +412,17 @@ Rischi residui:
 - asset e installer restano unsigned, quindi SmartScreen e atteso;
 - non viene modificato o aggiornato Graphify.
 
+Evidenza implementativa pre-release:
+
+- i modelli invariati sono pin-nati a `v0.3.2-pilot-p2` nel manifest con URL
+  `https://github.com/Criss-0429/Seed_ai/releases/download/...` e hash originali;
+- il bootstrap accetta URL riusati soltanto con HTTPS, host `github.com`, owner
+  e repository SEED esatti, senza query o fragment; URL esterni falliscono;
+- runtime, supervisor, bootstrap, reset script, manifest, somme e guida restano
+  asset nuovi della `0.3.3`; i circa 3,9 GB di modelli non vengono duplicati;
+- `34` test packaging/distribution/updater passati, inclusi URL pin-nato valido,
+  URL malevolo bloccato, asset mancante bloccato e generazione metadata riuso.
+
 ## Feature Context Pack - P2 Lint E Riduzione Dimensioni
 
 **Feature esatta:** `P2 - Lint E Riduzione Dimensioni`, terza fase del programma
