@@ -43,30 +43,38 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # storia + tag completi (serve a merge-base)
 
       - name: Resolve tag
         id: tag
         run: |
+          set -euo pipefail
           TAG="${{ github.event.inputs.tag }}"
-          [ -z "$TAG" ] && TAG="${GITHUB_REF_NAME}"
+          if [ -z "$TAG" ] && [ "${GITHUB_REF_TYPE:-}" = "tag" ]; then
+            TAG="${GITHUB_REF_NAME}"
+          fi
+          if [ -z "$TAG" ]; then
+            echo "ERROR: nessun tag. Su dispatch manuale inserisci il tag (es. v0.3.1-pilot)."
+            exit 1
+          fi
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "Preparing draft release for: $TAG"
 
-      - name: Validate tag exists and points to main history
+      # Ancestry control SOLO quando il tag esiste davvero (push di tag).
+      # Su dispatch manuale il tag puo' non esistere ancora: la draft lo ancora a main.
+      - name: Validate pushed tag points to main history
+        if: github.event_name == 'push'
         env:
           TAG: ${{ steps.tag.outputs.tag }}
         run: |
           set -euo pipefail
           git fetch --no-tags origin main
-          git fetch --force origin "refs/tags/$TAG:refs/tags/$TAG"
           TAG_SHA="$(git rev-parse "$TAG^{commit}")"
-          MAIN_SHA="$(git rev-parse origin/main)"
-          echo "tag sha:  $TAG_SHA"
-          echo "main sha: $MAIN_SHA"
-          git merge-base --is-ancestor "$TAG_SHA" origin/main || {
-            echo "ERROR: $TAG does not point to a commit reachable from origin/main."
+          if ! git merge-base --is-ancestor "$TAG_SHA" origin/main; then
+            echo "ERROR: $TAG non e' raggiungibile da origin/main."
             exit 1
-          }
+          fi
 
       - name: Create or update DRAFT release (no assets)
         env:
@@ -95,8 +103,11 @@ jobs:
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG exists — leaving as-is (assets managed locally)."
           else
+            # --target ancora la release a main: la draft si crea anche se il tag
+            # non esiste ancora (il tag verra' creato alla pubblicazione).
             gh release create "$TAG" \
               --draft \
+              --target "${{ github.sha }}" \
               --title "SEED $TAG" \
               --notes "$NOTES"
             echo "Draft release $TAG created. Upload assets locally, then publish."
