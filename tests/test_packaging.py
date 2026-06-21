@@ -7,6 +7,9 @@ import importlib.util
 from pathlib import Path
 import shutil
 import subprocess
+import json
+
+import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -150,6 +153,67 @@ def test_tester_reset_powershell_parses_when_available():
         capture_output=True,
         text=True,
     )
+
+
+def _load_script_module(name: str, relative: str):
+    spec = importlib.util.spec_from_file_location(name, ROOT / relative)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_bootstrap_resolves_only_official_current_or_pinned_assets():
+    module = _load_script_module(
+        "seed_bootstrap_installer_test", "scripts/seed_bootstrap_installer.py"
+    )
+    current = (
+        "https://github.com/Criss-0429/Seed_ai/releases/download/"
+        "v0.3.3-pilot-p2/runtime.zip"
+    )
+    pinned = (
+        "https://github.com/Criss-0429/Seed_ai/releases/download/"
+        "v0.3.2-pilot-p2/model.zip"
+    )
+
+    assert module.release_asset_url({"runtime.zip": current}, {"file": "runtime.zip"}) == current
+    assert module.release_asset_url({}, {"file": "model.zip", "download_url": pinned}) == pinned
+    with pytest.raises(RuntimeError, match="outside official repository"):
+        module.release_asset_url(
+            {}, {"file": "model.zip", "download_url": "https://evil.invalid/model.zip"}
+        )
+    with pytest.raises(RuntimeError, match="required release asset missing"):
+        module.release_asset_url({}, {"file": "missing.zip"})
+
+
+def test_preserved_models_are_pinned_to_source_release(tmp_path):
+    module = _load_script_module(
+        "build_bootstrap_release_test", "scripts/build_bootstrap_release.py"
+    )
+    manifest = {
+        "version": "0.3.2-pilot-p2",
+        "release_assets": {
+            "privacy_model": {
+                "file": "privacy.zip",
+                "sha256": "a" * 64,
+                "parts": [
+                    {"file": "privacy.part01", "sha256": "b" * 64, "bytes": 10},
+                    {"file": "privacy.part02", "sha256": "c" * 64, "bytes": 5},
+                ],
+            },
+            "emotion_model": {"file": "emotion.zip", "sha256": "d" * 64},
+            "embedding_model": {"file": "embedding.zip", "sha256": "e" * 64},
+        },
+    }
+    source = tmp_path / "release-manifest.json"
+    source.write_text(json.dumps(manifest), encoding="utf-8")
+
+    assets = module.preserved_model_assets(source)
+
+    base = "https://github.com/Criss-0429/Seed_ai/releases/download/v0.3.2-pilot-p2/"
+    assert assets["embedding-mpnet"]["download_url"] == base + "embedding.zip"
+    assert assets["emotion-wav2vec2"]["reused_from_release"] == "v0.3.2-pilot-p2"
+    assert assets["privacy-filter"]["parts"][0]["download_url"] == base + "privacy.part01"
 
 
 def test_runtime_pruning_removes_tests_caches_and_unused_audio_stack(tmp_path):

@@ -1,9 +1,10 @@
 """SEED bootstrap installer for tester GitHub Releases.
 
 The bootstrap is intentionally small. It downloads release assets from the same
-GitHub Release, verifies SHA-256 hashes from release-manifest.json, extracts the
-runtime/supervisor/model payloads under LocalAppData, creates shortcuts, and
-starts SEED through the supervisor.
+GitHub repository, verifies SHA-256 hashes from release-manifest.json, extracts
+the runtime/supervisor/model payloads under LocalAppData, creates shortcuts,
+and starts SEED through the supervisor. Unchanged model assets may be pinned to
+an older official SEED release instead of being uploaded again.
 """
 
 from __future__ import annotations
@@ -19,11 +20,13 @@ import urllib.error
 import urllib.request
 import zipfile
 from pathlib import Path
+from urllib.parse import urlparse
 
 OWNER = "Criss-0429"
 REPO = "Seed_ai"
 VERSION = "0.3.3-pilot-p2"
 API = f"https://api.github.com/repos/{OWNER}/{REPO}/releases/latest"
+OFFICIAL_RELEASE_PATH = f"/{OWNER}/{REPO}/releases/download/"
 
 
 def log(message: str) -> None:
@@ -63,6 +66,26 @@ def download(url: str, target: Path) -> None:
 
 def asset_map(release: dict) -> dict[str, str]:
     return {asset["name"]: asset["browser_download_url"] for asset in release.get("assets", [])}
+
+
+def release_asset_url(assets: dict[str, str], spec: dict) -> str:
+    """Resolve a current or pinned asset, accepting only official SEED URLs."""
+    name = spec.get("file")
+    if not isinstance(name, str) or not name:
+        raise RuntimeError("release asset without file name")
+    url = assets.get(name) or spec.get("download_url")
+    if not isinstance(url, str) or not url:
+        raise RuntimeError(f"required release asset missing: {name}")
+    parsed = urlparse(url)
+    if (
+        parsed.scheme != "https"
+        or parsed.netloc.lower() != "github.com"
+        or not parsed.path.startswith(OFFICIAL_RELEASE_PATH)
+        or parsed.query
+        or parsed.fragment
+    ):
+        raise RuntimeError(f"release asset outside official repository: {name}")
+    return url
 
 
 def extract_zip(archive: Path, destination: Path) -> None:
@@ -192,9 +215,7 @@ def main() -> int:
 
         required = ["runtime", "supervisor", "embedding_model", "emotion_model"]
         for key in required:
-            name = release_assets[key]["file"]
-            if name not in assets:
-                raise RuntimeError(f"required release asset missing: {name}")
+            release_asset_url(assets, release_assets[key])
 
         install_root.mkdir(parents=True, exist_ok=True)
         shutil.rmtree(install_root / "runtime", ignore_errors=True)
@@ -210,7 +231,7 @@ def main() -> int:
             spec = release_assets[key]
             archive = tmp / spec["file"]
             log(f"download {spec['file']}")
-            download(assets[spec["file"]], archive)
+            download(release_asset_url(assets, spec), archive)
             verify(archive, spec["sha256"])
             shutil.rmtree(destination, ignore_errors=True)
             log(f"extract {spec['file']}")
@@ -225,11 +246,9 @@ def main() -> int:
             with joined.open("wb") as out:
                 for part in parts:
                     name = part["file"]
-                    if name not in assets:
-                        raise RuntimeError(f"required release asset missing: {name}")
                     part_path = tmp / name
                     log(f"download {name}")
-                    download(assets[name], part_path)
+                    download(release_asset_url(assets, part), part_path)
                     verify(part_path, part["sha256"])
                     with part_path.open("rb") as inp:
                         shutil.copyfileobj(inp, out, 1024 * 1024)
