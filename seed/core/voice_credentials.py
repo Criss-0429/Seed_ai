@@ -11,7 +11,6 @@ Il file persistito contiene solo metadati e ciphertext, mai la key in chiaro.
 
 from __future__ import annotations
 
-import base64
 import json
 import time
 from pathlib import Path
@@ -20,7 +19,7 @@ from typing import Any, Callable
 import requests
 
 from . import forbidden
-from .provider_hub import _protect, _unprotect  # DPAPI condiviso (no-op fuori da Windows)
+from .dpapi import decrypt_str, encrypt_str
 
 SCHEMA_VERSION = "seed.voice-credentials.v1"
 _API = "https://api.elevenlabs.io/v1"
@@ -32,14 +31,6 @@ class VoiceCredentialsError(RuntimeError):
 
 def voice_credentials_path() -> Path:
     return forbidden.core_config_dir() / "voice_credentials.json"
-
-
-def _encrypted(key: str) -> str:
-    return base64.b64encode(_protect(key.encode("utf-8"))).decode("ascii")
-
-
-def _decrypted(value: str) -> str:
-    return _unprotect(base64.b64decode(value.encode("ascii"))).decode("utf-8")
 
 
 class VoiceCredentials:
@@ -79,7 +70,7 @@ class VoiceCredentials:
     def api_key(self) -> str:
         data = self._load()
         cipher = data.get("key_dpapi")
-        return _decrypted(cipher) if cipher else ""
+        return decrypt_str(cipher) if cipher else ""
 
     # -- mutazioni --------------------------------------------------------
     def validate_and_save(self, api_key: str) -> dict:
@@ -88,7 +79,7 @@ class VoiceCredentials:
             raise VoiceCredentialsError("API key richiesta")
         self._validate_key(api_key)
         data = self._load()
-        data["key_dpapi"] = _encrypted(api_key)
+        data["key_dpapi"] = encrypt_str(api_key)
         data["validated_at"] = time.time()
         data["skipped"] = False
         self._save(data)

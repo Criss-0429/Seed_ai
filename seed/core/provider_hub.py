@@ -6,12 +6,8 @@ Il file persistito contiene solo metadati, catalogo modelli e ciphertext.
 
 from __future__ import annotations
 
-import base64
-import ctypes
-import ctypes.wintypes as wt
 import json
 import logging
-import os
 import re
 import time
 from dataclasses import dataclass
@@ -21,6 +17,7 @@ from typing import Any, Callable
 import requests
 
 from . import forbidden
+from .dpapi import decrypt_str, encrypt_str
 
 log = logging.getLogger("seed.provider_hub")
 
@@ -106,56 +103,6 @@ def provider_hub_path() -> Path:
     return forbidden.core_config_dir() / "providers.json"
 
 
-def _protect(data: bytes) -> bytes:
-    if os.name != "nt":
-        return data
-
-    class DATA_BLOB(ctypes.Structure):
-        _fields_ = [("cbData", wt.DWORD), ("pbData", ctypes.POINTER(ctypes.c_char))]
-
-    buf = ctypes.create_string_buffer(data, len(data))
-    blob_in = DATA_BLOB(len(data), ctypes.cast(buf, ctypes.POINTER(ctypes.c_char)))
-    blob_out = DATA_BLOB()
-    ok = ctypes.windll.crypt32.CryptProtectData(
-        ctypes.byref(blob_in), "SEED Provider Hub", None, None, None, 0, ctypes.byref(blob_out)
-    )
-    if not ok:
-        raise ProviderHubError("DPAPI encryption failed")
-    try:
-        return ctypes.string_at(blob_out.pbData, blob_out.cbData)
-    finally:
-        ctypes.windll.kernel32.LocalFree(blob_out.pbData)
-
-
-def _unprotect(data: bytes) -> bytes:
-    if os.name != "nt":
-        return data
-
-    class DATA_BLOB(ctypes.Structure):
-        _fields_ = [("cbData", wt.DWORD), ("pbData", ctypes.POINTER(ctypes.c_char))]
-
-    buf = ctypes.create_string_buffer(data, len(data))
-    blob_in = DATA_BLOB(len(data), ctypes.cast(buf, ctypes.POINTER(ctypes.c_char)))
-    blob_out = DATA_BLOB()
-    ok = ctypes.windll.crypt32.CryptUnprotectData(
-        ctypes.byref(blob_in), None, None, None, None, 0, ctypes.byref(blob_out)
-    )
-    if not ok:
-        raise ProviderHubError("DPAPI decryption failed")
-    try:
-        return ctypes.string_at(blob_out.pbData, blob_out.cbData)
-    finally:
-        ctypes.windll.kernel32.LocalFree(blob_out.pbData)
-
-
-def _encrypted(key: str) -> str:
-    return base64.b64encode(_protect(key.encode("utf-8"))).decode("ascii")
-
-
-def _decrypted(value: str) -> str:
-    return _unprotect(base64.b64decode(value.encode("ascii"))).decode("utf-8")
-
-
 class ProviderHub:
     def __init__(
         self,
@@ -225,7 +172,7 @@ class ProviderHub:
         self._test_conversation(provider, api_key, selected["conversation"])
         data = self._load()
         data["profiles"][provider] = {
-            "key_dpapi": _encrypted(api_key),
+            "key_dpapi": encrypt_str(api_key),
             "models": models,
             "roles": selected,
             "validated_at": time.time(),
@@ -296,7 +243,7 @@ class ProviderHub:
         return ProviderRuntime(
             provider=selected,
             base_url=str(PROVIDERS[selected]["base_url"]),
-            api_key=_decrypted(profile["key_dpapi"]),
+            api_key=decrypt_str(profile["key_dpapi"]),
             roles=dict(profile["roles"]),
         )
 
@@ -344,7 +291,7 @@ class ProviderHub:
             return False
         data = self._load()
         data["profiles"][provider] = {
-            "key_dpapi": _encrypted(api_key),
+            "key_dpapi": encrypt_str(api_key),
             "models": sorted(set(filter(None, roles.values()))),
             "roles": {k: v for k, v in roles.items() if k in ROLE_NAMES and v},
             "validated_at": None,
