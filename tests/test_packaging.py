@@ -12,6 +12,21 @@ import subprocess
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def test_release_version_is_consistent_across_runtime_and_bootstrap():
+    expected = "0.3.3-pilot-p2"
+    package = (ROOT / "seed" / "__init__.py").read_text(encoding="utf-8")
+    bootstrap = (ROOT / "scripts" / "seed_bootstrap_installer.py").read_text(
+        encoding="utf-8"
+    )
+    builder = (ROOT / "scripts" / "build_bootstrap_release.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert f'__version__ = "{expected}"' in package
+    assert f'VERSION = "{expected}"' in bootstrap
+    assert f'default="{expected}"' in builder
+
+
 def test_pyinstaller_uses_package_entrypoint():
     spec = (ROOT / "packaging" / "pyinstaller" / "seed.spec").read_text(encoding="utf-8")
     assert "['../../build_entry.py']" in spec
