@@ -102,7 +102,7 @@ class SeedApp:
 
         self.memory = Memory()
         self.provider_hub = ProviderHub(
-            audit=lambda ev, payload: self.memory.add_event(ev, payload))
+            audit=self.memory.add_event)
         self.gate = PrivacyGate(self.memory,
                                 opf_checkpoint=self.cfg.privacy.opf_checkpoint,
                                 recall_bias=self.cfg.privacy.recall_bias,
@@ -162,7 +162,7 @@ class SeedApp:
                 allow_automatic_premium_escalation=(
                     self.cfg.models.policy.allow_automatic_premium_escalation),
             ),
-            audit=lambda ev, payload: self.memory.add_event(ev, payload),
+            audit=self.memory.add_event,
             provider=hub_runtime.provider if hub_runtime else self.cfg.models.provider,
             ollama_fallback_client=fallback_client,
             ollama_fallback_roles=hub_fallback.roles if hub_fallback else None,
@@ -182,7 +182,7 @@ class SeedApp:
         self.design_reviewer = DesignReviewer(
             lineage=getattr(self.evolution, "lineage", None),
             reviews_root=forbidden.seed_data_dir() / "lab" / "design_reviews",
-            audit=lambda ev, payload: self.memory.add_event(ev, payload),
+            audit=self.memory.add_event,
             real_enabled=self.cfg.models.policy.design_reviewer_real_enabled,
         )
         self.evolution.set_design_reviewer(self.design_reviewer, self.models)
@@ -202,12 +202,12 @@ class SeedApp:
         # ha precedenza; in sua assenza si usa quella eventuale in config.json.
         # Nessuna key = voce spenta, SEED resta testuale.
         self.voice_credentials = VoiceCredentials(
-            audit=lambda ev, payload: self.memory.add_event(ev, payload))
+            audit=self.memory.add_event)
         self.cfg.voice.elevenlabs_api_key = (
             self.voice_credentials.api_key() or self.cfg.voice.elevenlabs_api_key)
         self.voice = VoiceEngine(
             self.cfg.voice,
-            audit=lambda ev, payload: self.memory.add_event(ev, payload))
+            audit=self.memory.add_event)
         # S11.2: emotion recognizer (SER) per-turno, opt-in, SOLO pannello voce.
         self.emotion = (
             EmotionRecognizer(self.cfg.voice.emotion_model)
@@ -229,11 +229,11 @@ class SeedApp:
             heartbeat_seconds=self.cfg.daemon.heartbeat_seconds,
             cooldown_seconds=self.cfg.daemon.cooldown_seconds,
             min_net_value=self.cfg.daemon.min_net_value,
-            audit=lambda ev, payload: self.memory.add_event(ev, payload),
+            audit=self.memory.add_event,
             can_run=lambda: self.onboarding.complete,
         )
         self.startup = WindowsStartup(
-            audit=lambda ev, payload: self.memory.add_event(ev, payload))
+            audit=self.memory.add_event)
         # D2: worker adapter READ-only dietro permission broker + audit. Riceve
         # SOLO un provider di stato aggregato (review del daemon), mai config/key
         # o memoria grezza: per costruzione non puo' scrivere o leggere file/shell.
@@ -241,7 +241,7 @@ class SeedApp:
             worker_mod.build_runtime_status_worker(
                 broker=self.broker,
                 status_provider=self.daemon.review,
-                audit=lambda ev, payload: self.memory.add_event(ev, payload),
+                audit=self.memory.add_event,
                 allowed_actions=tuple(self.cfg.worker.allowed_actions),
             )
             if self.cfg.worker.enabled else None)
@@ -253,10 +253,10 @@ class SeedApp:
             enabled=self.cfg.observation.enabled,
             sensitive_excluded=self.cfg.observation.sensitive_excluded,
             min_salience=self.cfg.observation.min_salience,
-            audit=lambda ev, payload: self.memory.add_event(ev, payload))
+            audit=self.memory.add_event)
         self.observation_collector = ObservationCollector(
             self.observation, poll_seconds=self.cfg.observation.poll_seconds,
-            audit=lambda ev, payload: self.memory.add_event(ev, payload))
+            audit=self.memory.add_event)
         # D4: worker WRITE_SAFE. Default OFF; write reversibili allowlistate dietro
         # gate D3 (approval owner + dry-run + rollback + observation). Critiche
         # vietate. Nessuna shell, scrittura solo entro il workspace.
@@ -264,28 +264,28 @@ class SeedApp:
             broker=self.broker,
             enabled=self.cfg.worker.write_safe_enabled,
             allowed_actions=tuple(self.cfg.worker.write_safe_actions),
-            audit=lambda ev, payload: self.memory.add_event(ev, payload))
+            audit=self.memory.add_event)
         # D5: skills procedurali + delega. Default OFF; nessuna skill attiva senza
         # audit + reviewer + owner gate (mai self-install). Delega a sub-agenti
         # isolati gated (processo ristretto/container, rilevati a runtime).
         self.skills = SkillRegistry(
             enabled=self.cfg.skills.enabled,
             allowed_capabilities=tuple(self.cfg.skills.allowed_capabilities),
-            audit=lambda ev, payload: self.memory.add_event(ev, payload))
+            audit=self.memory.add_event)
         self.subagent = CapabilityTaskAgent(
             self.registry, enabled=self.cfg.skills.delegation_enabled,
             allowed_capabilities=tuple(self.cfg.skills.allowed_capabilities),
-            audit=lambda ev, payload: self.memory.add_event(ev, payload))
+            audit=self.memory.add_event)
         self.tool_builder = GovernedToolBuilder(
             self.registry, forbidden.seed_data_dir() / "lab" / "tool_candidates",
             enabled=self.cfg.evolution.tool_builder_enabled,
-            audit=lambda ev, payload: self.memory.add_event(ev, payload))
+            audit=self.memory.add_event)
         self.mutation_lifecycle = MutationLifecycle(
             self.evolution.lineage, self.evolution.promotion,
             forbidden.seed_data_dir() / "lab" / "promotion_proposals",
             enabled=self.cfg.evolution.lifecycle_enabled,
             canary_context=self.cfg.evolution.canary_context,
-            audit=lambda ev, payload: self.memory.add_event(ev, payload))
+            audit=self.memory.add_event)
         # P7: Selective Capability Forge. Default OFF. Orchestratore degli engine
         # (evidence/fitness/connector/builder/evaluator/connection/activation): con
         # capability_forge.enabled=False espone solo lo stato e non osserva/costruisce/
@@ -304,12 +304,12 @@ class SeedApp:
             advance_canary=lambda mutation_id: self.ui_advance_mutations(
                 owner_approved_canary=True, mutation_id=mutation_id),
             design_review=self._review_tool_candidate,
-            audit=lambda ev, payload: self.memory.add_event(ev, payload),
+            audit=self.memory.add_event,
         )
         self.brand = BrandEvolution(
             self.memory, self.evolution.ui_manifest,
             lambda manifest: self.evolution._save_json("ui_manifest.json", manifest),
-            audit=lambda ev, payload: self.memory.add_event(ev, payload))
+            audit=self.memory.add_event)
         self.operations = OperationsManager(forbidden.seed_data_dir())
         from seed import __version__
         self.release_updater = ReleaseUpdater(
@@ -1032,7 +1032,7 @@ class SeedApp:
         self.cfg.voice.elevenlabs_api_key = self.voice_credentials.api_key()
         self.voice = VoiceEngine(
             self.cfg.voice,
-            audit=lambda ev, payload: self.memory.add_event(ev, payload))
+            audit=self.memory.add_event)
 
     def _reload_provider_models(self) -> None:
         """Ricollega i consumer LLM dopo cambio profilo, senza riavvio."""
@@ -1060,7 +1060,7 @@ class SeedApp:
                 allow_automatic_premium_escalation=(
                     self.cfg.models.policy.allow_automatic_premium_escalation),
             ),
-            audit=lambda ev, payload: self.memory.add_event(ev, payload),
+            audit=self.memory.add_event,
             provider=runtime.provider,
             ollama_fallback_client=fallback_client,
             ollama_fallback_roles=fallback.roles if fallback else None,

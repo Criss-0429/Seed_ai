@@ -11,6 +11,8 @@ import json
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
+from .jsonio import write_json_atomic
+
 SCHEMA_VERSION = 1
 
 
@@ -209,11 +211,5 @@ def build_runtime_benchmark() -> dict:
 
 def write_runtime_benchmark(output_dir: Path) -> Path:
     """Atomically persist the privacy-safe D0 report."""
-    output_dir = Path(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
-    target = output_dir / "runtime_option_benchmark_v1.json"
-    temp = target.with_suffix(".tmp")
-    temp.write_text(json.dumps(build_runtime_benchmark(), ensure_ascii=False, indent=2),
-                    encoding="utf-8")
-    temp.replace(target)
-    return target
+    target = Path(output_dir) / "runtime_option_benchmark_v1.json"
+    return write_json_atomic(target, build_runtime_benchmark(), ensure_ascii=False)

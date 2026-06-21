@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from . import forbidden
+from .jsonio import write_json_atomic
 
 _REPO_CONFIG = Path(__file__).resolve().parents[2] / "config" / "config.json"
 _REPO_TEMPLATE = Path(__file__).resolve().parents[2] / "config" / "config.example.json"
@@ -355,7 +356,5 @@ def scrub_legacy_provider_keys(path: Path | None = None) -> bool:
             changed = True
     if not changed:
         return False
-    temp = target.with_suffix(".tmp")
-    temp.write_text(json.dumps(data, ensure_ascii=True, indent=2), encoding="utf-8")
-    temp.replace(target)
+    write_json_atomic(target, data)
     return True

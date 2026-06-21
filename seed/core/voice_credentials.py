@@ -20,6 +20,7 @@ import requests
 
 from . import forbidden
 from .dpapi import decrypt_str, encrypt_str
+from .jsonio import write_json_atomic
 
 SCHEMA_VERSION = "seed.voice-credentials.v1"
 _API = "https://api.elevenlabs.io/v1"
@@ -124,10 +125,7 @@ class VoiceCredentials:
 
     def _save(self, data: dict) -> None:
         data["schema_version"] = SCHEMA_VERSION
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        temp = self.path.with_suffix(".tmp")
-        temp.write_text(json.dumps(data, ensure_ascii=True, indent=2), encoding="utf-8")
-        temp.replace(self.path)
+        write_json_atomic(self.path, data)
 
     def _record(self, event: str, ok: bool) -> None:
         if self._audit:
