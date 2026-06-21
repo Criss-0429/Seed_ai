@@ -216,6 +216,24 @@ def test_preserved_models_are_pinned_to_source_release(tmp_path):
     assert assets["privacy-filter"]["parts"][0]["download_url"] == base + "privacy.part01"
 
 
+def test_site_uses_latest_installer_digest_without_cors_dependency():
+    site = (ROOT / "site" / "index.html").read_text(encoding="utf-8")
+
+    assert 'match(/^sha256:([A-Fa-f0-9]{64})$/)' in site
+    assert "shaFromDigest(installer.digest)" in site
+    assert "if (installerSha) showSha(installerSha)" in site
+    assert "releases/latest" in site
+
+
+def test_release_workflow_force_fetches_annotated_tag():
+    workflow = (ROOT / ".github" / "workflows" / "release.yml").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'git fetch --force origin "refs/tags/$TAG:refs/tags/$TAG"' in workflow
+    assert 'git rev-parse "$TAG^{commit}"' in workflow
+
+
 def test_runtime_pruning_removes_tests_caches_and_unused_audio_stack(tmp_path):
     spec = importlib.util.spec_from_file_location(
         "build_release", ROOT / "scripts" / "build_release.py"

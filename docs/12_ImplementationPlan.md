@@ -423,6 +423,21 @@ Evidenza implementativa pre-release:
 - `34` test packaging/distribution/updater passati, inclusi URL pin-nato valido,
   URL malevolo bloccato, asset mancante bloccato e generazione metadata riuso.
 
+Evidenza pubblicazione:
+
+- release `v0.3.3-pilot-p2` pubblicata come latest dal commit
+  `460316a2e9afdcf360af0729683e070182ab6452`;
+- pubblicati sette asset nuovi per circa 248 MB: bootstrap, runtime, supervisor,
+  manifest, somme, guida tester e reset script; digest e dimensioni GitHub
+  corrispondono ai file locali;
+- i quattro asset modello restano nella release `v0.3.2-pilot-p2`; tutti gli URL
+  pin-nati rispondono HTTP 200 e il bootstrap ne verifica gli hash originali;
+- smoke del runtime e del supervisor pacchettizzati conclusi con exit code `0`;
+- il sito usa l'API latest per versione, link, dimensione e digest SHA-256
+  dell'installer, mantenendo il download diretto alla release latest;
+- corretto il workflow release per validare anche i tag Git annotati senza
+  conflitto sul ref locale.
+
 ## Feature Context Pack - P2 Lint E Riduzione Dimensioni
 
 **Feature esatta:** `P2 - Lint E Riduzione Dimensioni`, terza fase del programma
