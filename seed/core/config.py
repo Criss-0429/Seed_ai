@@ -203,6 +203,18 @@ class CapabilityForgeConfig:
 
 
 @dataclass
+class MaintenanceConfig:
+    """Retention dei dati locali rigenerabili: evita che %LOCALAPPDATA%\\SEED
+    cresca senza limite (snapshot versioni, backup, lab, trace) riempiendo l'SSD.
+    Eseguita all'avvio. 0 = nessun limite per quella voce."""
+    enabled: bool = True
+    keep_versions: int = 10        # snapshot in versions/
+    keep_backups: int = 5          # operations/backups/
+    keep_lab_runs: int = 20        # lab/descendants e lab/evaluator_runs (ciascuna)
+    trace_days: int = 30           # data/traces/*.jsonl piu' vecchi di N giorni
+
+
+@dataclass
 class SeedConfig:
     user_alias: str = "utente"     # alias scelto dall'utente, NON il nome reale
     llm: LLMConfig = field(default_factory=LLMConfig)
@@ -219,6 +231,7 @@ class SeedConfig:
     skills: SkillsConfig = field(default_factory=SkillsConfig)
     web_render: WebRenderConfig = field(default_factory=WebRenderConfig)
     capability_forge: CapabilityForgeConfig = field(default_factory=CapabilityForgeConfig)
+    maintenance: MaintenanceConfig = field(default_factory=MaintenanceConfig)
 
     def redacted_summary(self) -> dict:
         """Versione loggabile: key sostituite da presenza/assenza."""
@@ -274,6 +287,7 @@ def _from_dict(d: dict) -> SeedConfig:
                                ("skills", cfg.skills),
                                ("web_render", cfg.web_render),
                                ("capability_forge", cfg.capability_forge),
+                               ("maintenance", cfg.maintenance),
                                ("provider_hub", cfg.provider_hub)):
         for k, v in d.get(section, {}).items():
             if hasattr(cls_field, k):

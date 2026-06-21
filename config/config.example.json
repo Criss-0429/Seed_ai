@@ -50,6 +50,13 @@
     "lite_mode": false,
     "opf_idle_unload_s": 120
   },
+  "maintenance": {
+    "enabled": true,
+    "keep_versions": 10,
+    "keep_backups": 5,
+    "keep_lab_runs": 20,
+    "trace_days": 30
+  },
   "watcher": {
     "enabled": true,
     "poll_seconds": 5,
