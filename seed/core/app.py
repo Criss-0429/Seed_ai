@@ -415,6 +415,12 @@ class SeedApp:
     # ------------------------------------------------------------------
     def start_background(self) -> None:
         _tune_torch_threads()
+        # Retention dati locali: evita che %LOCALAPPDATA%\SEED riempia l'SSD.
+        try:
+            from .maintenance import prune_runtime_data
+            prune_runtime_data(self.cfg.maintenance)
+        except Exception as exc:
+            log.warning("retention all'avvio fallita: %s", exc)
         # Privacy Filter caricato in un thread daemon: il boot non si blocca sul
         # load/download del modello e la prima chat lo trova gia' caldo. Se non
         # ancora pronto, `redact()` lo carica comunque lazy (fail-safe).
