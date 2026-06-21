@@ -180,13 +180,20 @@ def test_gate_bundled_models_resolve_locally(tmp_path, monkeypatch):
 
 
 # --- Gate 6: download runtime inatteso ------------------------------------
-def test_gate_bundled_runtime_enforces_offline(tmp_path, monkeypatch):
+def test_gate_bundled_runtime_offline_only_when_forced(tmp_path, monkeypatch):
+    import os
     root = tmp_path / "models"
     (root / "privacy-filter").mkdir(parents=True)
     monkeypatch.setenv("SEED_MODEL_BUNDLE", str(root))
     monkeypatch.delenv("HF_HUB_OFFLINE", raising=False)
+    monkeypatch.delenv("SEED_FORCE_OFFLINE", raising=False)
+    # default: bundle presente ma NIENTE offline globale (i modelli opzionali
+    # devono potersi scaricare on-demand; i bundlati caricano per path locale).
     assert model_bundle.enforce_offline_if_bundled() is True
-    import os
+    assert "HF_HUB_OFFLINE" not in os.environ
+    # offline duro solo se richiesto esplicitamente
+    monkeypatch.setenv("SEED_FORCE_OFFLINE", "1")
+    assert model_bundle.enforce_offline_if_bundled() is True
     assert os.environ["HF_HUB_OFFLINE"] == "1"
 
 

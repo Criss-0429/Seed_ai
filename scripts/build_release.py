@@ -59,9 +59,15 @@ def latest_snapshot(root: Path) -> Path:
     return max(snapshots, key=lambda path: path.stat().st_mtime)
 
 
-def copy_models(target: Path) -> dict[str, int]:
+def copy_models(target: Path, include: set[str]) -> dict[str, int]:
+    """Bundla solo i modelli in `include`. Default: privacy-filter (l'unico usato
+    dalla config di default). embedding/emotion sono OFF di default: bundlarli
+    gonfia l'installer di ~1.8GB per nulla, percio' si scaricano on-demand se
+    l'utente li attiva."""
     sizes = {}
     for name, source in MODEL_SOURCES.items():
+        if name not in include:
+            continue
         if not source.is_dir():
             raise RuntimeError(f"required ML checkpoint missing: {source}")
         actual = latest_snapshot(source) if source.name == "snapshots" else source
@@ -153,6 +159,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--schema-version", type=int, default=1)
     parser.add_argument("--skip-build", action="store_true")
     parser.add_argument("--finalize-installer", action="store_true")
+    # Modelli ML opzionali (default OFF): bundlarli gonfia l'installer.
+    parser.add_argument("--with-embedding", action="store_true",
+                        help="bundla il modello embedding (~1.1GB)")
+    parser.add_argument("--with-emotion", action="store_true",
+                        help="bundla il modello emotion wav2vec2 (~0.7GB)")
     args = parser.parse_args(argv)
 
     target = RELEASES / args.version
@@ -175,7 +186,12 @@ def main(argv: list[str] | None = None) -> int:
     supervisor_pruned = prune_runtime(target / "app" / "supervisor")
     pruned["files"] += supervisor_pruned["files"]
     pruned["bytes"] += supervisor_pruned["bytes"]
-    model_sizes = copy_models(target / "app" / "models")
+    include = {"privacy-filter"}
+    if args.with_embedding:
+        include.add("embedding-mpnet")
+    if args.with_emotion:
+        include.add("emotion-wav2vec2")
+    model_sizes = copy_models(target / "app" / "models", include)
     shutil.copy2(ROOT / "installer" / "TESTER_GUIDE.md", target / "TESTER_GUIDE.md")
     shutil.copy2(
         ROOT / "installer" / "Reset-SEED-Keep-Memory.ps1",

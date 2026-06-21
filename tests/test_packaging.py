@@ -225,13 +225,19 @@ def test_site_uses_latest_installer_digest_without_cors_dependency():
     assert "releases/latest" in site
 
 
-def test_release_workflow_force_fetches_annotated_tag():
+def test_release_workflow_draft_works_before_tag_exists():
     workflow = (ROOT / ".github" / "workflows" / "release.yml").read_text(
         encoding="utf-8"
     )
 
-    assert 'git fetch --force origin "refs/tags/$TAG:refs/tags/$TAG"' in workflow
-    assert 'git rev-parse "$TAG^{commit}"' in workflow
+    # checkout completo per merge-base
+    assert "fetch-depth: 0" in workflow
+    # niente fetch cieco del tag (causava exit 128 su tag non ancora esistente)
+    assert 'git fetch --force origin "refs/tags/$TAG:refs/tags/$TAG"' not in workflow
+    # ancestry SOLO su push di tag (quando il tag esiste davvero)
+    assert "if: github.event_name == 'push'" in workflow
+    # la draft si ancora a un commit, cosi' funziona anche se il tag non esiste
+    assert "--target" in workflow
 
 
 def test_runtime_pruning_removes_tests_caches_and_unused_audio_stack(tmp_path):

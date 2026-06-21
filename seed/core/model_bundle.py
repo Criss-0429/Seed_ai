@@ -35,9 +35,13 @@ def resolve(model: str) -> str:
 
 
 def enforce_offline_if_bundled() -> bool:
-    if bundle_root() is None:
-        return False
-    os.environ["HF_HUB_OFFLINE"] = "1"
-    os.environ["TRANSFORMERS_OFFLINE"] = "1"
-    os.environ["HF_DATASETS_OFFLINE"] = "1"
-    return True
+    """I modelli bundlati si caricano per path locale esplicito (vedi resolve),
+    quindi NON serve forzare HuggingFace offline a livello globale: farlo
+    impedirebbe il download on-demand dei modelli opzionali (embedding/emotion)
+    non bundlati. L'offline duro resta attivabile via SEED_FORCE_OFFLINE=1."""
+    bundled = bundle_root() is not None
+    if bundled and os.environ.get("SEED_FORCE_OFFLINE") == "1":
+        os.environ["HF_HUB_OFFLINE"] = "1"
+        os.environ["TRANSFORMERS_OFFLINE"] = "1"
+        os.environ["HF_DATASETS_OFFLINE"] = "1"
+    return bundled
