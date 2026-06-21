@@ -325,6 +325,57 @@ Rischi residui:
 - la release installabile deve essere rigenerata dopo merge per distribuire il
   fix ai tester; questa verifica riguarda il sorgente e il workflow locale.
 
+### Follow-up P1 - Reinstallazione Pulita Tester Con Memoria Preservata (2026-06-21)
+
+**Autorizzazione owner:** fornire al tester una procedura una tantum per
+rimuovere installazioni SEED duplicate e ripartire dall'installer completo
+aggiornato, preservando esclusivamente la memoria locale.
+
+Decisioni operative:
+
+- lo script opera solo sotto `%LOCALAPPDATA%` e sui path SEED riconosciuti;
+- la memoria canonica e `data/seed.db`; eventuali sidecar SQLite
+  `seed.db-wal` e `seed.db-shm` vengono preservati insieme;
+- prima della cancellazione viene creata una copia verificata tramite SHA-256
+  fuori da `%LOCALAPPDATA%/SEED`; la copia resta disponibile dopo il reset;
+- processi SEED e supervisor vengono arrestati prima della copia SQLite;
+- vengono rimossi installazioni runtime/modelli, duplicati riconoscibili,
+  dati rigenerabili, config e credenziali, lineage, workspace, backup, shortcut
+  e avvio automatico HKCU;
+- la root dati viene ricreata contenendo soltanto i file memoria preservati;
+- nessun repository, documento utente o path fuori da `%LOCALAPPDATA%` viene
+  enumerato o cancellato;
+- modalita `-WhatIf` mostra il piano senza modificare il PC; l'esecuzione reale
+  richiede conferma testuale o parametro esplicito `-Yes`.
+
+Test richiesti:
+
+- parsing PowerShell valido;
+- presenza di guardie path, `-WhatIf`, conferma e backup hashato;
+- allowlist memoria limitata a `seed.db`, `seed.db-wal`, `seed.db-shm`;
+- cleanup di startup e shortcut dichiarato;
+- build release copia lo script tester e lo include in `SHA256SUMS.txt`.
+
+Rischi e limiti:
+
+- provider key, preferenze non ancora consolidate nel DB, capability generate,
+  lineage e file workspace vengono intenzionalmente persi;
+- una memoria SQLite gia corrotta viene copiata ma non riparata; lo script
+  verifica identita byte-per-byte, non integrita semantica del database;
+- installazioni collocate manualmente fuori da `%LOCALAPPDATA%` non vengono
+  rimosse automaticamente per evitare cancellazioni eccessive.
+
+Evidenze di verifica (2026-06-21):
+
+- parser Windows PowerShell 5.1 valido;
+- simulazione locale `-WhatIf -Yes` riuscita: rilevata una installazione
+  canonica e `data/seed.db`, zero modifiche eseguite;
+- `25` test packaging e distribution gate passati;
+- `ruff check seed scripts tests`, `compileall seed scripts` e
+  `git diff --check` passati;
+- il release builder copia `Reset-SEED-Keep-Memory.ps1`; il bootstrap manifest
+  lo dichiara come `tester_reset` e `SHA256SUMS.txt` lo include automaticamente.
+
 ## Feature Context Pack - P2 Lint E Riduzione Dimensioni
 
 **Feature esatta:** `P2 - Lint E Riduzione Dimensioni`, terza fase del programma
