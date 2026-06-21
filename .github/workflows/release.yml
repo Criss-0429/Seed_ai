@@ -58,8 +58,8 @@ jobs:
         run: |
           set -euo pipefail
           git fetch --no-tags origin main
-          git fetch origin "refs/tags/$TAG:refs/tags/$TAG"
-          TAG_SHA="$(git rev-list -n 1 "$TAG")"
+          git fetch --force origin "refs/tags/$TAG:refs/tags/$TAG"
+          TAG_SHA="$(git rev-parse "$TAG^{commit}")"
           MAIN_SHA="$(git rev-parse origin/main)"
           echo "tag sha:  $TAG_SHA"
           echo "main sha: $MAIN_SHA"
@@ -81,11 +81,12 @@ jobs:
 
           ### Asset attesi (caricati localmente / da runner self-hosted)
           - SEED-Bootstrap-Setup-Unsigned.exe
-          - SEED-runtime-$TAG.zip
-          - SEED-models-*-$TAG.zip
+          - SEED-<version>-runtime-update.zip
+          - SEED-<version>-supervisor.zip
           - release-manifest.json
           - SHA256SUMS.txt
           - TESTER_GUIDE.md
+          - Reset-SEED-Keep-Memory.ps1
 
           > Questa draft è stata creata dalla CI. Gli asset NON vengono costruiti
           > su runner GitHub: aggiungili dalla macchina di build, poi pubblica.

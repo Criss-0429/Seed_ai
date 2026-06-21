@@ -621,6 +621,10 @@ kbd { font-family: var(--mono); font-size: 12px; line-height: 1; color: var(--in
     }
     return null;
   }
+  function shaFromDigest(digest) {
+    var m = String(digest || "").match(/^sha256:([A-Fa-f0-9]{64})$/);
+    return m ? m[1].toLowerCase() : null;
+  }
   function showSha(hash) { if (!hash) return; var box = $("hashbox"); if (box) box.hidden = false; setText("m-sha", hash); }
   function fetchSha(sumsUrl) {
     if (!sumsUrl) return;
@@ -697,7 +701,9 @@ kbd { font-family: var(--mono); font-size: 12px; line-height: 1; color: var(--in
           setText("m-size", "—");
           fallback("installer non ancora pubblicato in questa release");
         }
-        fetchSha(sums ? sums.browser_download_url : (RELEASE_PAGE + "/download/" + SUMS));
+        var installerSha = installer ? shaFromDigest(installer.digest) : null;
+        if (installerSha) showSha(installerSha);
+        else fetchSha(sums ? sums.browser_download_url : (RELEASE_PAGE + "/download/" + SUMS));
       })
       .catch(function () { fallback("API GitHub non raggiungibile — link diretto attivo"); });
   }
