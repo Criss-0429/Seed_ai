@@ -376,6 +376,42 @@ Evidenze di verifica (2026-06-21):
 - il release builder copia `Reset-SEED-Keep-Memory.ps1`; il bootstrap manifest
   lo dichiara come `tester_reset` e `SHA256SUMS.txt` lo include automaticamente.
 
+### Follow-up P1 - Release 0.3.3 E Latest Site (2026-06-21)
+
+**Autorizzazione owner:** pubblicare `v0.3.3-pilot-p2` con retention sicura,
+update in-place e reset tester, quindi renderla latest per sito e updater.
+
+Decisioni operative:
+
+- bump coerente di package, bootstrap e default build a `0.3.3-pilot-p2`;
+- build dal commit `main` definitivo dopo merge e CI verde;
+- runtime, supervisor, bootstrap, manifest, somme, guida e reset script vengono
+  rigenerati; nessun monolitico oltre i limiti GitHub viene pubblicato;
+- modelli invariati vengono riutilizzati byte-per-byte, ma devono essere
+  disponibili come asset della nuova release o tramite contratto esplicito
+  verificato dal bootstrap; una latest incompleta non viene pubblicata;
+- `release-manifest.json` e `SHA256SUMS.txt` devono descrivere tutti gli asset
+  effettivamente scaricati dal bootstrap;
+- il sito continua a usare GitHub `releases/latest` e l'API latest: nessun tag
+  versione viene hardcodato nella pagina; la pubblicazione aggiorna download,
+  versione, data, dimensione e SHA-256 automaticamente;
+- la release precedente resta disponibile per rollback, ma non latest.
+
+Test richiesti:
+
+- suite mirata version/build/release, Ruff, compileall e diff check;
+- manifest e somme verificati localmente;
+- bootstrap/runtime smoke non distruttivo;
+- release GitHub pubblicata con asset richiesti e nessun file oltre 2 GiB;
+- URL `releases/latest/download/SEED-Bootstrap-Setup-Unsigned.exe` HTTP 200;
+- API latest e sito mostrano `v0.3.3-pilot-p2` con hash installer corretto.
+
+Rischi residui:
+
+- upload dei modelli invariati puo essere lungo anche senza ricompressione;
+- asset e installer restano unsigned, quindi SmartScreen e atteso;
+- non viene modificato o aggiornato Graphify.
+
 ## Feature Context Pack - P2 Lint E Riduzione Dimensioni
 
 **Feature esatta:** `P2 - Lint E Riduzione Dimensioni`, terza fase del programma
