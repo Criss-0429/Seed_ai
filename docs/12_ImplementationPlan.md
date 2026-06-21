@@ -264,6 +264,67 @@ Rischi residui:
 - interruzioni ripetute conservano il `.part` per la ripresa e possono occupare
   temporaneamente fino alla dimensione del pacchetto runtime.
 
+### Follow-up P1 - Update In-Place E Retention Sicura (2026-06-21)
+
+**Autorizzazione owner:** verificare e correggere il push `82c1c5a`, destinato a
+impedire crescita locale non limitata durante aggiornamenti e uso prolungato.
+Il follow-up resta manutenzione P1 e non avanza la feature attiva D0.
+
+Decisioni operative:
+
+- il runtime aggiornato resta sempre nella stessa directory installata
+  `.../SEED/runtime`; non vengono create directory runtime versionate;
+- l'applicazione resta atomica: estrazione in directory temporanea, backup
+  transitorio, sostituzione della directory corrente, health check e rollback;
+- i backup runtime transitori e i marker update hanno retention limitata;
+- i pacchetti update applicati o falliti non restano indefinitamente nello
+  staging; un package referenziato da `pending_update.json` e sempre protetto;
+- backup manuali/UI dell'utente non vengono eliminati automaticamente;
+- versioni attiva, rollback, known-good e versioni richieste da candidate non
+  terminali non possono essere eliminate, indipendentemente dal limite;
+- descendant ed evaluator run si eliminano soltanto per candidate terminali;
+  stato lineage assente, invalido o ambiguo implica conservazione fail-closed;
+- memoria, config, credenziali, lineage append-only e `.part` riprendibili non
+  vengono toccati.
+
+Test richiesti:
+
+- due update consecutivi modificano gli stessi path runtime senza creare
+  sibling versionati e mantengono rollback funzionante;
+- active/rollback/known-good e parent di candidate aperte sopravvivono alla
+  retention anche quando sono i piu vecchi;
+- backup manuali sopravvivono, backup automatici e runtime backup rispettano i
+  limiti;
+- package pending e `.part` sopravvivono, package orfani e history eccedente
+  vengono rimossi;
+- candidate non terminali conservano descendant/evaluation; artefatti di
+  candidate terminali possono essere rimossi oltre il limite.
+
+Evidenze di verifica (2026-06-21):
+
+- `670` test distinti passati in processi separati, inclusi `8` test con OPF
+  reale, updater, supervisor, rollback, packaging, UI, voice e worker sandbox;
+- due update consecutivi sostituiscono la stessa directory `runtime` e il test
+  esclude directory sibling `runtime-v*`;
+- la retention dei runtime backup usa il timestamp monotono nel nome creato dal
+  supervisor, non l'`mtime` ereditato da `copytree`: il backup appena creato non
+  puo essere scambiato per il piu vecchio prima del health check;
+- watcher OPF terminabile e weak-reference: lo shutdown non accumula thread e
+  non attende indefinitamente un modello ancora in caricamento;
+- `ruff check seed scripts tests`, `compileall seed scripts` e
+  `git diff --check` passati; rimosso un import inutilizzato che bloccava lint.
+
+Rischi residui:
+
+- i file `.part` vengono conservati per permettere resume dopo interruzione;
+  possono occupare temporaneamente fino alla dimensione del runtime, ma non
+  vengono duplicati per tentativi ripetuti della stessa versione;
+- backup manuali e artefatti con formato sconosciuto restano fail-closed e non
+  vengono rimossi automaticamente, quindi richiedono pulizia esplicita se
+  creati fuori dai flussi gestiti;
+- la release installabile deve essere rigenerata dopo merge per distribuire il
+  fix ai tester; questa verifica riguarda il sorgente e il workflow locale.
+
 ## Feature Context Pack - P2 Lint E Riduzione Dimensioni
 
 **Feature esatta:** `P2 - Lint E Riduzione Dimensioni`, terza fase del programma

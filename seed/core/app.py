@@ -443,6 +443,7 @@ class SeedApp:
         self.daemon.stop()
         self.observation_collector.stop()
         self.scheduler.stop()
+        self.gate.close()
         self.memory.close()
 
     # ------------------------------------------------------------------

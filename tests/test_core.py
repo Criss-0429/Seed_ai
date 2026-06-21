@@ -62,7 +62,7 @@ class TestPrivacy:
     @pytest.fixture()
     def gate(self, tmp_path):
         mem = Memory(tmp_path / "t.db")
-        return PrivacyGate(mem), mem
+        return PrivacyGate(mem, backend="regex"), mem
 
     def test_email_redacted_and_stable(self, gate):
         g, _ = gate
@@ -188,7 +188,7 @@ class TestEvolution:
 
         monkeypatch.setattr(forbidden, "seed_data_dir", lambda: tmp_path / "SEED")
         mem = Memory(tmp_path / "e.db")
-        gate = PrivacyGate(mem)
+        gate = PrivacyGate(mem, backend="regex")
         broker = PermissionBroker(mem, ask_callback=lambda r: {"decision": "allow", "remember": False})
 
         class MockLLM:
