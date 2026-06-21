@@ -422,7 +422,7 @@ class JsApi:
             return {"decision": "deny", "remember": False}
 
 
-def run_window(app, *, start_hidden: bool = False) -> None:
+def run_window(app, *, start_hidden: bool = False, instance=None) -> None:
     import webview  # pywebview
 
     api = JsApi(app)
@@ -459,6 +459,10 @@ def run_window(app, *, start_hidden: bool = False) -> None:
                       on_quick=lambda: _summon(True),
                       on_quit=_quit_from_tray) is not None:
             api._tray_active = True
+        # Seconda apertura -> questa istanza primaria si mostra invece di
+        # lasciar partire un nuovo processo.
+        if instance is not None:
+            instance.start_show_listener(lambda: _summon(False))
         if start_hidden:
             window.hide()
             app.memory.add_event("window_started_hidden_for_heartbeat", {})

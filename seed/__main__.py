@@ -58,6 +58,21 @@ def main() -> int:
         return isolated_main()
 
     _setup_logging()
+
+    # Single-instance: se SEED gira gia', mostra quella finestra ed esci PRIMA
+    # di caricare app/modelli/DB (evita processi accavallati e lock sul DB).
+    gui_mode = not any(
+        flag in argv for flag in ("--smoke", "--repl", "--run-tool", "--run-isolated-tool"))
+    instance = None
+    if gui_mode:
+        from .ui.single_instance import SingleInstance
+        instance = SingleInstance()
+        if instance.already_running:
+            instance.signal_show()
+            logging.getLogger("seed").info(
+                "SEED gia' attivo: mostro l'istanza esistente e termino.")
+            return 0
+
     from .core.app import SeedApp
     app = SeedApp()
     from .supervisor import emit_health_signal_from_env
@@ -79,7 +94,7 @@ def main() -> int:
         print(f"pywebview non disponibile ({exc}); avvio REPL.")
         app.repl()
         return 0
-    run_window(app, start_hidden="--background" in argv)
+    run_window(app, start_hidden="--background" in argv, instance=instance)
     return 0
 
 
